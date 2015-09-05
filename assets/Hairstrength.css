@@ -1,0 +1,28 @@
+#Hairstrength .container {
+  margin-top: 15px;
+  padding: 15px;
+}
+#Hairstrength .hidden {
+  display: none;
+}
+#Hairstrength .show {
+  display: flex;
+}
+#Hairstrength ::-webkit-scrollbar {
+  width: 10px;
+}
+#Hairstrength .main-container {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  text-align: center;
+}
+#Hairstrength .col-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+#Hairstrength .table-container {
+  display: flex;
+  justify-content: space-around;
+}
