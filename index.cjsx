@@ -19,9 +19,10 @@ fs = require 'fs-extra'
 isLastDay = ->
   lastDay = false
   today = new Date()
+  today.setUTCHours(today.getUTCHours()+9)    #mapping Tokyo(00:00) to UTC(00:00)
   tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate()+1)
-  if today.getMonth() isnt tomorrow.getMonth()
+  tomorrow.setUTCDate(today.getUTCDate()+1)
+  if today.getUTCMonth() isnt tomorrow.getUTCMonth()
     lastDay = true
   lastDay
 
@@ -33,22 +34,23 @@ isFalse = (item) ->
 getRefreshTime = (type) ->
   date = new Date()
   hour = date.getUTCHours()
-  timeDelta = 60 * 60 * 1000 * 12
   if type is 'next'
-    time = [18, 6]
-    offset = [0, 1]
+    offset = 12 
   else
-    time = [6, 18]
-    offset = [-1, 0]
-  if hour in [6..17]
-    date.setUTCHours(time[0])
-    date.setUTCDate(date.getUTCDate() + offset[0])
+    offset = 0
+  
+  if hour < 6
+    freshHour = -6    #UTC lastDay's 18:00(Tokyo today's 3:00)
+  else if hour < 18
+    freshHour = 6
   else
-    date.setUTCHours(time[1])
-    date.setUTCDate(date.getUTCDate() + offset[1])
+    freshHour = 18
+  
+  date.setUTCHours(freshHour + offset)
+  
   date.setUTCMinutes(0)
   date.setUTCSeconds(0)
-
+  
   date.getTime()
 
 timeToRefresh = ->
