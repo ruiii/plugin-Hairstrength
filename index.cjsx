@@ -29,28 +29,32 @@ isTrue = (item) ->
   item is true
 isFalse = (item) ->
   item is false
+
 getRefreshTime = (type) ->
   date = new Date()
   hour = date.getUTCHours()
+  timeDelta = 60 * 60 * 1000 * 12
   if type is 'next'
     time = [18, 6]
-    offset = 0
+    offset = [0, 1]
   else
     time = [6, 18]
-    offset = -1
+    offset = [-1, 0]
   if hour in [6..17]
     date.setUTCHours(time[0])
-    #date.setUTCDate(date.getUTCDate() + offset[0])
+    date.setUTCDate(date.getUTCDate() + offset[0])
   else
     date.setUTCHours(time[1])
-    date.setUTCDate(date.getUTCDate() + offset)
+    date.setUTCDate(date.getUTCDate() + offset[1])
+  date.setUTCMinutes(0)
+  date.setUTCSeconds(0)
 
   date.getTime()
 
 timeToRefresh = ->
   anHour = 60 * 60 * 1000
   date = new Date()
-  if isLastDay() and (date.getUTCHours() + 9) > 15
+  if isLastDay() and (date.getUTCHours() + 9) in [15..21]
     ten = (22 - 9) * anHour
     time = 24 * anHour - (Date.now() - ten) % (24 * anHour)
   else
@@ -179,13 +183,15 @@ module.exports =
                 @saveData baseDetail
     updateCountdown: ->
       {countdown, needToUpdate, nextUpdateTime} = @state
-      if getCountdown() > 0 and nextUpdateTime isnt 0
+      if getCountdown() >= 1 and nextUpdateTime isnt 0
         countdown = getCountdown()
         @setState
           countdown: countdown
-      else
+      else if getCountdown() < 1
         for index in [0..needToUpdate.length - 1]
           needToUpdate[index] = true
+        @setState
+          needToUpdate: needToUpdate
     saveData: (baseDetail) ->
       try
         fs.writeJSONSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}.json"), baseDetail
@@ -205,9 +211,10 @@ module.exports =
         baseDetail.exp = exp
         for index in [0..needToUpdate.length - 1]
           needToUpdate[index] = true
-      else if (getRefreshTime('') - baseDetail.updateTime) > 43200000 # 60 * 60 * 1000 * 12
-        for index in [0..needToUpdate.length - 1]
-          needToUpdate[index] = true
+      else
+        if (getRefreshTime('') - baseDetail.updateTime) > 43199000 # 60 * 60 * 1000 * 12
+          for index in [0..needToUpdate.length - 1]
+            needToUpdate[index] = true
       @setState
         baseDetail: baseDetail
         memberId: parseInt memberId
@@ -230,9 +237,9 @@ module.exports =
             <div style={getStatusStyle update[0]}>
               <h5>截止至  {timeToString detail.updateTime} 时</h5>
               <h5>顺位:  {detail.ranking}位 ({
-                                                  if detail.rankingDelta > 0
+                                                  if detail.rankingDelta < 0
                                                     "↑#{detail.rankingDelta}"
-                                                  else if detail.rankingDelta < 0
+                                                  else if detail.rankingDelta > 0
                                                     "↓#{detail.rankingDelta}"
                                                   else
                                                     '-'})</h5>
