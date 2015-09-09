@@ -126,8 +126,8 @@ module.exports =
     componentWillUpdate: (nextProps, nextState) ->
       {baseDetail, senka} = @state
       if baseDetail.exp? and baseDetail.exp isnt null
-        if (nextState.exp - baseDetail.exp) > 1400 or senka is 0
-          senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1400)
+        if (nextState.exp - baseDetail.exp) > 1428 or senka is 0
+          senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
           if senka isnt (senkaDelta + baseDetail.rate)
             @setState
               senka: senkaDelta + baseDetail.rate
