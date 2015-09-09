@@ -35,37 +35,43 @@ getRefreshTime = (type) ->
   date = new Date()
   hour = date.getUTCHours()
   if type is 'next'
-    offset = 12 
+    offset = 12
+  else if type is 'account'
+    offset = 12 - 1
   else
     offset = 0
-  
+
   if hour < 6
     freshHour = -6    #UTC lastDay's 18:00(Tokyo today's 3:00)
   else if hour < 18
     freshHour = 6
   else
     freshHour = 18
-  
+
   date.setUTCHours(freshHour + offset)
-  
+
   date.setUTCMinutes(0)
   date.setUTCSeconds(0)
-  
+
   date.getTime()
 
-timeToRefresh = ->
+timeToRefresh = (type) ->
   anHour = 60 * 60 * 1000
   date = new Date()
+  if type is 'refresh'
+    offset = 0
+  else
+    offset = -1
   if isLastDay() and (date.getUTCHours() + 9) in [15..21]
     ten = (22 - 9) * anHour
     time = 24 * anHour - (Date.now() - ten) % (24 * anHour)
   else
-    three = anHour * (9 - 3)
+    three = anHour * (9 - 3 + offset)
     time = 12 * anHour - ((Date.now() - three) % (12 * anHour))
   time
 
-getCountdown = ->
-  timeToRefresh() / 1000
+getCountdown = (type) ->
+  timeToRefresh(type) / 1000
 
 timeToString = (time) ->
   date = new Date(time)
@@ -82,7 +88,7 @@ emptyDetail =
   updateTime: null,
   ranking: null,
   rankingDelta: null,
-  rate: null,
+  rate: 0,
   rateDelta: 0,
   exp: 0,
   senkaList: [0, 0, 0, 0, 0]
@@ -94,7 +100,7 @@ module.exports =
   author: 'Rui'
   link: 'https://github.com/ruiii'
   description: '战果计算器'
-  version: '1.0.0'
+  version: '1.1.0'
   reactClass: React.createClass
     getInitialState: ->
       needToUpdate = []
@@ -103,10 +109,12 @@ module.exports =
       baseDetail: Object.clone emptyDetail
       memberId: ''
       nickname: ''
+      nextAccountTime: 0
       nextUpdateTime: 0
       senka: 0
       exp: 0
-      countdown: -1
+      updateCountdown: -1
+      accountCountdown: -1
       ranks: [1, 5, 20, 100, 500]
       needToUpdate: needToUpdate
     componentDidMount: ->
@@ -123,7 +131,6 @@ module.exports =
           if senka isnt (senkaDelta + baseDetail.rate)
             @setState
               senka: senkaDelta + baseDetail.rate
-
     handleResponse: (e) ->
       {path, body} = e.detail
       if @state.needToUpdate.every isFalse
@@ -135,9 +142,11 @@ module.exports =
               memberId = body.api_member_id
               exp = body.api_experience
               nextUpdateTime = timeToString getRefreshTime('next')
+              nextAccountTime = timeToString getRefreshTime('account')
               @getDataFromFile memberId, exp
               @setState
                 nextUpdateTime: nextUpdateTime
+                nextAccountTime: nextAccountTime
                 nickname: body.api_nickname
                 exp: exp
           when '/kcsapi/api_req_mission/result'
@@ -184,12 +193,14 @@ module.exports =
               if needToUpdate.every isFalse
                 @saveData baseDetail
     updateCountdown: ->
-      {countdown, needToUpdate, nextUpdateTime} = @state
-      if getCountdown() >= 1 and nextUpdateTime isnt 0
-        countdown = getCountdown()
+      {refreshCountdown, accountCountdown, needToUpdate, nextUpdateTime} = @state
+      if getCountdown('refresh') >= 1 and nextUpdateTime isnt 0
+        refreshCountdown = getCountdown('refresh')
+        accountCountdown = getCountdown('')
         @setState
-          countdown: countdown
-      else if getCountdown() < 1
+          refreshCountdown: refreshCountdown
+          accountCountdown: accountCountdown
+      else if getCountdown('refresh') < 1
         for index in [0..needToUpdate.length - 1]
           needToUpdate[index] = true
         @setState
@@ -233,7 +244,7 @@ module.exports =
         {
           detail = @state.baseDetail
           update = @state.needToUpdate
-          {nickname, nextUpdateTime, countdown, exp, senka, ranks} = @state
+          {nickname, nextUpdateTime, nextAccountTime, refreshCountdown, accountCountdown, exp, senka, ranks} = @state
           <div style={getStatusStyle(update.every isTrue)}>
             <h4>{nickname}提督</h4>
             <div style={getStatusStyle update[0]}>
@@ -251,17 +262,32 @@ module.exports =
                                                   else
                                                     '-'})</h5>
             </div>
-            <div className='col-container'>
-              <h6 style={if isLastDay() then color: 'red' else color: 'inherit'}>
-                结算/刷新时间: {nextUpdateTime} 时
-              </h6>
-              <h6 style={if isLastDay() then color: 'red' else color: 'inherit'}>
-                距离刷新: {window.resolveTime countdown}
-              </h6>
+            <div className='table-container'
+                 style={if isLastDay() then color: 'red' else color: 'inherit'}>
+              <div className='col-container'>
+                <span>结算时间</span>
+                <span>{nextAccountTime} 时</span>
+                <span>距离结算</span>
+                <span>{window.resolveTime accountCountdown}</span>
+              </div>
+              <div className='col-container'>
+                <span>刷新时间</span>
+                <span>{nextUpdateTime} 时</span>
+                <span>距离刷新</span>
+                <span>{window.resolveTime refreshCountdown}</span>
+              </div>
             </div>
-            <div className='col-container'>
-              <span>经验值: {detail.exp} -> {exp} ( 增值: {exp - detail.exp} )</span>
-              <span>战果值: {detail.rate} -> {senka} ( 增值: {senka - detail.rate} )</span>
+            <div className='table-container'>
+              <div className='col-container'>
+                <span>经验值:</span>
+                <span>{detail.exp} -> {exp}</span>
+                <span>( 增值: {exp - detail.exp} )</span>
+              </div>
+              <div className='col-container'>
+                <span>战果值:</span>
+                <span>{detail.rate} -> {senka}</span>
+                <span>( 增值: {senka - detail.rate} )</span>
+              </div>
             </div>
             <div>
               <div className='table-container'>
