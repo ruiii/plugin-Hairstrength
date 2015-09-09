@@ -197,6 +197,10 @@ module.exports =
       if getCountdown('refresh') >= 1 and nextUpdateTime isnt 0
         refreshCountdown = getCountdown('refresh')
         accountCountdown = getCountdown('')
+        if accountCountdown < 1
+          nextAccountTime = timeToString getRefreshTime('account')
+          @setState
+            nextAccountTime: nextAccountTime
         @setState
           refreshCountdown: refreshCountdown
           accountCountdown: accountCountdown
