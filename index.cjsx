@@ -106,6 +106,7 @@ module.exports =
       baseDetail: Object.clone emptyDetail
       memberId: ''
       nickname: ''
+      accounted: false
       nextAccountTime: 0
       nextUpdateTime: 0
       senka: 0
@@ -198,24 +199,30 @@ module.exports =
               if needToUpdate.every isFalse
                 @saveData baseDetail
     updateCountdown: ->
-      {needToUpdate, nextUpdateTime} = @state
+      {needToUpdate, nextUpdateTime, accounted} = @state
       if getCountdown('refresh') >= 1 and nextUpdateTime isnt 0
         refreshCountdown = getCountdown('refresh')
-        accountCountdown = getCountdown('')
+        if getCountdown('') <= 1
+          accounted = true
+        if accounted
+          accountCountdown = 0
+        else
+          accountCountdown = getCountdown('')
         @setState
+          accounted: accounted
           refreshCountdown: refreshCountdown
           accountCountdown: accountCountdown
-      else if getCountdown('') <= 1
-        nextAccountTime = timeToString getRefreshTime('account')
-        @setState
-          nextAccountTime: nextAccountTime
       else if getCountdown('refresh') < 1
         for index in [0..needToUpdate.length - 1]
           needToUpdate[index] = true
+        accounted = false
         nextUpdateTime = timeToString getRefreshTime('next')
+        nextAccountTime = timeToString getRefreshTime('account')
         @setState
+          accounted: accounted
           needToUpdate: needToUpdate
           nextUpdateTime: nextUpdateTime
+          nextAccountTime: nextAccountTime
     saveData: (baseDetail) ->
       try
         fs.writeJSONSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}.json"), baseDetail
