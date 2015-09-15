@@ -1,0 +1,31 @@
+{
+  "name": "plugin-hairstrength",
+  "version": "1.1.0",
+  "description": "senka calculator for poi",
+  "main": "index.js",
+  "dependencies": {
+    "i18n": "^0.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruiii/plugin-Hairstrength.git"
+  },
+  "keywords": [
+    "senka",
+    "kancolle",
+    "poi",
+    "plugin",
+    "senka",
+    "calculator"
+  ],
+  "author": "Rui",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ruiii/plugin-Hairstrength/issues"
+  },
+  "homepage": "https://github.com/ruiii/plugin-Hairstrength#readme"
+}
