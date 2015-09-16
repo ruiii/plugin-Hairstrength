@@ -12,5 +12,7 @@
   "Before refresh": "距离刷新",
   "Experience": "经验值",
   "Increment": "增值",
-  "It will save when all rates is updated": "更新完所有的战果值之后才会保存"
+  "It will save when all rates is updated": "更新完所有的战果值之后才会保存",
+  "Presumed rate": "推定战果",
+  "Presumed experience": "推定经验值"
 }

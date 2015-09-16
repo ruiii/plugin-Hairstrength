@@ -107,6 +107,8 @@ module.exports =
       memberId: ''
       nickname: ''
       accounted: false
+      presumedSenka: 0
+      apresumedExp: 0
       nextAccountTime: 0
       nextUpdateTime: 0
       senka: 0
@@ -197,17 +199,21 @@ module.exports =
               if needToUpdate.every isFalse
                 @saveData baseDetail
     updateCountdown: ->
-      {needToUpdate, nextUpdateTime, accounted} = @state
+      {needToUpdate, nextUpdateTime, accounted, senka, baseDetail, exp, presumedSenka, presumedExp} = @state
       if getCountdown('refresh') >= 1 and nextUpdateTime isnt 0
         refreshCountdown = getCountdown('refresh')
         if getCountdown('') <= 1
           accounted = true
+          presumedSenka = (senka - detail.rate).toFixed(1)
+          presumedExp = exp - baseDetail.exp
         if accounted
           accountCountdown = 0
         else
           accountCountdown = getCountdown('')
         @setState
           accounted: accounted
+          presumedSenka: presumedSenka
+          presumedExp: presumedExp
           refreshCountdown: refreshCountdown
           accountCountdown: accountCountdown
       else if getCountdown('refresh') < 1
@@ -260,7 +266,7 @@ module.exports =
         {
           detail = @state.baseDetail
           update = @state.needToUpdate
-          {nickname, nextUpdateTime, nextAccountTime, refreshCountdown, accountCountdown, exp, senka, ranks} = @state
+          {nickname, nextUpdateTime, nextAccountTime, refreshCountdown, accountCountdown, exp, senka, ranks, presumedExp, presumedSenka, accounted} = @state
           <div style={getStatusStyle(update.every isTrue)}>
             <h4>{__('Admiral　%s　', nickname)}</h4>
             <div style={getStatusStyle update[0]}>
@@ -285,6 +291,14 @@ module.exports =
                 <span>{nextAccountTime}</span>
                 <span>{__ 'Before account'}</span>
                 <span>{window.resolveTime accountCountdown}</span>
+              </div>
+              <div className={if accounted then 'show' else 'hidden'}>
+                <div className='col-container'>
+                  <span>{__ 'Presumed experience'}</span>
+                  <span>{presumedExp}</span>
+                  <span>{__ 'Presumed rate'}</span>
+                  <span>{presumedSenka}</span>
+                </div>
               </div>
               <div className='col-container'>
                 <span>{__ "Refresh time"}</span>
