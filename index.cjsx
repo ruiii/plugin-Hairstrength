@@ -122,16 +122,14 @@ module.exports =
       window.addEventListener 'game.response', @handleResponse
       clearInterval @updateCountdown, 1000
     componentWillUpdate: (nextProps, nextState) ->
-      {baseDetail, senka} = @state
-      if baseDetail.exp? and baseDetail.exp isnt null
-        if (nextState.exp - baseDetail.exp) > 1428 or senka is 0
-          #senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
-          #ByAya: new estimate method.
-          #       A guess of Katokawa's method: Senka = Math.floor((Exp - absOffset)/1428)
-          senkaDelta = ((nextState.exp - baseDetail.exp ) / 1428)
-          if (senkaDelta + baseDetail.rate - senka) > 0.1
-            @setState
-              senka: (senkaDelta + baseDetail.rate - 0.05).toFixed(1)
+      {senka} = @state
+      if nextState.baseDetail.exp? and nextState.baseDetail.exp isnt 0
+        #senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
+        #A guess of Katokawa's method: Senka = Math.floor((Exp - absOffset)/1428)
+        senkaDelta = ((nextState.exp - nextState.baseDetail.exp ) / 1428)
+        if (senkaDelta + nextState.baseDetail.rate - senka) > 0.1
+          @setState
+            senka: parseFloat((senkaDelta + nextState.baseDetail.rate - 0.05).toFixed(1))
     handleResponse: (e) ->
       {path, body} = e.detail
       switch path
@@ -163,15 +161,15 @@ module.exports =
           if @state.needToUpdate.every isFalse
             return 0
           else
-            {needToUpdate, memberId, baseDetail, ranks, senka} = @state
+            {needToUpdate, memberId, baseDetail, ranks} = @state
             refreshFlag = false
             for teitoku in body.api_list
               if needToUpdate[0] and teitoku.api_member_id is memberId
                 #teitoku.api_member_id is memberId and baseDetail.rate isnt teitoku.api_rate
-                #ByAya,Estimate the rate with the offset;
+                #Estimate the rate with the offset;
                 _rate = Math.floor((teitoku.api_experience - baseDetail.exp) / 1428)
                 _rate = baseDetail.rate + _rate
-                if (teitoku.api_rate - _rate) % 10 isnt 0 #ByAya: %10 to ignore Extra Operation Map Senka.
+                if (teitoku.api_rate - _rate) % 10 isnt 0 # %10 to ignore Extra Operation Map Senka.
                   _newBaseExp = teitoku.api_experience
                 else
                   _newBaseExp = teitoku.api_experience - ((teitoku.api_experience - baseDetail.exp) % 1428)
@@ -182,7 +180,7 @@ module.exports =
                 baseDetail.updateTime = getRefreshTime('')
                 baseDetail.rate = teitoku.api_rate
                 baseDetail.ranking = ranking
-                baseDetail.exp = _newBaseExp   #ByAya:
+                baseDetail.exp = _newBaseExp
                 needToUpdate[0] = false
                 refreshFlag = true
               if teitoku.api_no in ranks
