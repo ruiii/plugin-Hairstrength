@@ -123,7 +123,7 @@ module.exports =
       clearInterval @updateCountdown, 1000
     componentWillUpdate: (nextProps, nextState) ->
       {senka} = @state
-      if nextState.baseDetail.exp? and nextState.baseDetail.exp isnt null
+      if nextState.baseDetail.exp? and nextState.baseDetail.exp isnt 0
         #senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
         #A guess of Katokawa's method: Senka = Math.floor((Exp - absOffset)/1428)
         senkaDelta = ((nextState.exp - nextState.baseDetail.exp ) / 1428)
