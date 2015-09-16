@@ -108,7 +108,7 @@ module.exports =
       nickname: ''
       accounted: false
       presumedSenka: 0
-      apresumedExp: 0
+      presumedExp: 0
       nextAccountTime: 0
       nextUpdateTime: 0
       senka: 0
