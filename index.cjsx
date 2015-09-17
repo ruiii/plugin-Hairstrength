@@ -204,7 +204,7 @@ module.exports =
         refreshCountdown = getCountdown('refresh')
         if getCountdown('') <= 1
           accounted = true
-          presumedSenka = (senka - detail.rate).toFixed(1)
+          presumedSenka = (senka - baseDetail.rate).toFixed(1)
           presumedExp = exp - baseDetail.exp
         if accounted
           accountCountdown = 0
