@@ -121,7 +121,7 @@ module.exports =
       window.addEventListener 'game.response', @handleResponse
       setInterval @updateCountdown, 1000
     componentWillUnmount: ->
-      window.addEventListener 'game.response', @handleResponse
+      window.removeEventListener 'game.response', @handleResponse
       clearInterval @updateCountdown, 1000
     componentWillUpdate: (nextProps, nextState) ->
       {senka} = @state
