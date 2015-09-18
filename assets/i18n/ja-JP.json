@@ -1,3 +1,18 @@
 {
-
+  "Hairstrength": "禿げ",
+  "Senka calculator": "戦果計算器",
+  "Please click the stats to update rankings": "戦果を更新するためランキングを訪問してください",
+  "Admiral　%s　": "　%s　提督",
+  "By:　%s　": "　%s　まで",
+  "Ranking": "順位",
+  "Rate": "戦果",
+  "Account time": "決済時",
+  "Before account": "決済まで",
+  "Refresh time": "更新時",
+  "Before refresh": "更新まで",
+  "Experience": "経験値",
+  "Increment": "増分",
+  "It will save when all rates is updated": "すべでのランキングを更新した後にセーブされます",
+  "Presumed rate": "推定戦果",
+  "Presumed experience": "推定経験値"
 }
