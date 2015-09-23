@@ -92,7 +92,7 @@ module.exports =
       memberId: ''
       nickname: ''
       exp: 0
-      timeUp: false
+      timeUp: true
       accounted: false
       isUpdated: []
       ranks: [1, 5, 20, 100, 500]
@@ -118,7 +118,8 @@ module.exports =
         fs.appendFileSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'data'), data
       catch e
         error "Write senkaData error!#{e}"
-    getDataFromFile: (memberId) ->
+    getDataFromFile: (memberId, exp) ->
+      {timeUp} = @state
       try
         fs.ensureDirSync join(APPDATA_PATH, 'hairstrength', memberId)
         baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', memberId, 'detail.json')
@@ -131,13 +132,17 @@ module.exports =
         data = data.split '\n'
         data = data.filter (item) ->
           item isnt ''
+        timeUp = false
       else
         data = Object.clone emptyData
+        timeUp = true
       @setState
         baseDetail: baseDetail
         memberId: parseInt memberId
         data: data
+        timeUp: timeUp
     isAccounted: ->
+      @saveData @state.baseDetail
       @setState
         accounted: !@state.accounted
     isTimeUp: ->
@@ -152,9 +157,9 @@ module.exports =
         @setState
           isUpdated: isUpdated
           ranks: ranks
-        window.addEventListener 'refresh.list', @handleRefreshList
+        window.addEventListener 'game.response', @handleRefreshList
       else
-        window.removeEventListener 'refresh.list', @handleRefreshList
+        window.removeEventListener 'game.response', @handleRefreshList
       @setState
         timeUp: !@state.timeUp
     handleRefreshList: (e) ->

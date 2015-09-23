@@ -23,6 +23,12 @@
   padding: 10px;
   width: 50%;
 }
+#Hairstrength .row-container {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  width: 50%;
+}
 #Hairstrength .table-container {
   display: flex;
   justify-content: space-around;

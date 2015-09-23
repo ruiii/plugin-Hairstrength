@@ -7,9 +7,9 @@ ExpListener = React.createClass
     senka: 0
     exp: 0
   componentDidMount: ->
-    window.addEventListener 'exp.change', @handleResponse
+    window.addEventListener 'game.response', @handleResponse
   componentWillUnmount: ->
-    window.removeEventListener 'exp.change', @handleResponse
+    window.removeEventListener 'game.response', @handleResponse
   componentWillReceiveProps: (nextProps) ->
     if nextProps.accounted is true and nextProps.accounted isnt @props.accounted
       @props.setPresumedSenka @state.senka
@@ -21,10 +21,10 @@ ExpListener = React.createClass
     if nextState.exp? and nextState.exp isnt 0
       #senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
       #A guess of Katokawa's method: Senka = Math.floor((Exp - absOffset)/1428)
-      senkaDelta = ((nextState.exp - nextProps.data[data.length - 1][3]) / 1428)
-      if (senkaDelta + nextProps.data[data.length - 1][2] - senka) > 0.1
+      senkaDelta = ((nextState.exp - nextProps.data[nextProps.data.length - 1][3]) / 1428)
+      if (senkaDelta + nextProps.data[nextProps.data.length - 1][2] - senka) > 0.1
         @setState
-          senka: parseFloat((senkaDelta + nextProps.nextProps.data[data.length - 1][2] - 0.05).toFixed(1))
+          senka: parseFloat((senkaDelta + nextProps.data[nextProps.data.length - 1][2] - 0.05).toFixed(1))
   handleResponse: (e) ->
     if !@props.timeUp
       {path, body} = e.detail
@@ -43,25 +43,17 @@ ExpListener = React.createClass
             exp: body.api_member_exp
   render: ->
     <div className='table-container'>
-      <div>
-        <div className='col-container'>
-          <span>{__ 'Experience'}</span>
-          <span>{@props.data[@props.data.length - 1][3]}　->　{@state.exp}</span>
-        </div>
-        <div className='col-container'>
-          <span>( {__ 'Increment'}</span>
-          <span>{@state.exp - @props.data[@props.data.length - 1][3]} )</span>
-        </div>
+      <div className='col-container'>
+        <span>{__ 'Experience'}</span>
+        <span>{@props.data[@props.data.length - 1][3]} -> {@state.exp}</span>
+        <span>{__ 'Increment'}</span>
+        <span>{@state.exp - @props.data[@props.data.length - 1][3]}</span>
       </div>
-      <div>
-        <div className='col-container'>
-          <span>{__ 'Rate'}</span>
-          <span>{@props.data[@props.data.length - 1][2]}　->　{@state.senka}</span>
-        </div>
-        <div className='col-container'>
-          <span>( {__ 'Increment'}</span>
-          <span>{(@state.senka - @props.data[@props.data.length - 1][2]).toFixed(1)} )</span>
-        </div>
+      <div className='col-container'>
+        <span>{__ 'Rate'}</span>
+        <span>{@props.data[@props.data.length - 1][2]} -> {@state.senka}</span>
+        <span>{__ 'Increment'}</span>
+        <span>{(@state.senka - @props.data[@props.data.length - 1][2]).toFixed(1)}</span>
       </div>
     </div>
 
