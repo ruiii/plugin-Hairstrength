@@ -234,7 +234,7 @@ module.exports =
             {__ 'Please click the stats to update rankings'}
           </Alert>
         {
-          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp} = @state
+          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka} = @state
           <div style={getStatusStyle timeUp}>
             <Detail data={data}
                     baseDetail={baseDetail}
@@ -253,6 +253,7 @@ module.exports =
                          exp={exp}
                          accounted={accounted}
                          timeUp={timeUp}
+                         baseSenka={baseSenka}
                          setPresumedSenka={@setPresumedSenka} />
             <RankList  baseDetail={baseDetail}
                        isUpdated={isUpdated}
