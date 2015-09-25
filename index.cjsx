@@ -115,7 +115,7 @@ module.exports =
         error "Write senkaDetail error!#{e}"
     addData: (data) ->
       try
-        fs.appendFileSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'data'), data
+        fs.appendFileSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'data'), "#{data}\n", 'utf-8'
       catch e
         error "Write senkaData error!#{e}"
     getDataFromFile: (memberId, exp) ->
@@ -128,7 +128,7 @@ module.exports =
         error "Read file form hairstrength error!#{e}"
       if !baseDetail?
         baseDetail = Object.clone emptyDetail
-      if data?
+      if data?.length > 0
         data = data.split '\n'
         data = data.filter (item) ->
           item isnt ''
@@ -239,7 +239,8 @@ module.exports =
                        isTimeUp={@isTimeUp}
                        timeUp={timeUp}
                        baseDetail={baseDetail}
-                       data={data} />
+                       data={data}
+                       timeToString={timeToString} />
             <ExpListener data={data}
                          exp={exp}
                          accounted={accounted}
@@ -250,7 +251,7 @@ module.exports =
                        timeUp={timeUp}
                        isTrue={isTrue}
                        getStatusStyle={getStatusStyle}
-                       checkedChange={@checkedChange} />
+                       handleCheckedChange={@handleCheckedChange} />
           </div>
         }
         </div>

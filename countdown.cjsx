@@ -54,8 +54,8 @@ getCountdown = (type) ->
 
 Countdown = React.createClass
   getInitialState: ->
-    nextAccountTime: 0
-    nextRefreshTime: 0
+    nextAccountTime: @props.timeToString getRefreshTime('account')
+    nextRefreshTime: @props.timeToString getRefreshTime('next')
     refreshCountdown: 0
     accountCountdown: 0
   componentDidMount: ->
