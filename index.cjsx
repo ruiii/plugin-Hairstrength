@@ -95,7 +95,7 @@ module.exports =
       nickname: ''
       exp: 0
       baseSenka: '0.0'  #basesenka for show
-      timeUp: true
+      timeUp: false
       accounted: false
       isUpdated: []
       ranks: [1, 5, 20, 100, 500]
