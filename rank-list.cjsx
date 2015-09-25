@@ -26,7 +26,7 @@ RankList = React.createClass
         senkaList.splice index, 0, null
         isUpdated = @props.isUpdated
         isUpdated.splice index, 0, false
-        @props.checkedChange rankListChecked, senkaList, isUpdated
+        @props.handleCheckedChange rankListChecked, senkaList, isUpdated
       @setState {rankListChecked}
   render: ->
     <div className='col-container'>

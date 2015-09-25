@@ -53,6 +53,7 @@ getRefreshTime = (type) ->
   date.setUTCHours(freshHour + offset)
   date.setUTCMinutes(0)
   date.setUTCSeconds(0)
+  date.setUTCMilliseconds(0)
 
   date.getTime()
 
@@ -72,6 +73,7 @@ getStatusStyle = (flag) ->
 emptyData = [[null, 0, 0, 0]]
 
 emptyDetail =
+  adjustedExp: 0,     #exp for adjust
   isAccounted: false,
   presumedSenka: 0,
   rankListChecked: [true, true, true, true, true],
@@ -92,6 +94,7 @@ module.exports =
       memberId: ''
       nickname: ''
       exp: 0
+      baseSenka: '0.0'  #basesenka for show
       timeUp: true
       accounted: false
       isUpdated: []
@@ -104,9 +107,13 @@ module.exports =
         when '/kcsapi/api_get_member/basic'
           if @state.memberId isnt body.api_member_id
             @getDataFromFile body.api_member_id, body.api_experience
+            if  @state.data[@state.data.length - 1][0] isnt getRefreshTime('') # if not refreshed ,mark as timeup
+              @isTimeUp()
+             baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.05).toFixed(1)
             @setState
               exp: body.api_experience
               nickname: body.api_nickname
+              baseSenka: baseSenka
             window.removeEventListener 'game.response', @handleResponse
     saveData: (baseDetail) ->
       try
@@ -119,11 +126,10 @@ module.exports =
       catch e
         error "Write senkaData error!#{e}"
     getDataFromFile: (memberId, exp) ->
-      {timeUp} = @state
       try
         fs.ensureDirSync join(APPDATA_PATH, 'hairstrength', memberId)
         baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', memberId, 'detail.json')
-        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, 'data')
+        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, 'data'), 'utf-8'
       catch e
         error "Read file form hairstrength error!#{e}"
       if !baseDetail?
@@ -132,22 +138,23 @@ module.exports =
         data = data.split '\n'
         data = data.filter (item) ->
           item isnt ''
-        timeUp = false
+        data = data.map (a) ->
+          a.split(',').map (a) ->
+            parseInt a
       else
         data = Object.clone emptyData
-        timeUp = true
       @setState
         baseDetail: baseDetail
         memberId: parseInt memberId
         data: data
-        timeUp: timeUp
     isAccounted: ->
-      @saveData @state.baseDetail
+      if !@state.accounted
+        @saveData @state.baseDetail
       @setState
         accounted: !@state.accounted
     isTimeUp: ->
       {timeUp, baseDetail, ranks} = @state
-      if timeUp
+      if !timeUp
         isUpdated = [false]
         for checked, index in baseDetail.rankListChecked
           if checked is false
@@ -166,7 +173,7 @@ module.exports =
       {path, body} = e.detail
       switch path
         when '/kcsapi/api_req_ranking/getlist'
-          {memberId, data, baseDetail, isUpdated, ranks, timeUp, accounted} = @state
+          {memberId, data, baseDetail, isUpdated, ranks, timeUp, accounted, baseSenka} = @state
           # updateTime, ranking, rate, exp
           baseRanking = data[data.length - 1][1]
           baseRate = data[data.length - 1][2]
@@ -177,22 +184,20 @@ module.exports =
               if teitoku.api_member_id is memberId and !isUpdated[0]
                 #teitoku.api_member_id is memberId and baseDetail.rate isnt teitoku.api_rate
                 #Estimate the rate with the offset;
-                _rate = Math.floor((teitoku.api_experience - baseExp) / 1428)
-                _rate = baseRate + _rate
-                if (teitoku.api_rate - _rate) % 10 isnt 0 # %10 to ignore Extra Operation Map Senka.
-                  _newBaseExp = teitoku.api_experience
+                _Senka = Math.floor((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + baseRate
+                if (teitoku.api_rate - _Senka) % 10 isnt 0 # %10 to ignore Extra Operation Map Senka.
+                  baseDetail.adjustedExp = teitoku.api_experience
                 else
-                  _newBaseExp = teitoku.api_experience - ((teitoku.api_experience - baseExp) % 1428)
-                _rate = Math.max(_rate, teitoku.api_rate)
+                  baseDetail.adjustedExp = teitoku.api_experience - ((teitoku.api_experience - baseDetail.adjustedExp) % 1428)
                 ranking = teitoku.api_no
                 newData[0] = getRefreshTime('')
                 newData[1] = ranking
                 newData[2] = teitoku.api_rate
-                newData[3] = _newBaseExp
+                newData[3] = teitoku.api_experience
+                baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.05).toFixed(1)
                 isUpdated[0] = true
                 @addData newData
-                accounted = false
-                timeUp = false
+                data.push newData #add new data to @state.data
                 refreshFlag = true
               if teitoku.api_no in ranks
                 index = ranks.indexOf teitoku.api_no
@@ -202,13 +207,15 @@ module.exports =
                   refreshFlag = true
               if refreshFlag
                 @setState
-                  accounted: accounted
-                  timeUp: timeUp
+                  baseSenka: baseSenka
                   baseDetail: baseDetail
                   isUpdated: isUpdated
                 refreshFlag = false
               if isUpdated.every isTrue
                 @saveData baseDetail
+                @isTimeUp() #mark not timeup if all lists are got
+                if accounted
+                  @isAccounted()
     setPresumedSenka: (presumedSenka) ->
       {baseDetail} = @state
       baseDetail.presumedSenka = presumedSenka
@@ -242,6 +249,7 @@ module.exports =
                        data={data}
                        timeToString={timeToString} />
             <ExpListener data={data}
+                         baseDetail={baseDetail}
                          exp={exp}
                          accounted={accounted}
                          timeUp={timeUp}
