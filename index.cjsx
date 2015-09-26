@@ -99,6 +99,7 @@ module.exports =
       accounted: false
       isUpdated: []
       ranks: [1, 5, 20, 100, 500]
+      rankList: [[true, true, true, true, true], [0, 0, 0, 0, 0]]
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
     handleResponse: (e) ->
@@ -143,18 +144,31 @@ module.exports =
             parseInt a
       else
         data = Object.clone emptyData
+      {rankList} = @state
+      rankList[0] = baseDetail.rankListChecked
+      rankList[1] = baseDetail.senkaList
       @setState
+        rankList: rankList
         baseDetail: baseDetail
         memberId: parseInt memberId
         data: data
     isAccounted: ->
-      if !@state.accounted
-        @saveData @state.baseDetail
+      {accounted, baseDetail, rankList} = @state
+      if !accounted
+        if rankList[0] isnt baseDetail.rankListChecked
+          baseDetail.rankListChecked = rankList[0]
+        if rankList[1] isnt baseDetail.senkaList
+          baseDetail.senkaList = rankList[1]
+        @saveData baseDetail
       @setState
-        accounted: !@state.accounted
+        accounted: !accounted
     isTimeUp: ->
-      {timeUp, baseDetail, ranks} = @state
+      {timeUp, baseDetail, ranks, rankList} = @state
       if !timeUp
+        if rankList[0] isnt baseDetail.rankListChecked
+          baseDetail.rankListChecked = rankList[0]
+        if rankList[1] isnt baseDetail.senkaList
+          baseDetail.senkaList = rankList[1]
         isUpdated = [false]
         for checked, index in baseDetail.rankListChecked
           if checked is false
@@ -162,13 +176,14 @@ module.exports =
           else
             isUpdated.push false
         @setState
+          baseDetail: baseDetail
           isUpdated: isUpdated
           ranks: ranks
         window.addEventListener 'game.response', @handleRefreshList
       else
         window.removeEventListener 'game.response', @handleRefreshList
       @setState
-        timeUp: !@state.timeUp
+        timeUp: !timeUp
     handleRefreshList: (e) ->
       {path, body} = e.detail
       switch path
@@ -221,10 +236,10 @@ module.exports =
       baseDetail.presumedSenka = presumedSenka
       @setState {baseDetail}
     handleCheckedChange: (rankListChecked, senkaList, isUpdated) ->
-      {baseDetail} = @state
-      baseDetail.rankListChecked = rankListChecked
-      baseDetail.senkaList = senkaList
-      @setState {baseDetail, isUpdated}
+      {rankList} = @state
+      rankList[0] = rankListChecked
+      rankList[1] = senkaList
+      @setState {rankList, isUpdated}
     render: ->
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
@@ -234,7 +249,7 @@ module.exports =
             {__ 'Please click the stats to update rankings'}
           </Alert>
         {
-          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks} = @state
+          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList} = @state
           <div style={getStatusStyle timeUp}>
             <Detail data={data}
                     baseDetail={baseDetail}
@@ -256,6 +271,7 @@ module.exports =
                          baseSenka={baseSenka}
                          setPresumedSenka={@setPresumedSenka} />
             <RankList  baseDetail={baseDetail}
+                       rankList={rankList}
                        ranks={ranks}
                        isUpdated={isUpdated}
                        timeUp={timeUp}
