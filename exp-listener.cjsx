@@ -48,19 +48,14 @@ ExpListener = React.createClass
           @setState
             exp: body.api_member_exp
   render: ->
-    <div className='table-container'>
-      <div className='col-container'>
-        <span>{__ 'Experience'}</span>
-        <span>{@props.data[@props.data.length - 1][3]}　->　{@state.exp}</span>
-        <span>{__ 'Increment'}</span>
-        <span>{@state.exp - @props.data[@props.data.length - 1][3]}</span>
-      </div>
-      <div className='col-container'>
-        <span>{__ 'Rate'}</span>
-        <span>{@props.baseSenka}　->　{@state.senka}</span>
-        <span>{__ 'Increment'}</span>
-        <span>{(@state.senka - @props.baseSenka).toFixed(1)}</span>
-      </div>
+    {baseSenka, data} = @props
+    {senka, exp} = @state
+    baseExp = data[data.length - 1][3]
+    <div className='exp-listener'>
+      <span>{__ 'Experience'}</span>
+      <span>{baseExp}　->　{exp}　( ↑ {exp - baseExp} )</span>
+      <span>{__ 'Rate'}</span>
+      <span>{baseSenka}　->　{senka}　( ↑ {(senka - baseSenka).toFixed(1)} )</span>
     </div>
 
 module.exports = ExpListener

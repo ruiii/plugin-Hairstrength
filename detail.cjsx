@@ -1,4 +1,5 @@
-{React} = window
+{React, ReactBootstrap, FontAwesome} = window
+{OverlayTrigger, Tooltip} = ReactBootstrap
 i18n = require './node_modules/i18n'
 {__} = i18n
 
@@ -43,25 +44,39 @@ Detail = React.createClass
       else
         rate[0] = ''
     <div className='main-container'>
-      <h4>{__('Admiral　%s　', nickname)}</h4>
-      <h5>{__('By:　%s　', timeToString(updateTime))}</h5>
-      <div className='row-container'>
-        <div className='col-container'>
-          <span>{__ 'Time'}</span>
-          <span>{__ 'Rate'}</span>
-          <span>{__ 'Ranking'}</span>
-        </div>
-        <div className='col-container'>
-          <span>{time[1]}</span>
-          <span>{rate[1]}</span>
-          <span>{ranking[1]}</span>
-        </div>
-        <div className='col-container'>
-          <span>{time[0]}</span>
-          <span>{rate[0]}</span>
-          <span>{ranking[0]}</span>
-        </div>
-      </div>
+      <h4 className='admiral-name'>{__('Admiral　%s　', nickname)}</h4>
+      <OverlayTrigger trigger='click' placement='bottom' overlay={
+        <Tooltip>
+          <div className='table-container'>
+            <div className='row-container'>
+              <span>{__ 'Time'}</span>
+              <span>{__ 'Rate'}</span>
+              <span>{__ 'Ranking'}</span>
+            </div>
+            <div className='row-container'>
+              <span>{time[1]}</span>
+              <span>{rate[1]}</span>
+              <span>{ranking[1]}</span>
+            </div>
+            <div className='row-container'>
+              <span>{time[0]}</span>
+              <span>{rate[0]}</span>
+              <span>{ranking[0]}</span>
+            </div>
+          </div>
+        </Tooltip>
+      }>
+        <h5 className='detail-time'>
+          {__('By:　%s　', timeToString(updateTime))}
+          <OverlayTrigger placement='top' overlay={
+            <Tooltip>
+              <span>点击查看本月战绩</span>
+            </Tooltip>
+          }>
+            <FontAwesome key={0} name='book' />
+          </OverlayTrigger>
+        </h5>
+      </OverlayTrigger>
     </div>
 
 module.exports = Detail
