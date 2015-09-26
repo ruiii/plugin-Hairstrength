@@ -193,6 +193,10 @@ module.exports =
           baseRanking = data[data.length - 1][1]
           baseRate = data[data.length - 1][2]
           baseExp = data[data.length - 1][3]
+          update = []
+          for item, index in baseDetail.rankListChecked
+            continue if !item
+            update.push ranks[index]
           newData = []
           refreshFlag = false
           for teitoku in body.api_list
@@ -214,8 +218,8 @@ module.exports =
                 @addData newData
                 data.push newData #add new data to @state.data
                 refreshFlag = true
-              if teitoku.api_no in ranks
-                index = ranks.indexOf teitoku.api_no
+              if teitoku.api_no in update
+                index = update.indexOf teitoku.api_no
                 if !isUpdated[index + 1]
                   baseDetail.senkaList[index] = teitoku.api_rate
                   isUpdated[index + 1] = true
