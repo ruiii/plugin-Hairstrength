@@ -1,73 +1,61 @@
 {React, ReactBootstrap, FontAwesome} = window
-{OverlayTrigger, Tooltip} = ReactBootstrap
+{OverlayTrigger, Tooltip, Table} = ReactBootstrap
 i18n = require './node_modules/i18n'
 {__} = i18n
 
-getpaneltaStyle = (delta) ->
-  if delta < 0
-    "↑#{Math.abs delta}"
-  else if delta > 0
-    "↓#{delta}"
-  else
-    '-'
+timeToString = (time) ->
+  if time isnt null
+    date = new Date(time)
+
+    "#{date.getMonth()+1}-#{date.getDate()} #{date.getHours()}:00"
+
+DataItem = React.createClass
+  render: ->
+    <tr>
+      {
+        for item, index in @props.data
+          if index is 0
+            <td key={index}>{timeToString item}</td>
+          else
+            if index is @props.data.length - 1
+              item = "↑#{item}"
+            <td key={index}>{item}</td>
+      }
+    </tr>
 
 Detail = React.createClass
   render: ->
     # updateTime, ranking, rate, exp
-    {data, nickname, timeToString, accounted, baseDetail} = @props
-    time = [0, 0]
-    rate = [0, 0]
-    ranking = [0, 0]
-    rateDelta = [0, 0]
-    time[0] = data[data.length - 1][0]
-    time[1] = data[data.length - 2]?[0]
-    ranking[0] = data[data.length - 1][1]
-    ranking[1] = data[data.length - 2]?[1]
-    rate[0] = data[data.length - 1][2]
-    rate[1] = data[data.length - 2]?[2]
-    rateDelta[0] = data[data.length - 2]?[2] - data[data.length - 1][2]
-    rateDelta[1] = data[data.length - 3]?[2] - data[data.length - 2]?[2]
-    updateTime = data[data.length - 1][0]
-    if time[0] isnt null
-      time[0] = timeToString time[0]
-    if time[1] isnt null
-      time[1] = timeToString time[1]
-    if accounted
-      text = __ 'Presumed rate'
-      rate[0] = baseDetail.presumedSenka
-      rate[1] = data[data.length - 1][2]
-    else
-      text = __ 'Rate'
-      rate[0] = data[data.length - 1][2]
-      if data[data.length - 2]?
-        rate[1] = data[data.length - 2][2]
-      else
-        rate[0] = ''
+    {data, nickname, accounted, baseDetail, timeToString} = @props
     <div className='main-container'>
       <h4 className='admiral-name'>{__('Admiral　%s　', nickname)}</h4>
       <OverlayTrigger trigger='click' placement='bottom' overlay={
         <Tooltip>
-          <div className='table-container'>
-            <div className='row-container'>
-              <span>{__ 'Time'}</span>
-              <span>{__ 'Rate'}</span>
-              <span>{__ 'Ranking'}</span>
-            </div>
-            <div className='row-container'>
-              <span>{time[1]}</span>
-              <span>{rate[1]}</span>
-              <span>{ranking[1]}</span>
-            </div>
-            <div className='row-container'>
-              <span>{time[0]}</span>
-              <span>{rate[0]}</span>
-              <span>{ranking[0]}</span>
-            </div>
-          </div>
+          <Table striped bordered condensed hover Responsive>
+            <thead>
+              <tr>
+                <th>{__ 'Time'}</th>
+                <th>{__ 'Ranking'}</th>
+                <th>{__ 'Rate'}</th>
+                <th>Rate Delta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                for detail, index in data
+                  if index is 0
+                    delta = detail[2]
+                  else
+                    delta = detail[2] - data[index - 1][2]
+                  detail.splice 3, 1, delta
+                  <DataItem key={index} data={detail} />
+              }
+            </tbody>
+          </Table>
         </Tooltip>
       }>
         <h5 className='detail-time'>
-          {__('By:　%s　', timeToString(updateTime))}
+          {__('By:　%s　', timeToString(data[0][0]))}
           <OverlayTrigger placement='top' overlay={
             <Tooltip>
               <span>点击查看本月战绩</span>

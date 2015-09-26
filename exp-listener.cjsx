@@ -53,9 +53,11 @@ ExpListener = React.createClass
     baseExp = data[data.length - 1][3]
     <div className='exp-listener'>
       <span>{__ 'Experience'}</span>
-      <span>{baseExp}　->　{exp}　( ↑ {exp - baseExp} )</span>
+      <span>{baseExp}　->　{exp}</span>
+      <span>( ↑ {exp - baseExp} )</span>
       <span>{__ 'Rate'}</span>
-      <span>{baseSenka}　->　{senka}　( ↑ {(senka - baseSenka).toFixed(1)} )</span>
+      <span>{baseSenka}　->　{senka}</span>
+      <span>( ↑ {(senka - baseSenka).toFixed(1)} )</span>
     </div>
 
 module.exports = ExpListener
