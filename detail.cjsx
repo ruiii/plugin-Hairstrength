@@ -43,12 +43,14 @@ Detail = React.createClass
             <tbody>
               {
                 for detail, index in data
+                  _detail = []
+                  for n,idx in detail
+                    _detail[idx] = n                 
                   if index is 0
-                    delta = detail[2]
+                    _detail[3] = detail[2]
                   else
-                    delta = detail[2] - data[index - 1][2]
-                  detail.splice 3, 1, delta
-                  <DataItem key={index} data={detail} />
+                    _detail[3] = detail[2] - data[index - 1][2]
+                  <DataItem key={index} data={_detail} />
               }
             </tbody>
           </Table>
