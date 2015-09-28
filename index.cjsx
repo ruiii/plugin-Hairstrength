@@ -95,28 +95,39 @@ module.exports =
       nickname: ''
       exp: 0
       baseSenka: '0.0'  #basesenka for show
+      updatedFlag: true
       timeUp: false
       accounted: false
-      isUpdated: []
+      isUpdated: [false, false, false, false, false, false]
       ranks: [1, 5, 20, 100, 500]
       rankList: [[true, true, true, true, true], [0, 0, 0, 0, 0]]
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
     handleResponse: (e) ->
       {path, body} = e.detail
+      {isUpdated} = @state
       switch path
         when '/kcsapi/api_get_member/basic'
           if @state.memberId isnt body.api_member_id
             @getDataFromFile body.api_member_id, body.api_experience
             if  @state.data[@state.data.length - 1][0] isnt getRefreshTime('') # if not refreshed ,mark as timeup
               @isTimeUp()
-             baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.05).toFixed(1)
+            else 
+              isUpdated[0] = true
+              for rank, idx in @state.baseDetail.senkaList
+                if rank isnt 0 
+                  isUpdated[idx + 1] = true
+            baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.05).toFixed(1)
             @setState
               exp: body.api_experience
               nickname: body.api_nickname
-              baseSenka: baseSenka
+              baseSenka: baseSenka            
+              isUpdated: isUpdated
             window.removeEventListener 'game.response', @handleResponse
     saveData: (baseDetail) ->
+      for senka, idx in baseDetail.senkaList
+        if !@state.isUpdated[idx + 1]
+          senkaList = 0
       try
         fs.writeJSONSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'detail.json'), baseDetail
       catch e
@@ -155,35 +166,24 @@ module.exports =
     isAccounted: ->
       {accounted, baseDetail, rankList} = @state
       if !accounted
-        if rankList[0] isnt baseDetail.rankListChecked
-          baseDetail.rankListChecked = rankList[0]
-        if rankList[1] isnt baseDetail.senkaList
-          baseDetail.senkaList = rankList[1]
         @saveData baseDetail
       @setState
         accounted: !accounted
     isTimeUp: ->
-      {timeUp, baseDetail, ranks, rankList} = @state
+      {timeUp, baseDetail, rankList, updatedFlag, isUpdated} = @state
       if !timeUp
-        if rankList[0] isnt baseDetail.rankListChecked
-          baseDetail.rankListChecked = rankList[0]
-        if rankList[1] isnt baseDetail.senkaList
-          baseDetail.senkaList = rankList[1]
-        isUpdated = [false]
-        for checked, index in baseDetail.rankListChecked
-          if checked is false
-            ranks.splice index, 1
-          else
-            isUpdated.push false
-        @setState
-          baseDetail: baseDetail
-          isUpdated: isUpdated
-          ranks: ranks
+        isUpdated = [false, false, false, false, false, false]
+        baseDetail.senkaList = [0, 0, 0, 0, 0]
+        updatedFlag = false
         window.addEventListener 'game.response', @handleRefreshList
       else
+        updatedFlag = true
         window.removeEventListener 'game.response', @handleRefreshList
       @setState
-        timeUp: !timeUp
+        baseDetail: baseDetail
+        isUpdated: isUpdated
+        updatedFlag: updatedFlag
+        timeUp: !timeUp        
     handleRefreshList: (e) ->
       {path, body} = e.detail
       switch path
@@ -193,10 +193,6 @@ module.exports =
           baseRanking = data[data.length - 1][1]
           baseRate = data[data.length - 1][2]
           baseExp = data[data.length - 1][3]
-          update = []
-          for item, index in baseDetail.rankListChecked
-            continue if !item
-            update.push ranks[index]
           newData = []
           refreshFlag = false
           for teitoku in body.api_list
@@ -218,8 +214,8 @@ module.exports =
                 @addData newData
                 data.push newData #add new data to @state.data
                 refreshFlag = true
-              if teitoku.api_no in update
-                index = update.indexOf teitoku.api_no
+              if teitoku.api_no in ranks
+                index = ranks.indexOf teitoku.api_no
                 if !isUpdated[index + 1]
                   baseDetail.senkaList[index] = teitoku.api_rate
                   isUpdated[index + 1] = true
@@ -230,20 +226,38 @@ module.exports =
                   baseDetail: baseDetail
                   isUpdated: isUpdated
                 refreshFlag = false
-              if isUpdated.every isTrue
+              
+              updatedFlag = true
+              if isUpdated[0] 
+                for check, idx in baseDetail.rankListChecked
+                  if check and !isUpdated[idx + 1]
+                    updatedFlag = false
+              else 
+                updatedFlag = false
+
+              if updatedFlag
                 @saveData baseDetail
-                @isTimeUp() #mark not timeup if all lists are got
+                if timeUp
+                  @isTimeUp() #mark not timeup if all lists are got
+                else
+                  @handleCheckedChange updatedFlag
                 if accounted
                   @isAccounted()
     setPresumedSenka: (presumedSenka) ->
       {baseDetail} = @state
       baseDetail.presumedSenka = presumedSenka
       @setState {baseDetail}
-    handleCheckedChange: (rankListChecked, senkaList, isUpdated) ->
-      {rankList} = @state
-      rankList[0] = rankListChecked
-      rankList[1] = senkaList
-      @setState {rankList, isUpdated}
+    handleCheckedChange: (updatedFlag) ->
+      {baseDetail, timeUp} = @state
+      if !updatedFlag and !timeUp
+        window.addEventListener 'game.response', @handleRefreshList
+      else if updatedFlag and timeUp
+        timeUp = false
+        @saveData baseDetail
+        window.removeEventListener 'game.response', @handleRefreshList
+      @setState 
+        updatedFlag: updatedFlag
+        timeUp: timeUp
     render: ->
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
@@ -253,7 +267,7 @@ module.exports =
             {__ 'Please click the stats to update rankings'}
           </Alert>
         {
-          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList} = @state
+          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList, updatedFlag} = @state
           <div style={getStatusStyle timeUp}>
             <Detail data={data}
                     baseDetail={baseDetail}
@@ -278,7 +292,7 @@ module.exports =
                        rankList={rankList}
                        ranks={ranks}
                        isUpdated={isUpdated}
-                       timeUp={timeUp}
+                       updatedFlag={updatedFlag}
                        isTrue={isTrue}
                        getStatusStyle={getStatusStyle}
                        handleCheckedChange={@handleCheckedChange} />
