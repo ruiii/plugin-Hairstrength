@@ -65,7 +65,7 @@ RankList = React.createClass
                 for checked, index in @props.rankList[0]
                   continue if !checked
                   <span key={index} style={@props.getStatusStyle !@props.isUpdated[index+1]}>
-                    {@props.rankList[1][index]}
+                    {@props.baseDetail.senkaList[index]}
                   </span>
             }
           </div>
