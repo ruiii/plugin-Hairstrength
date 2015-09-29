@@ -170,19 +170,15 @@ module.exports =
       @setState
         accounted: !accounted
     isTimeUp: ->
-      {timeUp, baseDetail, rankList, updatedFlag, isUpdated} = @state
+      {timeUp, baseDetail, rankList, isUpdated} = @state
       if !timeUp
         isUpdated = [false, false, false, false, false, false]
         baseDetail.senkaList = [0, 0, 0, 0, 0]
-        updatedFlag = false
-        window.addEventListener 'game.response', @handleRefreshList
-      else
-        updatedFlag = true
-        window.removeEventListener 'game.response', @handleRefreshList
+        flag = false
+        @handleCheckedChange flag
       @setState
         baseDetail: baseDetail
         isUpdated: isUpdated
-        updatedFlag: updatedFlag
         timeUp: !timeUp        
     handleRefreshList: (e) ->
       {path, body} = e.detail
@@ -214,50 +210,51 @@ module.exports =
                 @addData newData
                 data.push newData #add new data to @state.data
                 refreshFlag = true
+                if accounted
+                  @isAccounted()
+                if timeUp
+                  @isTimeUp() #mark not timeup if all lists are got
+              
               if teitoku.api_no in ranks
                 index = ranks.indexOf teitoku.api_no
                 if !isUpdated[index + 1]
                   baseDetail.senkaList[index] = teitoku.api_rate
                   isUpdated[index + 1] = true
                   refreshFlag = true
-              if refreshFlag
-                @setState
-                  baseSenka: baseSenka
-                  baseDetail: baseDetail
-                  isUpdated: isUpdated
-                refreshFlag = false
-              
-              updatedFlag = true
-              if isUpdated[0] 
-                for check, idx in baseDetail.rankListChecked
-                  if check and !isUpdated[idx + 1]
-                    updatedFlag = false
-              else 
-                updatedFlag = false
 
-              if updatedFlag
-                @saveData baseDetail
-                if timeUp
-                  @isTimeUp() #mark not timeup if all lists are got
-                else
-                  @handleCheckedChange updatedFlag
-                if accounted
-                  @isAccounted()
+          if refreshFlag
+            @setState
+              baseSenka: baseSenka
+              baseDetail: baseDetail
+              isUpdated: isUpdated
+            refreshFlag = false
+
+          if @checkUpdate()
+             @handleCheckedChange true
+    checkUpdate: ->
+      {isUpdated, baseDetail} = @state
+      flag = true
+      if isUpdated[0] 
+        for check, idx in baseDetail.rankListChecked
+          if check and !isUpdated[idx + 1]
+            flag = false
+          else 
+            updatedFlag = false
+
+      flag
     setPresumedSenka: (presumedSenka) ->
       {baseDetail} = @state
       baseDetail.presumedSenka = presumedSenka
       @setState {baseDetail}
-    handleCheckedChange: (updatedFlag) ->
-      {baseDetail, timeUp} = @state
-      if !updatedFlag and !timeUp
+    handleCheckedChange: (flag) ->
+      {baseDetail, timeUp, updatedFlag} = @state
+      if !flag and updatedFlag
         window.addEventListener 'game.response', @handleRefreshList
-      else if updatedFlag and timeUp
-        timeUp = false
+      else if flag and !updatedFlag
         @saveData baseDetail
         window.removeEventListener 'game.response', @handleRefreshList
       @setState 
-        updatedFlag: updatedFlag
-        timeUp: timeUp
+        updatedFlag: flag        
     render: ->
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
