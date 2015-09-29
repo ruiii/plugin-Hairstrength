@@ -57,7 +57,7 @@ Detail = React.createClass
         </Tooltip>
       }>
         <h5 className='detail-time'>
-          {__('By:　%s　', timeToString(data[0][0]))}
+          {__('By:　%s　', timeToString(data[data.length - 1][0]))}
           <OverlayTrigger placement='top' overlay={
             <Tooltip>
               <span>点击查看本月战绩</span>
