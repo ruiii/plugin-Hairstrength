@@ -13,16 +13,17 @@ RankList = React.createClass
     @setState {filterShow}
   handleClickCheckbox: (index) ->
     {rankList, baseDetail, isUpdated} = @props
-    if rankList[0] isnt []
-      flag = false
-      if rankList[0][index]
-        rankList[1][index] = null
-      else
-        rankList[1][index] = baseDetail.senkaList[index]
-        if baseDetail.senkaList[index] is null
-          isUpdated.splice index, 1, false
-      rankList[0][index] = !rankList[0][index]
-      @props.handleCheckedChange rankList[0], rankList[1], isUpdated
+    rankList[0][index] = !rankList[0][index]
+    updatedFlag = true
+    if isUpdated[0]
+      for check, idx in rankList[0]
+        if check and !isUpdated[idx + 1]
+          updatedFlag = false
+          break
+    else 
+      updatedFlag = false    
+    @props.handleCheckedChange updatedFlag
+    
   render: ->
     <div className='table-container'>
       <div className='col-container'>
@@ -44,7 +45,7 @@ RankList = React.createClass
       </div>
       <div className='col-container'>
         <Alert bsStyle='danger'
-               className={if @props.isUpdated.every @props.isTrue then 'hidden' else 'show'} >
+               className={if @props.updatedFlag then 'hidden' else 'show'} >
           {__ 'It will save when all rates is updated'}
         </Alert>
         <div className='table-container'>
@@ -63,7 +64,7 @@ RankList = React.createClass
               if @props.rankList?
                 for checked, index in @props.rankList[0]
                   continue if !checked
-                  <span key={index} style={@props.getStatusStyle @props.isUpdated[index+1]}>
+                  <span key={index} style={@props.getStatusStyle !@props.isUpdated[index+1]}>
                     {@props.rankList[1][index]}
                   </span>
             }
