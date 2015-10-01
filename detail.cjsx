@@ -79,12 +79,18 @@ Detail = React.createClass
             <TabPane eventKey={1} tab='1-10'>
               <DataTable data={partOne} />
             </TabPane>
-            <TabPane eventKey={2} tab='10-20'>
-              <DataTable data={partTwo} />
-            </TabPane>
-            <TabPane eventKey={3} tab='20-'>
-              <DataTable data={partThree} />
-            </TabPane>
+            {
+              if partTwo.length > 0
+                <TabPane eventKey={2} tab='10-20'>
+                  <DataTable data={partTwo} />
+                </TabPane>
+            }
+            {
+              if partThree.length > 0
+                <TabPane eventKey={3} tab='20-'>
+                  <DataTable data={partThree} />
+                </TabPane>
+            }
           </TabbedArea>
         </Tooltip>
       }>
