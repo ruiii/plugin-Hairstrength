@@ -69,10 +69,6 @@ Countdown = React.createClass
   componentWillUnmount: ->
     clearInterval @updateCountdown, 1000
   componentWillReceiveProps: (nextProps) ->
-      console.log "test"
-      console.log @props.timeUp
-      console.log nextProps.timeUp
-      console.log "endtest"
       if @props.timeUp and !nextProps.timeUp
         @setState          
           nextRefreshTime: getRefreshTime('next')
