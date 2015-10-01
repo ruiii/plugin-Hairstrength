@@ -6,7 +6,7 @@ ExpListener = React.createClass
   getInitialState: ->
     senka: '0.0'
     exp: 0
-    exRate: [0, 0]
+    exRate: 0
   componentDidMount: ->
     window.addEventListener 'game.response', @handleResponse
   componentWillUnmount: ->
@@ -14,26 +14,26 @@ ExpListener = React.createClass
   componentWillReceiveProps: (nextProps) ->
     if nextProps.accounted is true and nextProps.accounted isnt @props.accounted
       @props.setPresumedSenka @state.senka
-      @state.exRate[1] = @state.exRate[0]
-      @state.exRate[0] = 0
     if @state.exp is 0 and nextProps.exp isnt 0
       @setState
         exp: nextProps.exp
-    if nextProps.timeUp is false and @props.timeUp is true
-      @state.exRate[1] = 0
+    if @props.eoAccounted and !nextProps.eoAccounted
+      @setState
+        exRate: 0
+        senka: '0.0'
   componentWillUpdate: (nextProps, nextState) ->
     {exRate, senka} = @state
     if nextProps.baseDetail.adjustedExp? and nextProps.baseDetail.adjustedExp isnt 0  #judge if initialled
       #senkaDelta = Math.floor((nextState.exp - baseDetail.exp) / 1428)
       #A guess of Katokawa's method: Senka = Math.floor((Exp - absOffset)/1428)
       senkaDelta = ((nextState.exp - nextProps.baseDetail.adjustedExp) / 1428)
-      if (senkaDelta + nextProps.data[nextProps.data.length - 1][2] + exRate[0] + exRate[1] - senka) > 0.1
+      if (senkaDelta + nextProps.data[nextProps.data.length - 1][2] + exRate - senka) > 0.1 or (senkaDelta + nextProps.data[nextProps.data.length - 1][2] + exRate - senka) < 0
         @setState
-          senka: (senkaDelta + nextProps.data[nextProps.data.length - 1][2] + exRate[0] + exRate[1] - 0.05).toFixed(1)
+          senka: (senkaDelta + nextProps.data[nextProps.data.length - 1][2] + exRate - 0.0499).toFixed(1)
   handleResponse: (e) ->
-    if !@props.timeUp
+    if !@props.accounted
       {path, body} = e.detail
-      {exp, exRate} = @state
+      {exp} = @state
       switch path
         when '/kcsapi/api_req_mission/result'
           @setState
@@ -47,6 +47,18 @@ ExpListener = React.createClass
         when '/kcsapi/api_req_combined_battle/battleresult'
           @setState
             exp: body.api_member_exp
+    else if !@props.eoAccounted #listen before EOACCOUNTED
+        {path, body} = e.detail
+        {exRate} = @state
+      switch path
+        when '/kcsapi/api_req_mission/result'
+          if body.api_get_exmap_rate isnt 0
+            exRate += parseInt body.api_get_exmap_rate
+            @setState {exRate}
+        when '/kcsapi/api_req_map/next'
+          if body.api_get_eo_rate?
+            exRate += body.api_get_eo_rate
+            @setState {exRate}
   render: ->
     {baseSenka, data} = @props
     {senka, exp} = @state
