@@ -101,6 +101,7 @@ module.exports =
       isUpdated: [false, false, false, false, false, false]
       ranks: [1, 5, 20, 100, 500]
       rankList: [[true, true, true, true, true], [0, 0, 0, 0, 0]]
+      eoAccounted: false
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
     handleResponse: (e) ->
@@ -117,11 +118,11 @@ module.exports =
               for rank, idx in @state.baseDetail.senkaList
                 if rank isnt 0 
                   isUpdated[idx + 1] = true
-            baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.05).toFixed(1)
+            baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.0499).toFixed(1)
             @setState
               exp: body.api_experience
               nickname: body.api_nickname
-              baseSenka: baseSenka            
+              baseSenka: baseSenka
               isUpdated: isUpdated
             window.removeEventListener 'game.response', @handleResponse
     saveData: (baseDetail) ->
@@ -163,10 +164,16 @@ module.exports =
         baseDetail: baseDetail
         memberId: parseInt memberId
         data: data
+    isEOAccounted: ->
+      {eoAccounted} = @state
+      @setState
+        eoAccounted: !eoAccounted
     isAccounted: ->
       {accounted, baseDetail, rankList} = @state
       if !accounted
         @saveData baseDetail
+      if @state.eoAccounted #only use to unlock eoaccount
+        isEOAccounted
       @setState
         accounted: !accounted
     isTimeUp: ->
@@ -179,7 +186,7 @@ module.exports =
       @setState
         baseDetail: baseDetail
         isUpdated: isUpdated
-        timeUp: !timeUp        
+        timeUp: !timeUp
     handleRefreshList: (e) ->
       {path, body} = e.detail
       switch path
@@ -205,7 +212,7 @@ module.exports =
                 newData[1] = ranking
                 newData[2] = teitoku.api_rate
                 newData[3] = teitoku.api_experience
-                baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.05).toFixed(1)
+                baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.0499).toFixed(1)
                 isUpdated[0] = true
                 @addData newData
                 data.push newData #add new data to @state.data
@@ -254,7 +261,7 @@ module.exports =
         @saveData baseDetail
         window.removeEventListener 'game.response', @handleRefreshList
       @setState 
-        updatedFlag: flag        
+        updatedFlag: flag
     render: ->
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
@@ -264,7 +271,7 @@ module.exports =
             {__ 'Please click the stats to update rankings'}
           </Alert>
         {
-          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList, updatedFlag} = @state
+          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList, updatedFlag, eoAccounted} = @state
           <div style={getStatusStyle timeUp}>
             <Detail data={data}
                     baseDetail={baseDetail}
@@ -272,6 +279,8 @@ module.exports =
                     timeToString={timeToString}
                     accounted={accounted} />
             <Countdown isAccounted={@isAccounted}
+                       isEOAccounted={@isEOAccounted}
+                       eoAccounted={eoAccounted}
                        accounted={accounted}
                        isTimeUp={@isTimeUp}
                        timeUp={timeUp}
@@ -284,6 +293,7 @@ module.exports =
                          accounted={accounted}
                          timeUp={timeUp}
                          baseSenka={baseSenka}
+                         eoAccounted={eoAccounted}
                          setPresumedSenka={@setPresumedSenka} />
             <RankList  baseDetail={baseDetail}
                        rankList={rankList}

@@ -2,15 +2,32 @@
 i18n = require './node_modules/i18n'
 {__} = i18n
 
+
+
+accountTimeString = [
+  __('Account time'),
+  'Normal map',
+  'Extra Operation map'
+]
+
+
+getFinalTime = (type)-> #get Final AccountTime EO for EO 
+  finalDate = new Date()
+  finalDate.setUTCHours(finalDate.getUTCHours() + 9)    #mapping Tokyo(00:00) to UTC(00:00)
+  finalDate.setUTCMonth(finalDate.getUTCMonth() + 1)
+  finalDate.setUTCDate(0)
+  if type is 'EO'
+    finalDate.setUTCHours(15)
+   else
+    finalDate.setUTCHours(13)
+  finalDate.setUTCMinutes(0)
+  finalDate.setUTCSeconds(0)
+  finalDate.setUTCMilliseconds(0)
+
+  finalDate.getTime()
+
 isLastDay = ->
-  lastDay = false
-  today = new Date()
-  today.setUTCHours(today.getUTCHours()+9)    #mapping Tokyo(00:00) to UTC(00:00)
-  tomorrow = new Date(today)
-  tomorrow.setUTCDate(today.getUTCDate()+1)
-  if today.getUTCMonth() isnt tomorrow.getUTCMonth()
-    lastDay = true
-  lastDay
+  return getFinalTime('EO') - Date.now() < 24 * 3600 * 1000
 
 getRefreshTime = (type) ->
   date = new Date()
@@ -30,69 +47,88 @@ getRefreshTime = (type) ->
   date.setUTCHours(freshHour + offset)
   date.setUTCMinutes(0)
   date.setUTCSeconds(0)
-
+  date.setUTCMilliseconds(0)
+  
   date.getTime()
 
-timeToRefresh = (type) ->
-  anHour = 60 * 60 * 1000
-  date = new Date()
-  if type is 'refresh'
-    offset = 0
-  else
-    offset = -1
-  if isLastDay() and (date.getUTCHours() + 9) in [15..21]
-    ten = (22 - 9) * anHour
-    time = 24 * anHour - (Date.now() - ten) % (24 * anHour)
-  else
-    three = anHour * (9 - 3 + offset)
-    time = 12 * anHour - ((Date.now() - three) % (12 * anHour))
-
-  time
+timeToRefresh = (refreshTime) ->
+  time = refreshTime - Date.now()
 
 getCountdown = (type) ->
   timeToRefresh(type) / 1000
 
 Countdown = React.createClass
   getInitialState: ->
-    nextAccountTime: @props.timeToString getRefreshTime('account')
-    nextRefreshTime: @props.timeToString getRefreshTime('next')
+    accountStage: 0 # 0 for normal 1 for final normal map 2 for final eo 
+    nextAccountTime: [getRefreshTime('account'), getFinalTime(), getFinalTime('EO')] 
+    nextRefreshTime: getRefreshTime('next')
     refreshCountdown: 0
     accountCountdown: 0
   componentDidMount: ->
     setInterval @updateCountdown, 1000
   componentWillUnmount: ->
     clearInterval @updateCountdown, 1000
+  componentWillReceiveProps: (nextProps) ->
+      if @props.timeUp and !nextProps.timeUp
+        @setState          
+          nextRefreshTime: getRefreshTime('next')
+          nextAccountTime: [getRefreshTime('account'), getFinalTime(), getFinalTime('EO')] 
   updateCountdown: ->
     if !@props.timeUp
-      if getCountdown('refresh') >= 1
-        {refreshCountdown, accountCountdown} = @state
-        refreshCountdown = getCountdown('refresh')
-        if getCountdown('') <= 1
-          @props.isAccounted()
-        if @props.accounted
+      if getCountdown(@state.nextRefreshTime) >= 1
+        {finalNormalTime, finalEOTime, nextAccountTime, nextRefreshTime, refreshCountdown, accountCountdown} = @state
+        refreshCountdown = getCountdown(nextRefreshTime)
+
+        #some logic to determine account Stage
+        if @props.eoAccounted
+          accountStage = 2
           accountCountdown = 0
+        else if getCountdown(nextAccountTime[2]) <= 0
+          accountStage = 2
+          accountCountdown = 0
+          @props.isEOAccounted()
+        else if getCountdown(nextAccountTime[1]) <= 0
+          accountStage = 2
+          accountCountdown = getCountdown(nextAccountTime[2])
+          if !@props.accounted
+            @props.isAccounted()
+        else if getCountdown(nextAccountTime[1]) <= 8 * 3600
+          accountStage = 1
+          accountCountdown = getCountdown(nextAccountTime[1])
         else
-          accountCountdown = getCountdown('')
+          accountStage = 0
+          if getCountdown(nextAccountTime[0]) <= 0 and !@props.accounted
+            @props.isAccounted()
+            accountCountdown = 0
+          else if @props.accounted
+            accountCountdown = 0
+          else
+            accountCountdown = getCountdown(nextAccountTime[0])
+
         @setState
           refreshCountdown: refreshCountdown
           accountCountdown: accountCountdown
-      else if getCountdown('refresh') <= 1
+          accountStage: accountStage
+      else if getCountdown(@state.nextRefreshTime) <= 0
         refreshCountdown = 0
-        @props.isTimeUp()
+        @props.isTimeUp()    
         @setState
           refreshCountdown: refreshCountdown
+          #nextRefreshTime: getRefreshTime('next')
+          #nextAccountTime: [getRefreshTime('account'), getFinalTime(), getFinalTime('EO')] 
   render: ->
+
     <div className='table-container'
          style={if isLastDay() then color: 'red' else color: 'inherit'}>
       <div className='col-container'>
-        <span>{__ 'Account time'}</span>
-        <span>{@state.nextAccountTime}</span>
+        <span>{accountTimeString[@state.accountStage]}</span>
+        <span>{@props.timeToString @state.nextAccountTime[@state.accountStage]}</span>
         <span>{__ 'Before account'}</span>
         <span>{window.resolveTime @state.accountCountdown}</span>
       </div>
       <div className='col-container'>
         <span>{__ "Refresh time"}</span>
-        <span>{@state.nextRefreshTime}</span>
+        <span>{@props.timeToString @state.nextRefreshTime}</span>
         <span>{__ "Before refresh"}</span>
         <span>{window.resolveTime @state.refreshCountdown}</span>
       </div>
