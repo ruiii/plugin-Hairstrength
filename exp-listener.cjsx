@@ -48,16 +48,16 @@ ExpListener = React.createClass
           @setState
             exp: body.api_member_exp
     else if !@props.eoAccounted #listen before EOACCOUNTED
-        {path, body} = e.detail
-        {exRate} = @state
+      {path, body} = e.detail
+      {exRate} = @state
       switch path
-        when '/kcsapi/api_req_mission/result'
-          if body.api_get_exmap_rate isnt 0
+        when '/kcsapi/api_req_sortie/battleresult'
+          if body.api_get_exmap_rate? and body.api_get_exmap_rate isnt 0
             exRate += parseInt body.api_get_exmap_rate
             @setState {exRate}
         when '/kcsapi/api_req_map/next'
           if body.api_get_eo_rate?
-            exRate += body.api_get_eo_rate
+            exRate += parseInt body.api_get_eo_rate
             @setState {exRate}
   render: ->
     {baseSenka, data} = @props
