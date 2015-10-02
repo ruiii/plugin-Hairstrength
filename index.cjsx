@@ -57,11 +57,13 @@ getRefreshTime = (type) ->
 
   date.getTime()
 
-timeToString = (time) ->
+timeToString = (time, isFilename = false) ->
   if time isnt null
     date = new Date(time)
-
-    "#{date.getFullYear()}-#{date.getMonth()+1}-#{date.getDate()} #{date.getHours()}:00"
+    if isFilename
+      "#{date.getFullYear()}-#{date.getMonth()+1}"
+    else
+      "#{date.getFullYear()}-#{date.getMonth()+1}-#{date.getDate()} #{date.getHours()}:00"
 
 getStatusStyle = (flag) ->
   if flag
@@ -113,10 +115,10 @@ module.exports =
             @getDataFromFile body.api_member_id, body.api_experience
             if  @state.data[@state.data.length - 1][0] isnt getRefreshTime('') # if not refreshed ,mark as timeup
               @isTimeUp()
-            else 
+            else
               isUpdated[0] = true
               for rank, idx in @state.baseDetail.senkaList
-                if rank isnt 0 
+                if rank isnt 0
                   isUpdated[idx + 1] = true
             baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.0499).toFixed(1)
             @setState
@@ -134,15 +136,17 @@ module.exports =
       catch e
         error "Write senkaDetail error!#{e}"
     addData: (data) ->
+      filename = timeToString data[0], true
       try
-        fs.appendFileSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'data'), "#{data}\n", 'utf-8'
+        fs.appendFileSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", "#{filename}"), "#{data}\n", 'utf-8'
       catch e
         error "Write senkaData error!#{e}"
     getDataFromFile: (memberId, exp) ->
+      filename = timeToString getRefreshTime(''), true
       try
         fs.ensureDirSync join(APPDATA_PATH, 'hairstrength', memberId)
         baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', memberId, 'detail.json')
-        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, 'data'), 'utf-8'
+        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, "#{filename}"), 'utf-8'
       catch e
         error "Read file form hairstrength error!#{e}"
       if !baseDetail?
@@ -215,13 +219,15 @@ module.exports =
                 baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.0499).toFixed(1)
                 isUpdated[0] = true
                 @addData newData
+                if (new Date()).getUTCDate() is 1
+                  data = []
                 data.push newData #add new data to @state.data
                 refreshFlag = true
                 if accounted
                   @isAccounted()
                 if timeUp
                   @isTimeUp() #mark not timeup if all lists are got
-              
+
               if teitoku.api_no in ranks
                 index = ranks.indexOf teitoku.api_no
                 if !isUpdated[index + 1]
@@ -230,10 +236,7 @@ module.exports =
                   refreshFlag = true
 
           if refreshFlag
-            @setState
-              baseSenka: baseSenka
-              baseDetail: baseDetail
-              isUpdated: isUpdated
+            @setState {baseSenka, baseDetail, isUpdated, data}
             refreshFlag = false
 
           if @checkUpdate()
@@ -241,13 +244,12 @@ module.exports =
     checkUpdate: ->
       {isUpdated, baseDetail} = @state
       flag = true
-      if isUpdated[0] 
+      if isUpdated[0]
         for check, idx in baseDetail.rankListChecked
           if check and !isUpdated[idx + 1]
             flag = false
-          else 
+          else
             updatedFlag = false
-
       flag
     setPresumedSenka: (presumedSenka) ->
       {baseDetail} = @state
@@ -260,7 +262,7 @@ module.exports =
       else if flag and !updatedFlag
         @saveData baseDetail
         window.removeEventListener 'game.response', @handleRefreshList
-      @setState 
+      @setState
         updatedFlag: flag
     render: ->
       <div>
