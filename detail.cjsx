@@ -44,7 +44,7 @@ DataTable = React.createClass
             if index is 0
               _detail[3] = detail[2]
             else
-              _detail[3] = detail[2] - @props.data[index - 1][2]
+              _detail[3] = detail[2] - @props.data[index - 2][2]
             <DataItem key={index} data={_detail} />
         }
       </tbody>
