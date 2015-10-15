@@ -18,7 +18,10 @@ DataItem = React.createClass
             <td style={padding: 2} key={index}>{dateToString item}</td>
           else
             if index is @props.data.length - 1
-              item = "↑#{item}"
+              if item is -1
+                item = __ 'No Data'
+              else
+                item = "↑#{item}"
             <td style={padding: 2} key={index}>{item}</td>
       }
     </tr>
@@ -44,7 +47,10 @@ DataTable = React.createClass
             if index is 0
               _detail[3] = detail[2]
             else
-              _detail[3] = detail[2] - @props.data[index - 2][2]
+              if (new Date(@props.data[index - 2][0])).getUTCHours() is 6
+                _detail[3] = detail[2] - @props.data[index - 2][2]
+              else
+                _detail[3] = -1
             <DataItem key={index} data={_detail} />
         }
       </tbody>
@@ -57,11 +63,12 @@ Detail = React.createClass
     @setState
       selectedKey: selectedKey
   render: ->
-    # updateTime, ranking, rate, exp
+    # data = [[updateTime, ranking, rate, exp] * n]
     {data, nickname, accounted, baseDetail, timeToString} = @props
     partOne = []
     partTwo = []
     partThree = []
+    rankingDelta = rateDelta = ''
     if data.length > 41
       partOne = data.slice 0, 20
       partTwo = data.slice 21, 40
@@ -71,6 +78,9 @@ Detail = React.createClass
       partTwo = data.slice 21, data.length - 1
     else
       partOne = data.slice 0, data.length - 1
+    if data.length >= 2 and data[data.length - 1][0] - data[data.length - 2][0] is 43200000
+      rankingDelta = data[data.length - 1][1] - data[data.length - 2][1]
+      rateDelta = data[data.length - 1][2] - data[data.length - 2][2]
     <div className='main-container'>
       <h4 className='admiral-name'>{__('Admiral　%s　', nickname)}</h4>
       <OverlayTrigger trigger='click' placement='bottom' overlay={
@@ -94,7 +104,7 @@ Detail = React.createClass
           </TabbedArea>
         </Tooltip>
       }>
-        <h5 className='detail-time'>
+        <h6 className='detail-time'>
           {__('By:　%s　', timeToString(data[data.length - 1][0]))}
           <OverlayTrigger placement='top' overlay={
             <Tooltip>
@@ -103,8 +113,16 @@ Detail = React.createClass
           }>
             <FontAwesome key={0} name='book' />
           </OverlayTrigger>
-        </h5>
+        </h6>
       </OverlayTrigger>
+      <h6>
+        {__ 'Ranking'}: {data[data.length - 1][1]}{if rankingDelta > 0
+                                                     "(↓#{rankingDelta})"
+                                                   else if rankingDelta < 0
+                                                     "(↑#{Math.abs rankingDelta})"}
+        　{__ 'Rate'}: {data[data.length - 1][2]}{if rateDelta > 0
+                                                  "(↑#{rateDelta})"}
+      </h6>
     </div>
 
 module.exports = Detail
