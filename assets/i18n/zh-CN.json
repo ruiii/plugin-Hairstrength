@@ -15,5 +15,9 @@
   "It will save when all rates is updated": "更新完所有的战果值之后才会保存",
   "Presumed rate": "推定战果",
   "Presumed experience": "推定经验值",
-  "No Data": "数据缺失"
+  "No Data": "数据缺失",
+  "Accounted": "已结算",
+  "EO map final time": "EO海图战果结算时间",
+  "Normal map final time": "普通海图战果结算时间",
+  "Click to show your rates this month": "点击查看本月战绩"
 }

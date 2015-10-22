@@ -12,18 +12,10 @@ RankList = React.createClass
     filterShow = not filterShow
     @setState {filterShow}
   handleClickCheckbox: (index) ->
-    {rankList, baseDetail, isUpdated} = @props
-    rankList[0][index] = !rankList[0][index]
-    updatedFlag = true
-    if isUpdated[0]
-      for check, idx in rankList[0]
-        if check and !isUpdated[idx + 1]
-          updatedFlag = false
-          break
-    else 
-      updatedFlag = false    
-    @props.handleCheckedChange updatedFlag
-    
+    {baseDetail} = @props
+    baseDetail.rankListChecked[index] = !baseDetail.rankListChecked[index]
+    @props.handleCheckedChange baseDetail.rankListChecked 
+    @setState { }      
   render: ->
     <div className='table-container'>
       <div className='col-container'>
@@ -33,13 +25,13 @@ RankList = React.createClass
         <div style={marginTop: '-15px'}
              className={if @state.filterShow then 'show' else 'hidden'}>
            {
-             if @props.rankList?[0]? and @state.rankList?[0] isnt []
+             if @props.baseDetail?.rankListChecked?
                for rank, index in @props.ranks
                  <Input type='checkbox'
                         label={rank}
                         key={rank}
                         onChange={@handleClickCheckbox.bind(@, index)}
-                        checked={@props.rankList[0][index]}/>
+                        checked={@props.baseDetail.rankListChecked[index]}/>
            }
         </div>
       </div>
@@ -52,8 +44,8 @@ RankList = React.createClass
           <div className='col-container'>
             <span className='title'>{__ 'Ranking'}</span>
             {
-              if @props.rankList?
-                for checked, index in @props.rankList[0]
+              #if @props.rankList?
+                for checked, index in @props.baseDetail.rankListChecked
                   continue if !checked
                   <span key={index}>{@props.ranks[index]}</span>
             }
@@ -61,10 +53,10 @@ RankList = React.createClass
           <div className='col-container'>
             <span className='title'>{__ 'Rate'}</span>
             {
-              if @props.rankList?
-                for checked, index in @props.rankList[0]
+              #if @props.rankList?
+                for checked, index in @props.baseDetail.rankListChecked
                   continue if !checked
-                  <span key={index} style={@props.getStatusStyle !@props.isUpdated[index+1]}>
+                  <span key={index} style={@props.getStatusStyle !@props.isUpdated[index]}>
                     {@props.baseDetail.senkaList[index]}
                   </span>
             }
