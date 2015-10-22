@@ -20,6 +20,24 @@ RankList = require './rank-list'
 ExpListener = require './exp-listener'
 Countdown = require './countdown'
 
+getFinalTime = (type) -> #get Final AccountTime EO for EO 
+  finalDate = new Date()
+  finalDate.setUTCHours(finalDate.getUTCHours() + 9)    #mapping Tokyo(00:00) to UTC(00:00)
+  finalDate.setUTCMonth(finalDate.getUTCMonth() + 1)
+  finalDate.setUTCDate(0)
+  if type is 'eo'
+    finalDate.setUTCHours(15)
+  else if type is 'exp'
+    finalDate.setUTCHours(13)
+  else 
+    finalDate.setUTCHours(6)
+
+  finalDate.setUTCMinutes(0)
+  finalDate.setUTCSeconds(0)
+  finalDate.setUTCMilliseconds(0)
+
+  finalDate.getTime()
+
 isLastDay = ->
   lastDay = false
   today = new Date()
@@ -28,6 +46,7 @@ isLastDay = ->
   tomorrow.setUTCDate(today.getUTCDate()+1)
   if today.getUTCMonth() isnt tomorrow.getUTCMonth()
     lastDay = true
+  
   lastDay
 
 isTrue = (item) ->
@@ -72,12 +91,16 @@ getStatusStyle = (flag) ->
     return {}
 
 # updateTime, ranking, rate, exp
-emptyData = [[null, 0, 0, 0]]
+emptyData = [[0, 0, 0, 0]]
+
 
 emptyDetail =
   adjustedExp: 0,     #exp for adjust
-  isAccounted: false,
-  presumedSenka: 0,
+  baseExp: 0,
+  baseRate: 0,
+  exRate: [0, 0],
+  presumedExp: 0,
+  updateTime: 0,
   rankListChecked: [true, true, true, true, true],
   senkaList: [0, 0, 0, 0, 0]
 
@@ -96,40 +119,114 @@ module.exports =
       memberId: ''
       nickname: ''
       exp: 0
-      baseSenka: '0.0'  #basesenka for show
-      updatedFlag: true
-      timeUp: false
+      baseSenka: '0.0'  #basesenka for show     
+
       accounted: false
-      isUpdated: [false, false, false, false, false, false]
-      ranks: [1, 5, 20, 100, 500]
-      rankList: [[true, true, true, true, true], [0, 0, 0, 0, 0]]
+      expAccounted: false
       eoAccounted: false
+      
+      accountString: ''
+
+      timeUp: false
+      
+      updatedFlag: true
+
+      #remove the flag of user's update as timeUp can stand for it
+      isUpdated: [true, true, true, true ,true] 
+            
+      ranks: [1, 5, 20, 100, 500]
+    
+      tutuInitialed: false
+
+      #final refresh, exp account, eo account 
+      finalTimes: [0, 0, 0]
+      nextAccountTime: 0
+      nextRefreshTime: 0
+
+
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
+    
     handleResponse: (e) ->
       {path, body} = e.detail
       {isUpdated} = @state
       switch path
         when '/kcsapi/api_get_member/basic'
-          if @state.memberId isnt body.api_member_id
-            @getDataFromFile body.api_member_id, body.api_experience
-            if  @state.data[@state.data.length - 1][0] isnt getRefreshTime('') # if not refreshed ,mark as timeup
-              @isTimeUp()
-            else
-              isUpdated[0] = true
-              for rank, idx in @state.baseDetail.senkaList
-                if rank isnt 0
-                  isUpdated[idx + 1] = true
-            baseSenka = (((@state.data[@state.data.length - 1][3] - @state.baseDetail.adjustedExp) / 1428) + @state.data[@state.data.length - 1][2] - 0.0499).toFixed(1)
-            @setState
-              exp: body.api_experience
-              nickname: body.api_nickname
-              baseSenka: baseSenka
-              isUpdated: isUpdated
-            window.removeEventListener 'game.response', @handleResponse
+          #remove useless judgement 
+          #if @state.memberId isnt body.api_member_id
+          @tutuInitial body.api_member_id, body.api_nickname, body.api_experience
+
+          window.removeEventListener 'game.response', @handleResponse
+    
+    #initial everything of tutu
+    tutuInitial: (memberId, nickname, exp)->      
+      {accounted, eoAccounted, expAccounted, accountString, isUpdated} = @state
+      
+      {data, baseDetail} = @getDataFromFile memberId                  
+      finalTimes = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
+      nextAccountTime = getRefreshTime 'account'
+      accountString = __ 'Account time'
+      now = Date.now()
+      #some logic to determine account Stage
+      if now >= finalTimes[2]
+        eoAccounted = true
+        accounted = true        
+      else if now >= finalTimes[1]
+        expAccounted = true
+        accountString = __ 'EO map final time'
+        nextAccountTime = finalTimes[2]
+      else if now >= finalTimes[0]
+        accountString = __ 'Normal map final time'
+        nextAccountTime = finalTimes[1]
+      else if now >= baseDetail.updateTime + 11 * 3600 * 1000 #TODO
+        baseDetail.exRate[0] = baseDetail.exRate[1]
+        baseDetail.exRate[1] = 0
+        @saveData baseDetail
+        accounted = true
+      else 
+        accountString = __ 'Account time'
+        accounted = false
+        
+      if (eoAccounted or accounted) and baseDetail.presumedExp is 0
+        baseDetail.presumedExp = exp     
+
+      if baseDetail.updateTime isnt getRefreshTime ''  # if not refreshed ,mark as timeup
+        @refreshTimeout()
+        isUpdated = [false, false, false, false, false]
+        nextRefreshTime = getRefreshTime ''         
+      else
+        nextRefreshTime = getRefreshTime 'next' 
+        for rank, idx in baseDetail.senkaList
+          if rank is 0
+            isUpdated[idx] = false
+            
+      baseSenka = (((baseDetail.baseExp - baseDetail.adjustedExp) / 1428) + baseDetail.baseRate - 0.0499).toFixed(1)
+
+        
+      @setState
+        baseDetail: baseDetail
+        memberId: parseInt memberId
+        data: data
+        exp: exp
+        nickname: nickname
+        baseSenka: baseSenka
+        finalTimes: finalTimes
+        nextAccountTime: nextAccountTime
+        nextRefreshTime: nextRefreshTime        
+        accounted: accounted
+        eoAccounted: eoAccounted
+        expAccounted: expAccounted
+        accountString: accountString
+        isUpdated: isUpdated
+
+        tutuInitialed: true  
+    #TODO: judge if adjusted
+    ##adjustInitial: (baseDetail, listRate, listExp) ->
+
+
     saveData: (baseDetail) ->
       for senka, idx in baseDetail.senkaList
-        if !@state.isUpdated[idx + 1]
+        if !@state.isUpdated[idx]
           senkaList = 0
       try
         fs.writeJSONSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'detail.json'), baseDetail
@@ -151,6 +248,12 @@ module.exports =
         error "Read file form hairstrength error!#{e}"
       if !baseDetail?
         baseDetail = Object.clone emptyDetail
+      else
+        aEmptyDetail = Object.clone emptyDetail
+        for idx of emptyDetail
+          if !baseDetail[idx]?
+            baseDetail[idx] = aEmptyDetail[idx]
+
       if data?.length > 0
         data = data.split '\n'
         data = data.filter (item) ->
@@ -158,113 +261,188 @@ module.exports =
         data = data.map (a) ->
           a.split(',').map (a) ->
             parseInt a
+        
+        if baseDetail.baseRate is 0
+          baseDetail.baseRate = data[data.length - 1][2]
+        if baseDetail.baseExp is 0
+          baseDetail.baseExp = data[data.length - 1][3]
+        if baseDetail.updateTime is 0
+          baseDetail.updateTime = data[data.length - 1][0] 
       else
         data = Object.clone emptyData
-      {rankList} = @state
-      rankList[0] = baseDetail.rankListChecked
-      rankList[1] = baseDetail.senkaList
-      @setState
-        rankList: rankList
-        baseDetail: baseDetail
-        memberId: parseInt memberId
-        data: data
-    isEOAccounted: ->
-      {eoAccounted} = @state
-      @setState
-        eoAccounted: !eoAccounted
-    isAccounted: ->
-      {accounted, baseDetail, rankList} = @state
-      if !accounted
+        #if there's no data mark baseDetail as empty 
+        baseDetail = Object.clone emptyDetail
+      
+
+      {data, baseDetail}
+
+    estimateSenka: (exp) ->
+      {adjustedExp, baseRate, exRate} = @state.baseDetail      
+      if adjustedExp isnt 0
+        estimate = (((exp - adjustedExp) / 1428) + exRate[0] + exRate[1] + baseRate- 0.0499).toFixed(1)      
+      else
+        estimate = '0.0'
+
+    accountTimeout: ->
+      {finalTimes, nextAccountTime} = @state
+      {accounted, expAccounted, eoAccounted} = @state
+      {accountString, baseDetail} = @state
+      
+      now = Date.now()
+      #some logic to determine account Stage
+      if now >= finalTimes[2]
+        eoAccounted = true
+        accounted = true        
+      else if now >= finalTimes[1]
+        expAccounted = true
+        accountString = __ 'EO map final time'
+        nextAccountTime = finalTimes[2]
+      else if now >= nextAccountTime
+        accounted = true
+      else 
+        baseDetail.exRate[0] = baseDetail.exRate[1]
+        baseDetail.exRate[1] = 0
         @saveData baseDetail
-      if @state.eoAccounted #only use to unlock eoaccount
-        isEOAccounted
-      @setState
-        accounted: !accounted
-    isTimeUp: ->
-      {timeUp, baseDetail, rankList, isUpdated} = @state
+        accountString = __ 'Account time'
+        accounted = false
+
+      @setState {nextAccountTime, accounted, expAccounted, eoAccounted, accountString, baseDetail}
+         
+
+    refreshTimeout: ->
+      {timeUp, baseDetail, isUpdated} = @state
+      {accounted, expAccounted, eoAccounted} = @state
+      {accountString} = @state
+      {nextRefreshTime, finalTimes, nextAccountTime} = @state
       if !timeUp
-        isUpdated = [false, false, false, false, false, false]
+        isUpdated = [false, false, false, false, false]
         baseDetail.senkaList = [0, 0, 0, 0, 0]
-        flag = false
-        @handleCheckedChange flag
+
+        @handleCheckedChange baseDetail.rankListChecked, isUpdated
+      else
+        baseDetail.exRate[0] = 0
+        baseDetail.presumedExp = 0
+        nextRefreshTime = getRefreshTime 'next'
+        nextAccountTime = getRefreshTime 'account'
+        accounted = false        
+        accountString = __ 'Account time'
+        if eoAccounted 
+          baseDetail.exRate[1] = 0
+          finalTimes = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
+          expAccounted = false
+          eoAccounted = false          
+        if Date.now() >= finalTimes[0]
+          accountString = __ 'Normal map final time'
+          nextAccountTime = finalTimes[1]
+        
+
       @setState
         baseDetail: baseDetail
         isUpdated: isUpdated
         timeUp: !timeUp
+        accounted: accounted
+        expAccounted: expAccounted
+        eoAccounted: eoAccounted
+        nextAccountTime: nextAccountTime
+        nextRefreshTime: nextRefreshTime
+        finalTimes: finalTimes
+        accountString: accountString
+
+
     handleRefreshList: (e) ->
       {path, body} = e.detail
       switch path
         when '/kcsapi/api_req_ranking/getlist'
-          {memberId, data, baseDetail, isUpdated, ranks, timeUp, accounted, baseSenka} = @state
+          {memberId, data, baseDetail, isUpdated, ranks, timeUp, accounted, baseSenka, eoAccounted} = @state
           # updateTime, ranking, rate, exp
-          baseRanking = data[data.length - 1][1]
-          baseRate = data[data.length - 1][2]
-          baseExp = data[data.length - 1][3]
           newData = []
           refreshFlag = false
           for teitoku in body.api_list
-              if teitoku.api_member_id is memberId and !isUpdated[0]
+              if teitoku.api_member_id is memberId and timeUp
                 #teitoku.api_member_id is memberId and baseDetail.rate isnt teitoku.api_rate
                 #Estimate the rate with the offset;
-                _Senka = Math.floor((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + baseRate
-                if (teitoku.api_rate - _Senka) % 10 isnt 0 # %10 to ignore Extra Operation Map Senka.
+                if eoAccounted
+                  baseDetail = Object.clone emptyDetail
+                  data = []
+                if baseDetail.adjustedExp
+                  _Senka = Math.floor((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + baseDetail.baseRate + baseDetail.exRate[0]
+                else
+                  _Senka = 0
+
+                if (teitoku.api_rate - _Senka) isnt 0 
                   baseDetail.adjustedExp = teitoku.api_experience
                 else
                   baseDetail.adjustedExp = teitoku.api_experience - ((teitoku.api_experience - baseDetail.adjustedExp) % 1428)
+                
+                baseDetail.baseExp = teitoku.api_experience
+                baseDetail.baseRate = teitoku.api_rate 
+                baseDetail.updateTime = getRefreshTime ''
+
                 ranking = teitoku.api_no
-                newData[0] = getRefreshTime('')
+                newData[0] = getRefreshTime '' 
                 newData[1] = ranking
                 newData[2] = teitoku.api_rate
                 newData[3] = teitoku.api_experience
                 baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.0499).toFixed(1)
-                isUpdated[0] = true
-                @addData newData
-                if (new Date()).getUTCDate() is 1
-                  data = []
-                data.push newData #add new data to @state.data
-                refreshFlag = true
-                if accounted
-                  @isAccounted()
-                if timeUp
-                  @isTimeUp() #mark not timeup if all lists are got
 
-              if teitoku.api_no in ranks
-                index = ranks.indexOf teitoku.api_no
-                if !isUpdated[index + 1]
+                @addData newData
+
+                data.push newData #add new data to @state.data
+                @refreshTimeout()
+                refreshFlag = true
+
+              if  (index = ranks.indexOf teitoku.api_no) > -1            
+                if !isUpdated[index]
                   baseDetail.senkaList[index] = teitoku.api_rate
-                  isUpdated[index + 1] = true
+                  isUpdated[index] = true
                   refreshFlag = true
 
           if refreshFlag
+            @handleCheckedChange baseDetail.rankListChecked, isUpdated
             @setState {baseSenka, baseDetail, isUpdated, data}
-            refreshFlag = false
+            
 
-          if @checkUpdate()
-             @handleCheckedChange true
-    checkUpdate: ->
-      {isUpdated, baseDetail} = @state
-      flag = true
-      if isUpdated[0]
-        for check, idx in baseDetail.rankListChecked
-          if check and !isUpdated[idx + 1]
-            flag = false
-          else
-            updatedFlag = false
-      flag
-    setPresumedSenka: (presumedSenka) ->
+    addExRate: (rate) ->
       {baseDetail} = @state
-      baseDetail.presumedSenka = presumedSenka
+      baseDetail.exRate[1] = baseDetail.exRate[1] + rate
+      
+      @saveData baseDetail 
       @setState {baseDetail}
-    handleCheckedChange: (flag) ->
-      {baseDetail, timeUp, updatedFlag} = @state
+        
+      
+    setPresumedExp: (exp) ->
+      {baseDetail} = @state
+      baseDetail.exRate[0] = baseDetail.exRate[1]
+      baseDetail.exRate[1] = 0
+      if exp isnt 0 
+        baseDetail.presumedExp = exp
+        @saveData baseDetail
+      @setState {baseDetail}
+
+    handleCheckedChange: (rankListChecked, isUpdated)->
+      
+      {isUpdated} = @state if !isUpdated?
+      {updatedFlag, baseDetail} = @state
+      
+      flag = true
+      for checked, idx in rankListChecked
+        if checked and !isUpdated[idx]
+          flag = false
+          break
+      
       if !flag and updatedFlag
         window.addEventListener 'game.response', @handleRefreshList
+        @setState
+          updatedFlag: flag
       else if flag and !updatedFlag
         @saveData baseDetail
         window.removeEventListener 'game.response', @handleRefreshList
-      @setState
-        updatedFlag: flag
+        @setState
+          updatedFlag: flag
+
     render: ->
+      if !@state.tutuInitialed 
+        return <div />      
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
         <div className='main-container'>
@@ -273,38 +451,45 @@ module.exports =
             {__ 'Please click the stats to update rankings'}
           </Alert>
         {
-          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, rankList, updatedFlag, eoAccounted} = @state
+          {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, updatedFlag, eoAccounted} = @state
+          {expAccounted, nextAccountTime, nextRefreshTime, accountString} = @state
           <div style={getStatusStyle timeUp}>
-            <Detail data={data}
-                    baseDetail={baseDetail}
-                    nickname={nickname}
-                    timeToString={timeToString}
-                    accounted={accounted} />
-            <Countdown isAccounted={@isAccounted}
-                       isEOAccounted={@isEOAccounted}
-                       eoAccounted={eoAccounted}
-                       accounted={accounted}
-                       isTimeUp={@isTimeUp}
-                       timeUp={timeUp}
-                       baseDetail={baseDetail}
-                       data={data}
-                       timeToString={timeToString} />
-            <ExpListener data={data}
-                         baseDetail={baseDetail}
-                         exp={exp}
-                         accounted={accounted}
-                         timeUp={timeUp}
-                         baseSenka={baseSenka}
-                         eoAccounted={eoAccounted}
-                         setPresumedSenka={@setPresumedSenka} />
-            <RankList  baseDetail={baseDetail}
-                       rankList={rankList}
-                       ranks={ranks}
-                       isUpdated={isUpdated}
-                       updatedFlag={updatedFlag}
-                       isTrue={isTrue}
-                       getStatusStyle={getStatusStyle}
-                       handleCheckedChange={@handleCheckedChange} />
+            <Detail 
+              data={data}
+              baseDetail={baseDetail}
+              nickname={nickname}
+              timeToString={timeToString}
+              accounted={accounted} />
+            <Countdown 
+              accountTimeout={@accountTimeout}
+              refreshTimeout={@refreshTimeout}
+              accounted={accounted}
+              timeUp={timeUp}
+              accountTimeString={accountString}
+              refreshTimeString={__ "Refresh time"}
+              nextAccountTime={nextAccountTime}
+              nextRefreshTime={nextRefreshTime}
+              timeToString={timeToString}
+              isLastDay={isLastDay}
+              presumedSenka={@estimateSenka baseDetail.presumedExp} />
+            <ExpListener 
+              exp={exp}
+              accounted={accounted}
+              eoAccounted={eoAccounted}
+              expAccounted={expAccounted}
+              baseSenka={baseSenka}
+              baseExp={baseDetail.baseExp}
+              estimateSenka={@estimateSenka}
+              addExRate={@addExRate}
+              setPresumedExp={@setPresumedExp} />
+            <RankList  
+              baseDetail={baseDetail}
+              ranks={ranks}
+              isUpdated={isUpdated}
+              updatedFlag={updatedFlag}
+              isTrue={isTrue}
+              getStatusStyle={getStatusStyle}
+              handleCheckedChange={@handleCheckedChange} />
           </div>
         }
         </div>

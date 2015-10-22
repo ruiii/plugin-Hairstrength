@@ -108,7 +108,7 @@ Detail = React.createClass
           {__('By:　%s　', timeToString(data[data.length - 1][0]))}
           <OverlayTrigger placement='top' overlay={
             <Tooltip>
-              <span>点击查看本月战绩</span>
+              <span>{__ 'Click to show your rates this month'}</span>
             </Tooltip>
           }>
             <FontAwesome key={0} name='book' />
