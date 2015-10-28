@@ -112,7 +112,7 @@ module.exports =
   author: 'Rui'
   link: 'https://github.com/ruiii'
   description: __ 'Senka calculator'
-  version: '1.3.0'
+  version: '1.4.0'
   reactClass: React.createClass
     getInitialState: ->
       data: Object.clone emptyData
