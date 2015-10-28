@@ -14,8 +14,8 @@ RankList = React.createClass
   handleClickCheckbox: (index) ->
     {baseDetail} = @props
     baseDetail.rankListChecked[index] = !baseDetail.rankListChecked[index]
-    @props.handleCheckedChange baseDetail.rankListChecked 
-    @setState { }      
+    @props.handleCheckedChange baseDetail.rankListChecked
+    @setState { }
   render: ->
     <div className='table-container'>
       <div className='col-container'>
@@ -57,7 +57,7 @@ RankList = React.createClass
                 for checked, index in @props.baseDetail.rankListChecked
                   continue if !checked
                   <span key={index} style={@props.getStatusStyle !@props.isUpdated[index]}>
-                    {@props.baseDetail.senkaList[index]}
+                    {@props.baseDetail.senkaList[index]}(↑{@props.baseDetail.listDelta[index]})
                   </span>
             }
           </div>

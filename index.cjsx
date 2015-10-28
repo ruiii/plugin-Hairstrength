@@ -102,6 +102,7 @@ emptyDetail =
   presumedExp: 0,
   updateTime: 0,
   rankListChecked: [true, true, true, true, true],
+  listDelta: [0, 0, 0, 0, 0]
   senkaList: [0, 0, 0, 0, 0]
 
 module.exports =
@@ -227,7 +228,7 @@ module.exports =
     saveData: (baseDetail) ->
       for senka, idx in baseDetail.senkaList
         if !@state.isUpdated[idx]
-          senkaList = 0
+          senka = 0
       try
         fs.writeJSONSync join(APPDATA_PATH, 'hairstrength', "#{@state.memberId}", 'detail.json'), baseDetail
       catch e
@@ -316,7 +317,7 @@ module.exports =
       {nextRefreshTime, finalTimes, nextAccountTime} = @state
       if !timeUp
         isUpdated = [false, false, false, false, false]
-        baseDetail.senkaList = [0, 0, 0, 0, 0]
+        #baseDetail.senkaList = [0, 0, 0, 0, 0]
 
         @handleCheckedChange baseDetail.rankListChecked, isUpdated
       else
@@ -393,6 +394,7 @@ module.exports =
 
               if  (index = ranks.indexOf teitoku.api_no) > -1            
                 if !isUpdated[index]
+                  baseDetail.listDelta[index] = teitoku.api_rate - baseDetail.senkaList[index]
                   baseDetail.senkaList[index] = teitoku.api_rate
                   isUpdated[index] = true
                   refreshFlag = true
