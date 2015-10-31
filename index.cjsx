@@ -23,6 +23,7 @@ Countdown = require './countdown'
 getFinalTime = (type) -> #get Final AccountTime EO for EO 
   finalDate = new Date()
   finalDate.setUTCHours(finalDate.getUTCHours() + 9)    #mapping Tokyo(00:00) to UTC(00:00)
+  finalDate.setUTCDate(1)                               #in case next month's day less than this month
   finalDate.setUTCMonth(finalDate.getUTCMonth() + 1)
   finalDate.setUTCDate(0)
   if type is 'eo'
