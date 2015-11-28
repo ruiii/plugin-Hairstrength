@@ -1,54 +1,57 @@
-#Hairstrength .container {
+#Senka\ Calc .container {
   margin-top: 15px;
   padding: 15px;
 }
-#Hairstrength .form-group {
+#Senka\ Calc .form-group {
   margin-bottom: -15px;
 }
-#Hairstrength .hidden {
+#Senka\ Calc .hidden {
   display: none;
 }
-#Hairstrength .show {
+#Senka\ Calc .show {
   display: flex;
 }
-#Hairstrength ::-webkit-scrollbar {
+#Senka\ Calc ::-webkit-scrollbar {
   width: 10px;
 }
-#Hairstrength .main-container {
+#Senka\ Calc .main-container {
   display: flex;
   flex-direction: column;
   padding: 15px 15px 5px;
   text-align: center;
 }
-#Hairstrength .col-container {
+#Senka\ Calc .col-container {
   display: flex;
   flex-direction: column;
   padding: 10px 10px 5px;
   width: 50%;
 }
-#Hairstrength .row-container {
+#Senka\ Calc .row-container {
   display: flex;
   flex-direction: row;
   padding: 10px;
   height: 50%;
 }
-#Hairstrength .table-container {
+#Senka\ Calc .table-container {
   display: flex;
   justify-content: space-around;
 }
-#Hairstrength .title {
+#Senka\ Calc .title {
   font-size: 130%;
 }
-#Hairstrength .admiral-name {
+#Senka\ Calc .admiral-name {
   margin: 0px;
 }
-#Hairstrength .detail-time {
+#Senka\ Calc .detail-time {
   margin-bottom: 0px;
 }
-#Hairstrength .exp-listener {
+#Senka\ Calc .exp-listener {
   display: flex;
   flex-direction: column;
   padding: 10px 10px 5px;
   font-size: 130%;
   width: 100%;
+}
+#Senka\ Calc .alert {
+  overflow: hidden;
 }
