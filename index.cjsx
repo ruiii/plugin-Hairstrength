@@ -108,12 +108,12 @@ emptyDetail =
 
 module.exports =
   name: 'Senka Calc'
-  displayName: <span><FontAwesome key={0} name='odnoklassniki' />{__ 'Senka Calc'}</span>
+  displayName: <span><FontAwesome key={0} name='child' style={fontSize: 16, width: 17} /> {__ 'Senka Calc'}</span>
   priority: 7
   author: 'Rui'
   link: 'https://github.com/ruiii'
   description: __ 'Senka calculator'
-  version: '1.4.0'
+  version: '1.5.0'
   reactClass: React.createClass
     getInitialState: ->
       data: Object.clone emptyData
