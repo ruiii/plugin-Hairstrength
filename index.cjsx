@@ -447,7 +447,7 @@ module.exports =
       if !@state.tutuInitialed
         return <div />
       <div>
-        <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
+        <link rel='stylesheet' href={join(__dirname , 'assets', 'Hairstrength.css')} />
         <div className='main-container'>
           <Alert bsStyle='danger'
                  className={if @state.timeUp then 'show' else 'hidden'}>

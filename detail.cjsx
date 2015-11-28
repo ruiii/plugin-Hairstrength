@@ -69,7 +69,7 @@ Detail = React.createClass
     <div className='main-container'>
       <h4 className='admiral-name'>{__('Admiral　%s　', nickname)}</h4>
       <OverlayTrigger trigger='click' placement='bottom' overlay={
-        <Tooltip>
+        <Tooltip id='show-rate'>
           <Tabs activeKey={@state.selectedKey} onSelect={@handleSelectTab} animation={false}>
             <Tab eventKey={1} title='1-10'>
               <DataTable data={partOne} />
@@ -92,7 +92,7 @@ Detail = React.createClass
         <h6 className='detail-time'>
           {__('By:　%s　', timeToString(data[data.length - 1][0]))}
           <OverlayTrigger placement='top' overlay={
-            <Tooltip>
+            <Tooltip id='show-rate-tip'>
               <span>{__ 'Click to show your rates this month'}</span>
             </Tooltip>
           }>
