@@ -20,7 +20,7 @@ RankList = require './rank-list'
 ExpListener = require './exp-listener'
 Countdown = require './countdown'
 
-getFinalTime = (type) -> #get Final AccountTime EO for EO 
+getFinalTime = (type) -> #get Final AccountTime EO for EO
   finalDate = new Date()
   finalDate.setUTCHours(finalDate.getUTCHours() + 9)    #mapping Tokyo(00:00) to UTC(00:00)
   finalDate.setUTCDate(1)                               #in case next month's day less than this month
@@ -30,7 +30,7 @@ getFinalTime = (type) -> #get Final AccountTime EO for EO
     finalDate.setUTCHours(15)
   else if type is 'exp'
     finalDate.setUTCHours(13)
-  else 
+  else
     finalDate.setUTCHours(6)
 
   finalDate.setUTCMinutes(0)
@@ -47,7 +47,7 @@ isLastDay = ->
   tomorrow.setUTCDate(today.getUTCDate()+1)
   if today.getUTCMonth() isnt tomorrow.getUTCMonth()
     lastDay = true
-  
+
   lastDay
 
 isTrue = (item) ->
@@ -107,8 +107,8 @@ emptyDetail =
   senkaList: [0, 0, 0, 0, 0]
 
 module.exports =
-  name: 'Hairstrength'
-  displayName: <span><FontAwesome key={0} name='odnoklassniki' />{__ 'Hairstrength'}</span>
+  name: 'Senka Calc'
+  displayName: <span><FontAwesome key={0} name='odnoklassniki' />{__ 'Senka Calc'}</span>
   priority: 7
   author: 'Rui'
   link: 'https://github.com/ruiii'
@@ -121,26 +121,26 @@ module.exports =
       memberId: ''
       nickname: ''
       exp: 0
-      baseSenka: '0.0'  #basesenka for show     
+      baseSenka: '0.0'  #basesenka for show
 
       accounted: false
       expAccounted: false
       eoAccounted: false
-      
+
       accountString: ''
 
       timeUp: false
-      
+
       updatedFlag: true
 
       #remove the flag of user's update as timeUp can stand for it
-      isUpdated: [true, true, true, true ,true] 
-            
+      isUpdated: [true, true, true, true ,true]
+
       ranks: [1, 5, 20, 100, 500]
-    
+
       tutuInitialed: false
 
-      #final refresh, exp account, eo account 
+      #final refresh, exp account, eo account
       finalTimes: [0, 0, 0]
       nextAccountTime: 0
       nextRefreshTime: 0
@@ -148,23 +148,23 @@ module.exports =
 
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
-    
+
     handleResponse: (e) ->
       {path, body} = e.detail
       {isUpdated} = @state
       switch path
         when '/kcsapi/api_get_member/basic'
-          #remove useless judgement 
+          #remove useless judgement
           #if @state.memberId isnt body.api_member_id
           @tutuInitial body.api_member_id, body.api_nickname, body.api_experience
 
           window.removeEventListener 'game.response', @handleResponse
-    
+
     #initial everything of tutu
-    tutuInitial: (memberId, nickname, exp)->      
+    tutuInitial: (memberId, nickname, exp)->
       {accounted, eoAccounted, expAccounted, accountString, isUpdated} = @state
-      
-      {data, baseDetail} = @getDataFromFile memberId                  
+
+      {data, baseDetail} = @getDataFromFile memberId
       finalTimes = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
       nextAccountTime = getRefreshTime 'account'
       accountString = __ 'Account time'
@@ -172,7 +172,7 @@ module.exports =
       #some logic to determine account Stage
       if now >= finalTimes[2]
         eoAccounted = true
-        accounted = true        
+        accounted = true
       else if now >= finalTimes[1]
         expAccounted = true
         accountString = __ 'EO map final time'
@@ -185,26 +185,26 @@ module.exports =
         baseDetail.exRate[1] = 0
         @saveData baseDetail
         accounted = true
-      else 
+      else
         accountString = __ 'Account time'
         accounted = false
-        
+
       if (eoAccounted or accounted) and baseDetail.presumedExp is 0
-        baseDetail.presumedExp = exp     
+        baseDetail.presumedExp = exp
 
       if baseDetail.updateTime isnt getRefreshTime ''  # if not refreshed ,mark as timeup
         @refreshTimeout()
         isUpdated = [false, false, false, false, false]
-        nextRefreshTime = getRefreshTime ''         
+        nextRefreshTime = getRefreshTime ''
       else
-        nextRefreshTime = getRefreshTime 'next' 
+        nextRefreshTime = getRefreshTime 'next'
         for rank, idx in baseDetail.senkaList
           if rank is 0
             isUpdated[idx] = false
-            
+
       baseSenka = (((baseDetail.baseExp - baseDetail.adjustedExp) / 1428) + baseDetail.baseRate - 0.0499).toFixed(1)
 
-        
+
       @setState
         baseDetail: baseDetail
         memberId: parseInt memberId
@@ -214,14 +214,14 @@ module.exports =
         baseSenka: baseSenka
         finalTimes: finalTimes
         nextAccountTime: nextAccountTime
-        nextRefreshTime: nextRefreshTime        
+        nextRefreshTime: nextRefreshTime
         accounted: accounted
         eoAccounted: eoAccounted
         expAccounted: expAccounted
         accountString: accountString
         isUpdated: isUpdated
 
-        tutuInitialed: true  
+        tutuInitialed: true
     #TODO: judge if adjusted
     ##adjustInitial: (baseDetail, listRate, listExp) ->
 
@@ -263,25 +263,25 @@ module.exports =
         data = data.map (a) ->
           a.split(',').map (a) ->
             parseInt a
-        
+
         if baseDetail.baseRate is 0
           baseDetail.baseRate = data[data.length - 1][2]
         if baseDetail.baseExp is 0
           baseDetail.baseExp = data[data.length - 1][3]
         if baseDetail.updateTime is 0
-          baseDetail.updateTime = data[data.length - 1][0] 
+          baseDetail.updateTime = data[data.length - 1][0]
       else
         data = Object.clone emptyData
-        #if there's no data mark baseDetail as empty 
+        #if there's no data mark baseDetail as empty
         baseDetail = Object.clone emptyDetail
-      
+
 
       {data, baseDetail}
 
     estimateSenka: (exp) ->
-      {adjustedExp, baseRate, exRate} = @state.baseDetail      
+      {adjustedExp, baseRate, exRate} = @state.baseDetail
       if adjustedExp isnt 0
-        estimate = (((exp - adjustedExp) / 1428) + exRate[0] + exRate[1] + baseRate- 0.0499).toFixed(1)      
+        estimate = (((exp - adjustedExp) / 1428) + exRate[0] + exRate[1] + baseRate- 0.0499).toFixed(1)
       else
         estimate = '0.0'
 
@@ -289,19 +289,19 @@ module.exports =
       {finalTimes, nextAccountTime} = @state
       {accounted, expAccounted, eoAccounted} = @state
       {accountString, baseDetail} = @state
-      
+
       now = Date.now()
       #some logic to determine account Stage
       if now >= finalTimes[2]
         eoAccounted = true
-        accounted = true        
+        accounted = true
       else if now >= finalTimes[1]
         expAccounted = true
         accountString = __ 'EO map final time'
         nextAccountTime = finalTimes[2]
       else if now >= nextAccountTime
         accounted = true
-      else 
+      else
         baseDetail.exRate[0] = baseDetail.exRate[1]
         baseDetail.exRate[1] = 0
         @saveData baseDetail
@@ -309,7 +309,7 @@ module.exports =
         accounted = false
 
       @setState {nextAccountTime, accounted, expAccounted, eoAccounted, accountString, baseDetail}
-         
+
 
     refreshTimeout: ->
       {timeUp, baseDetail, isUpdated} = @state
@@ -326,17 +326,17 @@ module.exports =
         baseDetail.presumedExp = 0
         nextRefreshTime = getRefreshTime 'next'
         nextAccountTime = getRefreshTime 'account'
-        accounted = false        
+        accounted = false
         accountString = __ 'Account time'
-        if eoAccounted 
+        if eoAccounted
           baseDetail.exRate[1] = 0
           finalTimes = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
           expAccounted = false
-          eoAccounted = false          
+          eoAccounted = false
         if Date.now() >= finalTimes[0]
           accountString = __ 'Normal map final time'
           nextAccountTime = finalTimes[1]
-        
+
 
       @setState
         baseDetail: baseDetail
@@ -371,17 +371,17 @@ module.exports =
                 else
                   _Senka = 0
 
-                if (teitoku.api_rate - _Senka) isnt 0 
+                if (teitoku.api_rate - _Senka) isnt 0
                   baseDetail.adjustedExp = teitoku.api_experience
                 else
                   baseDetail.adjustedExp = teitoku.api_experience - ((teitoku.api_experience - baseDetail.adjustedExp) % 1428)
-                
+
                 baseDetail.baseExp = teitoku.api_experience
-                baseDetail.baseRate = teitoku.api_rate 
+                baseDetail.baseRate = teitoku.api_rate
                 baseDetail.updateTime = getRefreshTime ''
 
                 ranking = teitoku.api_no
-                newData[0] = getRefreshTime '' 
+                newData[0] = getRefreshTime ''
                 newData[1] = ranking
                 newData[2] = teitoku.api_rate
                 newData[3] = teitoku.api_experience
@@ -393,7 +393,7 @@ module.exports =
                 @refreshTimeout()
                 refreshFlag = true
 
-              if  (index = ranks.indexOf teitoku.api_no) > -1            
+              if  (index = ranks.indexOf teitoku.api_no) > -1
                 if !isUpdated[index]
                   baseDetail.listDelta[index] = teitoku.api_rate - baseDetail.senkaList[index]
                   baseDetail.senkaList[index] = teitoku.api_rate
@@ -403,36 +403,36 @@ module.exports =
           if refreshFlag
             @handleCheckedChange baseDetail.rankListChecked, isUpdated
             @setState {baseSenka, baseDetail, isUpdated, data}
-            
+
 
     addExRate: (rate) ->
       {baseDetail} = @state
       baseDetail.exRate[1] = baseDetail.exRate[1] + rate
-      
-      @saveData baseDetail 
+
+      @saveData baseDetail
       @setState {baseDetail}
-        
-      
+
+
     setPresumedExp: (exp) ->
       {baseDetail} = @state
       baseDetail.exRate[0] = baseDetail.exRate[1]
       baseDetail.exRate[1] = 0
-      if exp isnt 0 
+      if exp isnt 0
         baseDetail.presumedExp = exp
         @saveData baseDetail
       @setState {baseDetail}
 
     handleCheckedChange: (rankListChecked, isUpdated)->
-      
+
       {isUpdated} = @state if !isUpdated?
       {updatedFlag, baseDetail} = @state
-      
+
       flag = true
       for checked, idx in rankListChecked
         if checked and !isUpdated[idx]
           flag = false
           break
-      
+
       if !flag and updatedFlag
         window.addEventListener 'game.response', @handleRefreshList
         @setState
@@ -444,8 +444,8 @@ module.exports =
           updatedFlag: flag
 
     render: ->
-      if !@state.tutuInitialed 
-        return <div />      
+      if !@state.tutuInitialed
+        return <div />
       <div>
         <link rel='stylesheet' href={join(relative(ROOT, __dirname), 'assets', 'Hairstrength.css')} />
         <div className='main-container'>
@@ -457,13 +457,13 @@ module.exports =
           {data, baseDetail, nickname, timeUp, accounted, isUpdated, exp, baseSenka, ranks, updatedFlag, eoAccounted} = @state
           {expAccounted, nextAccountTime, nextRefreshTime, accountString} = @state
           <div style={getStatusStyle timeUp}>
-            <Detail 
+            <Detail
               data={data}
               baseDetail={baseDetail}
               nickname={nickname}
               timeToString={timeToString}
               accounted={accounted} />
-            <Countdown 
+            <Countdown
               accountTimeout={@accountTimeout}
               refreshTimeout={@refreshTimeout}
               accounted={accounted}
@@ -475,7 +475,7 @@ module.exports =
               timeToString={timeToString}
               isLastDay={isLastDay}
               presumedSenka={@estimateSenka baseDetail.presumedExp} />
-            <ExpListener 
+            <ExpListener
               exp={exp}
               accounted={accounted}
               eoAccounted={eoAccounted}
@@ -485,7 +485,7 @@ module.exports =
               estimateSenka={@estimateSenka}
               addExRate={@addExRate}
               setPresumedExp={@setPresumedExp} />
-            <RankList  
+            <RankList
               baseDetail={baseDetail}
               ranks={ranks}
               isUpdated={isUpdated}
