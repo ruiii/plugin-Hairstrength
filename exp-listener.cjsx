@@ -1,11 +1,10 @@
 {React} = window
-i18n = require './node_modules/i18n'
-{__} = i18n
+__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
 
 ExpListener = React.createClass
   getInitialState: ->
     exp: @props.exp
-    senka: '0.0'  
+    senka: '0.0'
   componentDidMount: ->
     window.addEventListener 'game.response', @handleResponse
   componentWillUnmount: ->
@@ -14,13 +13,13 @@ ExpListener = React.createClass
     if @state.exp is 0 and nextProps.exp isnt 0
       @setState
         exp: nextProps.exp
-        
+
     if (!@props.accounted and nextProps.accounted) or (!@props.expAccounted and nextProps.expAccounted)
       @props.setPresumedExp @state.exp
-        
+
   handleResponse: (e) ->
     #listen before Exp Accounted
-    if !@props.expAccounted 
+    if !@props.expAccounted
       {path, body} = e.detail
       {exp} = @state
       switch path
@@ -35,9 +34,9 @@ ExpListener = React.createClass
             exp: body.api_member_exp
         when '/kcsapi/api_req_combined_battle/battleresult'
           @setState
-            exp: body.api_member_exp      
-    #listen before EOACCOUNTED        
-    if !@props.eoAccounted 
+            exp: body.api_member_exp
+    #listen before EOACCOUNTED
+    if !@props.eoAccounted
       {path, body} = e.detail
       switch path
         when '/kcsapi/api_req_sortie/battleresult'

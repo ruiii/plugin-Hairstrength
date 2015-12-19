@@ -1,6 +1,5 @@
 {React, ReactBootstrap} = window
-i18n = require './node_modules/i18n'
-{__} = i18n
+__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
 
 
 timeToRefresh = (refreshTime) ->
@@ -20,14 +19,14 @@ Countdown = React.createClass
   updateCountdown: ->
     {accountCountdown, refreshCountdown} = @state
     {accounted, timeUp, nextAccountTime, nextRefreshTime} = @props
-    
-    if !accounted 
+
+    if !accounted
       accountCountdown = getCountdown nextAccountTime
       if accountCountdown < 0
         @props.accountTimeout()
         accountCountdown = 0
 
-    if !timeUp 
+    if !timeUp
       refreshCountdown = getCountdown nextRefreshTime
       if refreshCountdown < 0
         @props.refreshTimeout()
@@ -39,7 +38,7 @@ Countdown = React.createClass
   render: ->
     <div className='table-container'
          style={if @props.isLastDay() then color: 'red' else color: 'inherit'}>
-      {  
+      {
         if !@props.accounted
           <div className='col-container'>
             <span>{@props.accountTimeString}</span>

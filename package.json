@@ -4,7 +4,6 @@
   "description": "senka calculator for poi",
   "main": "index.js",
   "dependencies": {
-    "i18n": "^0.5.0"
   },
   "devDependencies": {},
   "scripts": {
