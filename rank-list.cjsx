@@ -1,8 +1,7 @@
 {React, ReactBootstrap} = window
 {Input, Alert} = ReactBootstrap
 Divider = require './divider'
-i18n = require './node_modules/i18n'
-{__} = i18n
+__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
 
 RankList = React.createClass
   getInitialState: ->

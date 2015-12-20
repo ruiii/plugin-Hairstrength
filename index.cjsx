@@ -2,9 +2,8 @@
 {Alert} = ReactBootstrap
 fs = require 'fs-extra'
 {relative, join} = require 'path-extra'
-i18n = require './node_modules/i18n'
 # i18n configure
-i18n.configure({
+window.i18n.senkaCalc = new(require 'i18n-2')({
     locales: ['en-US', 'ja-JP', 'zh-CN', 'zh-TW'],
     defaultLocale: 'zh-CN',
     directory: join(__dirname, 'assets', 'i18n'),
@@ -12,8 +11,8 @@ i18n.configure({
     indent: '\t',
     extension: '.json'
 })
-i18n.setLocale window.language
-{__} = i18n
+window.i18n.senkaCalc.setLocale window.language
+__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
 
 Detail = require './detail' #completed
 RankList = require './rank-list'
