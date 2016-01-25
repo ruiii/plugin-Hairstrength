@@ -7,8 +7,8 @@ window.i18n.senkaCalc = new(require 'i18n-2')({
     locales: ['en-US', 'ja-JP', 'zh-CN', 'zh-TW'],
     defaultLocale: 'zh-CN',
     directory: join(__dirname, 'assets', 'i18n'),
-    updateFiles: false,
-    indent: '\t',
+    devMode: false,
+    indent: '  ',
     extension: '.json'
 })
 window.i18n.senkaCalc.setLocale window.language
