@@ -7,8 +7,8 @@ window.i18n.senkaCalc = new(require 'i18n-2')({
     locales: ['en-US', 'ja-JP', 'zh-CN', 'zh-TW'],
     defaultLocale: 'zh-CN',
     directory: join(__dirname, 'assets', 'i18n'),
-    updateFiles: false,
-    indent: '\t',
+    devMode: false,
+    indent: '  ',
     extension: '.json'
 })
 window.i18n.senkaCalc.setLocale window.language
@@ -112,7 +112,7 @@ module.exports =
   author: 'Rui'
   link: 'https://github.com/ruiii'
   description: __ 'Senka calculator'
-  version: '1.5.0'
+  version: '2.0.1'
   reactClass: React.createClass
     getInitialState: ->
       data: Object.clone emptyData
@@ -246,7 +246,7 @@ module.exports =
         baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', memberId, 'detail.json')
         data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, "#{filename}"), 'utf-8'
       catch e
-        error "Read file form hairstrength error!#{e}"
+        error "Read file form hairstrength error!#{e}" if process.env.DEBUG?
       if !baseDetail?
         baseDetail = Object.clone emptyDetail
       else

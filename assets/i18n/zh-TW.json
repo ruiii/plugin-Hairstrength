@@ -1,3 +1,23 @@
 {
-
+  "Senka Calc": "戰果計算",
+  "Senka calculator": "戰果計算器",
+  "Please click the stats to update rankings": "請瀏覽戰績表示以更新戰果值",
+  "Admiral　%s　": "　%s　提督",
+  "By:　%s　": "截止至　%s　",
+  "Ranking": "順位",
+  "Rate": "戰果值",
+  "Account time": "結算時間",
+  "Before account": "距離結算",
+  "Refresh time": "刷新時間",
+  "Before refresh": "距離刷新",
+  "Experience": "經驗值",
+  "Increment": "增值",
+  "It will save when all rates is updated": "更新完所有的戰果值之後才會儲存",
+  "Presumed rate": "推定戰果",
+  "Presumed experience": "推定經驗值",
+  "No Data": "資料缺失",
+  "Accounted": "已結算",
+  "EO map final time": "EO海圖戰果結算時間",
+  "Normal map final time": "普通海圖戰果結算時間",
+  "Click to show your rates this month": "點選檢視本月戰績"
 }
