@@ -147,7 +147,9 @@ module.exports =
 
     componentDidMount: ->
       window.addEventListener 'game.response', @handleResponse
-
+    componentWillUnmount: ->
+      window.removeEventListener 'game.response', @handleResponse
+      window.removeEventListener 'game.response', @handleRefreshList
     handleResponse: (e) ->
       {path, body} = e.detail
       {isUpdated} = @state

@@ -9,13 +9,14 @@ getCountdown = (type) ->
   timeToRefresh(type) / 1000
 
 Countdown = React.createClass
+  interval: null
   getInitialState: ->
     refreshCountdown: 0
     accountCountdown: 0
   componentDidMount: ->
-    setInterval @updateCountdown, 1000
+    @interval = setInterval @updateCountdown, 1000
   componentWillUnmount: ->
-    clearInterval @updateCountdown, 1000
+    clearInterval @interval
   updateCountdown: ->
     {accountCountdown, refreshCountdown} = @state
     {accounted, timeUp, nextAccountTime, nextRefreshTime} = @props
