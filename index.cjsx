@@ -107,7 +107,7 @@ emptyDetail =
 
 module.exports =
   name: 'Senka Calc'
-  displayName: <span><FontAwesome key={0} name='child' style={fontSize: 16, width: 17} /> {__ 'Senka Calc'}</span>
+  displayName: <span><FontAwesome key={0} name='child' /> {__ 'Senka Calc'}</span>
   priority: 7
   author: 'Rui'
   link: 'https://github.com/ruiii'
