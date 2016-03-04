@@ -104,7 +104,7 @@ Detail = React.createClass
                                                      "(↓#{rankingDelta})"
                                                    else if rankingDelta < 0
                                                      "(↑#{Math.abs rankingDelta})"}
-        　{__ 'Rate'}: {data[data.length - 1][2]}{if rateDelta > 0
+        &nbsp;&nbsp;{__ 'Rate'}: {data[data.length - 1][2]}{if rateDelta > 0
                                                   "(↑#{rateDelta})"}
       </h6>
     </div>
