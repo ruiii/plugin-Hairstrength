@@ -2,17 +2,7 @@
 {Alert} = ReactBootstrap
 fs = require 'fs-extra'
 {relative, join} = require 'path-extra'
-# i18n configure
-window.i18n.senkaCalc = new(require 'i18n-2')({
-    locales: ['en-US', 'ja-JP', 'zh-CN', 'zh-TW'],
-    defaultLocale: 'zh-CN',
-    directory: join(__dirname, 'assets', 'i18n'),
-    devMode: false,
-    indent: '  ',
-    extension: '.json'
-})
-window.i18n.senkaCalc.setLocale window.language
-__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
+__ = window.i18n["poi-plugin-senka-calc"].__.bind(window.i18n["poi-plugin-senka-calc"])
 
 Detail = require './detail' #completed
 RankList = require './rank-list'
@@ -106,13 +96,6 @@ emptyDetail =
   senkaList: [0, 0, 0, 0, 0]
 
 module.exports =
-  name: 'Senka Calc'
-  displayName: <span><FontAwesome key={0} name='child' /> {__ 'Senka Calc'}</span>
-  priority: 7
-  author: 'Rui'
-  link: 'https://github.com/ruiii'
-  description: __ 'Senka calculator'
-  version: '2.0.1'
   reactClass: React.createClass
     getInitialState: ->
       data: Object.clone emptyData
@@ -452,7 +435,7 @@ module.exports =
     render: ->
       if !@state.tutuInitialed
         return <div />
-      <div>
+      <div id="Senka Calc" className="Senka Calc">
         <link rel='stylesheet' href={join(__dirname , 'assets', 'Hairstrength.css')} />
         <div className='main-container'>
           <Alert bsStyle='danger'

@@ -21,10 +21,19 @@
     "senka",
     "calculator"
   ],
-  "author": "Rui",
+  "author": {
+    "name": "Rui",
+    "link": "https://github.com/ruiii"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ruiii/plugin-Hairstrength/issues"
   },
-  "homepage": "https://github.com/ruiii/plugin-Hairstrength#readme"
+  "homepage": "https://github.com/ruiii/plugin-Hairstrength#readme",
+  "poiPlugin": {
+    "title": "Senka Calc",
+    "description": "Senka calculator",
+    "icon": "fa/child",
+    "priority": 7
+  }
 }

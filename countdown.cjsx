@@ -1,5 +1,5 @@
 {React, ReactBootstrap} = window
-__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
+__ = window.i18n["poi-plugin-senka-calc"].__.bind(window.i18n["poi-plugin-senka-calc"])
 
 
 timeToRefresh = (refreshTime) ->
