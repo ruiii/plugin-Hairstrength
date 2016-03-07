@@ -1,6 +1,6 @@
 {React, ReactBootstrap, FontAwesome} = window
 {OverlayTrigger, Tooltip, Table, Tabs, Tab} = ReactBootstrap
-__ = window.i18n.senkaCalc.__.bind(window.i18n.senkaCalc)
+__ = window.i18n["poi-plugin-senka-calc"].__.bind(window.i18n["poi-plugin-senka-calc"])
 
 dateToString = (time) ->
   if time isnt null
