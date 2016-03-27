@@ -136,7 +136,7 @@ module.exports =
         
     componentWillUnmount: ->
       if !@state.tutuInitialed
-        window.removeEventListener'game.response', @handleResponse
+        window.removeEventListener 'game.response', @handleResponse
       else if !@state.updatedFlag
         window.removeEventListener 'game.response', @handleRefreshList
         
