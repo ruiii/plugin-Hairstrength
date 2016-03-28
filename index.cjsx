@@ -133,11 +133,13 @@ module.exports =
         @tutuInitial window._teitokuId, window._nickName, window._teitokuExp
       else
         window.addEventListener 'game.response', @handleResponse
+        
     componentWillUnmount: ->
       if !@state.tutuInitialed
-        window.removeEventListener @handleResponse
+        window.removeEventListener 'game.response', @handleResponse
       else if !@state.updatedFlag
-        window.removeEventListener @handleRefreshList
+        window.removeEventListener 'game.response', @handleRefreshList
+        
     handleResponse: (e) ->
       {path, body} = e.detail
       {isUpdated} = @state
