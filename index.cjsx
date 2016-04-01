@@ -144,10 +144,11 @@ module.exports =
       {path, body} = e.detail
       {isUpdated} = @state
       switch path
-        when '/kcsapi/api_get_member/basic'
+        when '/kcsapi/api_port/port'
           #remove useless judgement
           #if @state.memberId isnt body.api_member_id
-          @tutuInitial body.api_member_id, body.api_nickname, body.api_experience
+          basic = body.api_basic
+          @tutuInitial basic.api_member_id, basic.api_nickname, basic.api_experience
 
           window.removeEventListener 'game.response', @handleResponse
 
