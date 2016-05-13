@@ -235,9 +235,9 @@ module.exports =
     getDataFromFile: (memberId, exp) ->
       filename = timeToString getRefreshTime(''), true
       try
-        fs.ensureDirSync join(APPDATA_PATH, 'hairstrength', memberId)
-        baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', memberId, 'detail.json')
-        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', memberId, "#{filename}"), 'utf-8'
+        fs.ensureDirSync join(APPDATA_PATH, 'hairstrength', "#{memberId}")
+        baseDetail = fs.readJSONSync join(APPDATA_PATH, 'hairstrength', "#{memberId}", 'detail.json')
+        data = fs.readFileSync join(APPDATA_PATH, 'hairstrength', "#{memberId}", "#{filename}"), 'utf-8'
       catch e
         error "Read file form hairstrength error!#{e}" if process.env.DEBUG?
       if !baseDetail?
