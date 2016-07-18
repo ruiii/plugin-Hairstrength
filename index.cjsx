@@ -9,6 +9,10 @@ RankList = require './rank-list'
 ExpListener = require './exp-listener'
 Countdown = require './countdown'
 
+getRate = (_no, rate, rank, id) ->
+  MAGIC = [2, 5, 7, 2, 7, 3, 1, 6, 9, 9]
+  rate / rank / MAGIC[id % 10] / _no
+
 getFinalTime = (type) -> #get Final AccountTime EO for EO
   finalDate = new Date()
   finalDate.setUTCHours(finalDate.getUTCHours() + 9)    #mapping Tokyo(00:00) to UTC(00:00)
@@ -127,19 +131,15 @@ module.exports =
       nextAccountTime: 0
       nextRefreshTime: 0
 
-
     componentDidMount: ->
-      if window._teitokuId? && window._nickName? && window._teitokuExp?
-        @tutuInitial window._teitokuId, window._nickName, window._teitokuExp
-      else
-        window.addEventListener 'game.response', @handleResponse
-        
+      window.addEventListener 'game.response', @handleResponse
+
     componentWillUnmount: ->
       if !@state.tutuInitialed
         window.removeEventListener 'game.response', @handleResponse
       else if !@state.updatedFlag
         window.removeEventListener 'game.response', @handleRefreshList
-        
+
     handleResponse: (e) ->
       {path, body} = e.detail
       {isUpdated} = @state
@@ -346,38 +346,42 @@ module.exports =
     handleRefreshList: (e) ->
       {path, body} = e.detail
       switch path
+        when '/kcsapi/api_get_member/record'
+          @setState
+            exp: body.api_experience[0]
         when '/kcsapi/api_req_ranking/getlist'
-          {memberId, data, baseDetail, isUpdated, ranks, timeUp, accounted, baseSenka, eoAccounted} = @state
+          {memberId, nickname, data, baseDetail, isUpdated, ranks, timeUp, accounted, baseSenka, eoAccounted, exp} = @state
           # updateTime, ranking, rate, exp
           newData = []
           refreshFlag = false
           for teitoku in body.api_list
-              if teitoku.api_member_id is memberId and timeUp
+              if teitoku.api_nickname is nickname and timeUp
                 #teitoku.api_member_id is memberId and baseDetail.rate isnt teitoku.api_rate
                 #Estimate the rate with the offset;
+                rate = getRate teitoku.api_no, teitoku.api_rate, teitoku.api_rank, memberId
                 if eoAccounted
                   baseDetail = Object.clone emptyDetail
                   data = []
                 if baseDetail.adjustedExp
-                  _Senka = Math.floor((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + baseDetail.baseRate + baseDetail.exRate[0]
+                  _Senka = Math.floor((exp - baseDetail.adjustedExp) / 1428) + baseDetail.baseRate + baseDetail.exRate[0]
                 else
                   _Senka = 0
 
-                if (teitoku.api_rate - _Senka) isnt 0
-                  baseDetail.adjustedExp = teitoku.api_experience
+                if (rate - _Senka) isnt 0
+                  baseDetail.adjustedExp = exp
                 else
-                  baseDetail.adjustedExp = teitoku.api_experience - ((teitoku.api_experience - baseDetail.adjustedExp) % 1428)
+                  baseDetail.adjustedExp = exp - ((exp - baseDetail.adjustedExp) % 1428)
 
-                baseDetail.baseExp = teitoku.api_experience
-                baseDetail.baseRate = teitoku.api_rate
+                baseDetail.baseExp = exp
+                baseDetail.baseRate = rate
                 baseDetail.updateTime = getRefreshTime ''
 
                 ranking = teitoku.api_no
                 newData[0] = getRefreshTime ''
                 newData[1] = ranking
-                newData[2] = teitoku.api_rate
-                newData[3] = teitoku.api_experience
-                baseSenka = (((teitoku.api_experience - baseDetail.adjustedExp) / 1428) + teitoku.api_rate - 0.0499).toFixed(1)
+                newData[2] = rate
+                newData[3] = exp
+                baseSenka = (((exp - baseDetail.adjustedExp) / 1428) + rate - 0.0499).toFixed(1)
 
                 @addData newData
 
@@ -387,8 +391,9 @@ module.exports =
 
               if  (index = ranks.indexOf teitoku.api_no) > -1
                 if !isUpdated[index]
-                  baseDetail.listDelta[index] = teitoku.api_rate - baseDetail.senkaList[index]
-                  baseDetail.senkaList[index] = teitoku.api_rate
+                  rate = getRate teitoku.api_no, teitoku.api_rate, teitoku.api_rank, memberId
+                  baseDetail.listDelta[index] = rate - baseDetail.senkaList[index]
+                  baseDetail.senkaList[index] = rate
                   isUpdated[index] = true
                   refreshFlag = true
 
