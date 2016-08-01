@@ -1,6 +1,28 @@
+import { join } from 'path-extra'
+
+const { APPDATA_PATH } = window
+
+export function estimateSenka(base, now) {
+  
+}
 export function getRate(no, rate, id) {
   const MAGIC = [2, 5, 7, 2, 7, 3, 1, 6, 9, 9]
   return rate / MAGIC[id % 10] / no
+}
+
+export function getActiveRank() {
+  return window.getStore('ext["poi-plugin-senka-calc"].activeRank')
+}
+
+export function getMemberId() {
+  return window.getStore('info.basic.api_member_id')
+}
+
+export function getFilePath(filename = false) {
+  const userPath = join(APPDATA_PATH, 'senka-calc', getMemberId())
+  return filename
+         ? join(userPath, timeToString(getRefreshTime(), true))
+         : userPath
 }
 
 export function getFinalTime(type) {
@@ -63,10 +85,18 @@ export function timeToString(time, isFilename = false) {
   const date = new Date(time)
 
   return isFilename
-    ? `${date.getFullYear()}-${date.getMonth() + 1}`
-    : `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:00`
+         ? `${date.getFullYear()}-${date.getMonth() + 1}`
+         : `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:00`
 }
 
 export function getStatusStyle(flag) {
   return flag ? { opacity: 0.4 } : {}
+}
+
+export function dateToString(time) {
+  if (!time) {
+    return
+  }
+  const date = new Data(time)
+  return `${date.getMonth() + 1}-${date.getDate()}`
 }
