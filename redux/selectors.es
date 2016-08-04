@@ -10,19 +10,42 @@ export const customSelector = createSelector(
   state => ({ custom: state.custom || { baseExp: 0 } })
 )
 
-export const historyStatusSelector = createSelector(
-  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ historyShow: state.history.historyShow || false })
-)
 
-export const historyDataSelector = createSelector(
+export const historySelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ historyData: state.history.historyData || [] })
+  state => ({ history: state.history || { historyShow: false, historyData: [] } })
 )
+// export const historyStatusSelector = createSelector(
+//   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+//   state => ({ historyShow: state.history.historyShow || false })
+// )
+// export const historyDataSelector = createSelector(
+//   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+//   state => ({ historyData: state.history.historyData || [] })
+// )
 
 export const rankSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ rank: state.rank || [] })
+)
+
+const emptyAccount = {
+  accounted: false,
+  accountTimeString: '',
+  nextAccountTime: -1
+}
+export const accountSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ account: state.account || emptyAccount })
+)
+
+const emptyRefresh = {
+  refreshTimeString: '',
+  nextRefreshTime: -1
+}
+export const refreshSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ refresh: state.refresh || { baseExp: 0 } })
 )
 
 // export const activeRankSelector = createSelector(

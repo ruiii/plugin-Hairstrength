@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { isLastDay } from './utils'
+import { accountSelector, refreshSelector } from '../redux/selectors'
 
 import CountdownTimer from 'views/components/main/parts/countdown-timer'
 
@@ -40,13 +41,11 @@ export default connect(
       presumedSenka,
       accounted,
       accountTimeString,
-      nextAccountTime,
-      accountCountdown
+      nextAccountTime
     } = this.props.account
     const {
       refreshTimeString,
-      nextRefreshTime,
-      refreshCountdown
+      nextRefreshTime
     } = this.props.refresh
     return (
       <div className='table-container'
@@ -67,7 +66,7 @@ export default connect(
               <span>{timeToString(nextAccountTime)}</span>
               <span>{__('Before account')}</span>
               <CountdownTimer countdownId={`expedition-${this.props.dockIndex+1}`}
-                              completeTime={accountCountdown}
+                              completeTime={nextAccountTime}
                               tickCallback={this.tick} />
             </div>
           )
@@ -77,7 +76,7 @@ export default connect(
           <span>{timeToString(nextRefreshTime)}</span>
           <span>{__('Before refresh')}</span>
           <CountdownTimer countdownId={`expedition-${this.props.dockIndex+1}`}
-                          completeTime={refreshCountdown}
+                          completeTime={nextRefreshTime}
                           tickCallback={this.tick} />
         </div>
       </div>

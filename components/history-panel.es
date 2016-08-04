@@ -3,7 +3,7 @@ import { Table } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { forEach } from 'lodash'
 import { dateToString } from './utils'
-import { historyStatusSelector, historyDataSelector } from '../redux/selectors'
+import { historySelector } from '../redux/selectors'
 
 const DataItem = connect(
   state => ({}),
@@ -25,19 +25,19 @@ const DataItem = connect(
 
 
 export default connect(
-  historyStatusSelector,
-  historyDataSelector
+  historySelector,
 )(class HistoryPanel extends Component{
   render() {
+    const { historyData, historyShow } = this.props.history
     let items = []
-    forEach(this.props.historyData, (d, i) => {
+    forEach(historyData, (d, i) => {
       if ((new Date(d[0])).getUTCHours() === 18) {
         continue
       }
       items.push(<DataItem key={i} data={d} />)
     })
     return (
-      <div className={`histort-panel ${this.props.historyShow ? 'show' : 'hidden'}`}>
+      <div className={`histort-panel ${historyShow ? 'show' : 'hidden'}`}>
         <Table striped bordered condensed hover Responsive>
           <thead>
             <tr>
