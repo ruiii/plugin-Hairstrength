@@ -3,6 +3,13 @@ import { extensionSelectorFactory } from 'views/utils/selectors'
 
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 
+export const expSelector = (state) => ({ exp: state.info.basic.api_experience })
+
+export const customSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ custom: state.custom || { baseExp: 0 } })
+)
+
 export const historyStatusSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ historyShow: state.history.historyShow || false })

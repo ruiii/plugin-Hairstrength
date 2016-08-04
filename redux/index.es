@@ -4,6 +4,7 @@ import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
 import { getRate, getMemberId, getFilePath } from '../components/utils'
 import { ACTIVE_RANK_UPDATE, HISTORY_SHOW, HISTORY_HIDE } from './actions'
+
 /*
 *    api_req_ranking/getlist	：ランキング
 *    	api_count			：最大読み込み可能数？
@@ -108,8 +109,10 @@ function rootReducer(state = initialState, action) {
 }
 
 const detailPath = 'plugin-senka-detail'
+const customPath = 'plugin-senka-custom'
 const storePath = state.plugin.poi_plugin_senka_calc
 const dataPath = join(APPDATA_PATH, 'senka-calc')
+
 observe(store, [observer(
   (state) =>
     storePath.detail,
@@ -117,10 +120,12 @@ observe(store, [observer(
     localStorage.setItem(detailPath, JSON.stringify(current))
 )])
 
-const historyDataSelector = createSelector(
-  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  (state={}) => storePath.historyData || {}
-)
+observe(store, [observer(
+  (state) =>
+    storePath.custom,
+  (dispatch, current, previous) =>
+    localStorage.setItem(customPath, JSON.stringify(current))
+)])
 
 // setImmediate dispatch
 function getHistoryData(state, action) {

@@ -1,67 +1,86 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Panel, Label, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { map, get, range, once, isEqual } from 'lodash'
+import { isLastDay } from './utils'
 
 import CountdownTimer from 'views/components/main/parts/countdown-timer'
 
-class CountdownLabel extends Component {
-  getLabelStyle = (timeRemaining) => {
-    return (
-      timeRemaining > 600 ? 'primary' :
-      timeRemaining > 60 ? 'warning' :
-      timeRemaining >= 0 ? 'success' :
-      'default'
-    )
-  }
+export default connect(
+  createSelector([
+    accountSelector,
+    refreshSelector
+  ], (account, refresh) => ({
+    account,
+    refresh
+  }))
+)(class TimerPanel extends Component {
   constructor(props) {
     super(props)
-    this.notify = once(this.props.notify)
     this.state = {
-      style: this.getLabelStyle(CountdownTimer.getTimeRemaining(this.props.completeTime)),
+      isLastDay: isLastDay(),
     }
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.completeTime != this.props.completeTime) {
-      this.notify = once(nextProps.notify)
       this.setState({
-        style: this.getLabelStyle(CountdownTimer.getTimeRemaining(nextProps.completeTime)),
+        isLastDay: isLastDay(),
       })
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.completeTime != this.props.completeTime || nextState.style != this.state.style
+    return nextProps.completeTime != this.props.completeTime || nextState.isLastDay != this.state.isLastDay
   }
   tick = (timeRemaining) => {
-    const notifyBefore = Math.max(window.notify.expedition || 0, 1)
-    if (0 < timeRemaining && timeRemaining <= notifyBefore)
-      this.notify()
-    const style = this.getLabelStyle(timeRemaining)
-    if (style != this.state.style)
-      this.setState({style: style})
+    const isLastDay = isLastDay()
+    if (isLastDay != this.state.isLastDay)
+      this.setState({ isLastDay })
   }
   render() {
+    const {
+      presumedSenka,
+      accounted,
+      accountTimeString,
+      nextAccountTime,
+      accountCountdown
+    } = this.props.account
+    const {
+      refreshTimeString,
+      nextRefreshTime,
+      refreshCountdown
+    } = this.props.refresh
     return (
-      <OverlayTrigger placement='left' overlay={
-        (this.props.completeTime > 0) ? (
-          <Tooltip id={`expedition-return-by-${this.props.dockIndex}`}>
-            <strong>{__("Return by : ")}</strong>{timeToString(this.props.completeTime)}
-          </Tooltip>
-        ) : (
-          <span />
-        )
-      }>
-        <Label className="expedition-timer" bsStyle={this.state.style}>
+      <div className='table-container'
+           style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
-          (this.props.completeTime > 0) ? (
-            <CountdownTimer countdownId={`expedition-${this.props.dockIndex+1}`}
-                            completeTime={this.props.completeTime}
-                            tickCallback={this.tick} />
-          ) : undefined
+          accounted
+          ? (
+            <div className='col-container'>
+              <span>{__('Accounted')}</span>
+              <span>{'  '}</span>
+              <span>{__('Presumed rate')}</span>
+              <span>{presumedSenka}</span>
+            </div>
+          )
+          : (
+            <div className='col-container'>
+              <span>{accountTimeString}</span>
+              <span>{timeToString(nextAccountTime)}</span>
+              <span>{__('Before account')}</span>
+              <CountdownTimer countdownId={`expedition-${this.props.dockIndex+1}`}
+                              completeTime={accountCountdown}
+                              tickCallback={this.tick} />
+            </div>
+          )
         }
-        </Label>
-      </OverlayTrigger>
+        <div className='col-container'>
+          <span>{refreshTimeString}</span>
+          <span>{timeToString(nextRefreshTime)}</span>
+          <span>{__('Before refresh')}</span>
+          <CountdownTimer countdownId={`expedition-${this.props.dockIndex+1}`}
+                          completeTime={refreshCountdown}
+                          tickCallback={this.tick} />
+        </div>
+      </div>
     )
   }
-}
+})

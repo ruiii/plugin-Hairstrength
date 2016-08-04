@@ -1,24 +1,21 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { createSelector } from 'reselect'
+import { expSelector, customSelector } from '../redux/selectors'
 import { estimateSenka } from './utils'
+
 export default connect(
-  state => ({ exp: state.info.basic.api_experience })
+  createSelector([
+    expSelector,
+    customSelector
+  ], (exp, custom) => ({
+    exp,
+    baseExp: custom.baseExp
+  }))
 )(class RatePanel extends Component{
-  constructor(props) {
-    super(props)
-    this.state = {
-      rate: 0
-    }
-  }
-  componentDidMount() {
-    this.props.startListen()
-  }
-  componentWillUnmount() {
-    this.props.stopListen()
-  }
   render() {
-    const { exp, baseSenka, baseExp} = this.props
-    const senka = @props.estimateSenka exp
+    const { exp, baseExp } = this.props
+    const rate = estimateSenka(exp, baseExp)
 
     return (
       <div className='exp-listener'>
@@ -26,8 +23,7 @@ export default connect(
         <span>{baseExp}　->　{exp}</span>
         <span>( ↑ {exp - baseExp} )</span>
         <span>{__ 'Rate'}</span>
-        <span>{baseSenka}　->　{senka}</span>
-        <span>( ↑ {(senka - baseSenka).toFixed(1)} )</span>
+        <span>{rate}</span>
       </div>
     )
   }
