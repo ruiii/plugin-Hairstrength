@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { observer, observe } from 'redux-observers'
+import { set } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
 import { getRate, getMemberId, getFilePath } from '../components/utils'
@@ -84,7 +85,7 @@ function activeRankReducer(state = activeRank, action) {
   return state
 }
 
-function histroyReducer(state = { historyShow: false }, action) {
+function histroyReducer(state = { historyShow: false, historyData: [] }, action) {
   switch (action.type) {
   case HISTORY_SHOW:
     return {
@@ -108,24 +109,45 @@ function rootReducer(state = initialState, action) {
   }
 }
 
-const detailPath = 'plugin-senka-detail'
-const customPath = 'plugin-senka-custom'
-const storePath = state.plugin.poi_plugin_senka_calc
+const storePath = 'plugin-senka'
+const path = state.plugin.poi_plugin_senka_calc
+const storeItems = ['detail', 'custom']
 const dataPath = join(APPDATA_PATH, 'senka-calc')
 
-observe(store, [observer(
-  (state) =>
-    storePath.detail,
-  (dispatch, current, previous) =>
-    localStorage.setItem(detailPath, JSON.stringify(current))
-)])
+function setLocalStorageObserver(item) {
+  try {
+    _localStorage = JSON.parse(localStorage.getItem(cachePosition) || '{}')
+  } catch (e) {
+    _localStorage = {}
+  }
+  return observer(
+    (state) =>
+      path[item],
+    (dispatch, current, previous) =>
+      set(_localStorage, item, current)
+      localStorage.setItem(storePath, JSON.stringify(current))
+  )
+}
 
-observe(store, [observer(
-  (state) =>
-    storePath.custom,
-  (dispatch, current, previous) =>
-    localStorage.setItem(customPath, JSON.stringify(current))
-)])
+observe(store,
+  storeItems.map((item) =>
+    setLocalStorageObserver(item)
+  )
+)
+
+// observe(store, [observer(
+//   (state) =>
+//     storePath.detail,
+//   (dispatch, current, previous) =>
+//     localStorage.setItem(detailPath, JSON.stringify(current))
+// )])
+//
+// observe(store, [observer(
+//   (state) =>
+//     storePath.custom,
+//   (dispatch, current, previous) =>
+//     localStorage.setItem(customPath, JSON.stringify(current))
+// )])
 
 // setImmediate dispatch
 function getHistoryData(state, action) {
