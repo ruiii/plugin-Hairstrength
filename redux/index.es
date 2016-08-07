@@ -1,6 +1,8 @@
+import { join } from 'path-extra'
+import fs from 'fs-extra'
 import { combineReducers } from 'redux'
 import { observer, observe } from 'redux-observers'
-import { set, forEach } from 'lodash'
+import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
 import { getRate, getMemberId, getFilePath, getFinalTime, getRefreshTime } from '../components/utils'
@@ -53,88 +55,16 @@ const emptyRank = {
   rate: -1
 }
 
-function rankListReducer(state, { type, body, postBody }) {
-  switch (type) {
-  // case '@@Response/kcsapi/api_req_ranking/getlist':
-  case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
-    // const { api_no, api_rate } = body
-    const api_no = body[apiMap.api_no]
-    const api_rate = body[apiMap.api_rate]
-
-    if (!getActiveRank().indexOf(api_no)) {
-      return state
-    }
-
-    const memberId = getMemberId()
-    let rankList = state.rankList
-    rankList[api_no] = getRate(api_no, api_rate, memberId)
-
-    return {
-      ...state,
-      rankList
-    }
-  }
-}
-
-// [1, 5, 20, 100, 500]
-// const activeRank = [true, true, true, true, true]
-
-function activeRankReducer(state, action) {
-  switch (action.type) {
-  case ACTIVE_RANK_UPDATE:
-    return action.activeRank
-  }
-  return state
-}
-
-function histroyReducer(state, action) {
-  switch (action.type) {
-  case RATE_HISTORY_SHOW:
-    return {
-      ...state,
-      historyShow: action.show
-    }
-  }
-  return state
-}
-
-// export const emptyTimer = {
-//   accounted: false,
-//   accountTimeString: '',
-//   nextAccountTime: -1,
-//   refreshTimeString: '',
-//   nextRefreshTime: -1
-// }
-function timerReducer(state, action) {
-  switch (action.type) {
-  case RATE_TIME_UP:
-    return {
-      ...state,
-      isTimeUp: true
-    }
-  case RATE_UPDATED:
-    return {
-      ...state,
-      isUpdated: true
-    }
-  case RATE_ACCOUNTED:
-    return {
-      ...state,
-      accounted: true
-    }
-  }
-  return state
-}
 
 
 const storePath = 'plugin-senka'
-const path = state.plugin.poi_plugin_senka_calc
+const path = 'state.plugin.poi_plugin_senka_calc'
 const storeItems = ['detail', 'custom']
 const dataPath = join(APPDATA_PATH, 'senka-calc')
 
 observe(store,[observer(
   (state) =>
-    storePath.baseDetail,
+    get(state, path + '.baseDetail'),
   (dispatch, current, previous) =>
     localStorage.setItem(storePath, JSON.stringify(current))
 )])
@@ -150,7 +80,7 @@ function saveHistoryData(historyData) {
 }
 observe(store, [observer(
   (state) =>
-    storePath.history.historyData,
+    get(state, path + '.history.historyData'),
   (dispatch, current, previous) =>
     saveHistoryData(current)
 )])
@@ -172,6 +102,159 @@ const baseDetail = {
   }
 }
 
+function initReducer() {
+  // historyData
+  let historyData = {}
+  try {
+    historyData = fs.readJsonSync(getFilePath(true))
+  } catch (e) {
+  }
+  // baseDetail
+  let storeData = getLocalStorage()
+  if (Object.keys(storeData).length === 0) {
+    storeData = baseDetail
+  }
+  // accounted timer
+  let accounted, eoAccounted, expAccounted, accountString, nextAccountTime
+  const now = Date.now()
+  const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
+  if (now >= eoTime) {
+    accounted = true
+    eoAccounted = true
+  } else if (now >= expTime) {
+    expAccounted = true
+    accountString = __('EO map final time')
+    nextAccountTime = eoTime
+  } else if (now >= normalTime) {
+    accountString = __('Normal map final time')
+    nextAccountTime = expTime
+  } else if (now >= storeData.updateTime + 11 * 3600 * 1000) {
+    storeData.rank.exRate[0] = storeData.rank.exRate[1]
+    storeData.rank.exRate[1] = 0
+    accounted = true
+  } else {
+    accountString = __('Account time')
+    accounted = false
+  }
+  // refresh timer
+  let refreshString = __("Refresh time")
+  let nextRefreshTime = getRefreshTime()
+  let isUpdated = [true, true, true, true, true]
+  let isTimeUp = true
+  // ???
+  let _refreshTime = nextRefreshTime
+  // if not refreshed, mark as timeup
+  if (storeData.timer.updateTime !== _refreshTime) {
+    isUpdated = [false, false, false, false, false]
+  } else {
+    isTimeUp = false
+    nextRefreshTime = getRefreshTime('next')
+    forEach(storeData.rank.rankList, (rank, idx) => {
+      if (rank === 0) {
+        isUpdated[idx] = false
+      }
+    })
+  }
+  console.log('init');
+  return {
+    custom: {
+      ...storeData.custom
+    },
+    rank: {
+      ...storeData.rank
+    },
+    history: {
+      historyShow: false,
+      historyData
+    },
+    timer: {
+      ...storeData.timer,
+      accounted,
+      eoAccounted,
+      expAccounted,
+      accountString,
+      nextAccountTime,
+      refreshString,
+      nextRefreshTime,
+      isUpdated,
+      isTimeUp
+    }
+  }
+}
+
+let baseState = initReducer()
+
+function rankListReducer(state = baseState.rank, { type, body, postBody }) {
+  switch (type) {
+  // case '@@Response/kcsapi/api_req_ranking/getlist':
+  case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
+    // const { api_no, api_rate } = body
+    const api_no = body[apiMap.api_no]
+    const api_rate = body[apiMap.api_rate]
+
+    if (!getActiveRank().indexOf(api_no)) {
+      return state
+    }
+
+    const memberId = getMemberId()
+    let rankList = state
+    rankList[api_no] = getRate(api_no, api_rate, memberId)
+
+    return rankList
+  }
+  return state
+}
+
+// [1, 5, 20, 100, 500]
+// const activeRank = [true, true, true, true, true]
+
+function activeRankReducer(state = {}, action) {
+  switch (action.type) {
+  case ACTIVE_RANK_UPDATE:
+    return action.activeRank
+  }
+  return state
+}
+
+function historyReducer(state = baseState.history, action) {
+  switch (action.type) {
+  case RATE_HISTORY_SHOW:
+    return {
+      ...state,
+      historyShow: action.show
+    }
+  }
+  return state
+}
+
+// export const emptyTimer = {
+//   accounted: false,
+//   accountTimeString: '',
+//   nextAccountTime: -1,
+//   refreshTimeString: '',
+//   nextRefreshTime: -1
+// }
+function timerReducer(state = baseState.timer, action) {
+  switch (action.type) {
+  case RATE_TIME_UP:
+    return {
+      ...state,
+      isTimeUp: true
+    }
+  case RATE_UPDATED:
+    return {
+      ...state,
+      isUpdated: true
+    }
+  case RATE_ACCOUNTED:
+    return {
+      ...state,
+      accounted: true
+    }
+  }
+  return state
+}
+
 function getLocalStorage() {
   try {
     return JSON.parse(localStorage.getItem(storePath) || '{}')
@@ -180,91 +263,11 @@ function getLocalStorage() {
   }
 }
 
-function initReducer(state, action) {
-  if (!state) {
-    // historyData
-    const historyData = readJsonSync(getFilePath(true))
-    // baseDetail
-    let storeData = getLocalStorage()
-    if (Object.keys(storeData).length === 0) {
-      storeData = baseDetail
-    }
-    // accounted timer
-    let accounted, eoAccounted, expAccounted, accountString, nextAccountTime
-    const now = Date.now()
-    const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
-    if (now >= eoTime) {
-      accounted = true
-      eoAccounted = true
-    } else if (now >= expTime) {
-      expAccounted = true
-      accountString = __('EO map final time')
-      nextAccountTime = eoTime
-    } else if (now >= normalTime) {
-      accountString = __('Normal map final time')
-      nextAccountTime = expTime
-    } else if (now >= storeData.updateTime + 11 * 3600 * 1000) {
-      storeData.rank.exRate[0] = storeData.rank.exRate[1]
-      storeData.rank.exRate[1] = 0
-      accounted = true
-    } else {
-      accountString = __('Account time')
-      accounted = false
-    }
-    // refresh timer
-    let refreshString = __("Refresh time")
-    let nextRefreshTime = getRefreshTime()
-    let isUpdated = [true, true, true, true, true]
-    let isTimeUp = true
-    // if not refreshed, mark as timeup
-    if (storeData.timer.updateTime !== _refreshTime) {
-      isUpdated = [false, false, false, false, false]
-    } else {
-      isTimeUp = false
-      nextRefreshTime = getRefreshTime('next')
-      forEach(storeData.rank.rankList, (rank, idx) => {
-        if (rank === 0) {
-          isUpdated[idx] = false
-        }
-      })
-    }
-    console.log('init');
-    return {
-      custom: {
-        ...storeData.custom
-      },
-      rank: {
-        ...storeData.rank
-      },
-      history: {
-        historyShow: false,
-        historyData
-      },
-      timer: {
-        ...storeData.timer,
-        accounted,
-        eoAccounted,
-        expAccounted,
-        accountString,
-        nextAccountTime,
-        refreshString,
-        nextRefreshTime,
-        isUpdated,
-        isTimeUp
-      }
-    }
-  }
-  return state
-}
-
-const reducer = combineReducers({
-  initReducer,
-  rankList: rankListReducer,
+export const reducer = combineReducers({
+  rank: {
+    rankList: rankListReducer
+  },
   activeRank: activeRankReducer,
-  history: histroyReducer,
+  history: historyReducer,
   timer: timerReducer
 })
-setTimeout(()=>{
-  console.log('extend');
-  extendReducer(REDUCER_EXTENSION_KEY, reducer)
-}, 0)

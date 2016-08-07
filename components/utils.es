@@ -21,7 +21,7 @@ export function getMemberId() {
 }
 
 export function getFilePath(filename = false) {
-  const userPath = join(APPDATA_PATH, 'senka-calc', getMemberId())
+  const userPath = join(APPDATA_PATH, 'senka-calc', getMemberId().toString())
   return filename
          ? join(userPath, timeToString(getRefreshTime(), true))
          : userPath

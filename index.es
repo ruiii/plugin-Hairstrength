@@ -17,7 +17,7 @@ import TimerPanel from './components/timer-panel'
 // import RatePanel from './components/rate-panel'
 // import RankList from './components/rank-list'
 
-//import { initReducer } from './redux'
+import { reducer } from './redux'
 
 
 export const reactClass = (class SenkaCalc extends Component {
@@ -34,3 +34,5 @@ export const reactClass = (class SenkaCalc extends Component {
     )
   }
 })
+
+export { reducer }
