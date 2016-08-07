@@ -7,13 +7,13 @@ export const expSelector = (state) => ({ exp: state.info.basic.api_experience })
 
 export const customSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ custom: state.custom || { baseExp: 0 } })
+  state => ({ custom: state.custom })
 )
 
 
 export const historySelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ history: state.history || { historyShow: false, historyData: [] } })
+  state => ({ history: state.history })
 )
 // export const historyStatusSelector = createSelector(
 //   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
@@ -26,26 +26,18 @@ export const historySelector = createSelector(
 
 export const rankSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ rank: state.rank || [] })
+  state => ({ rank: state.rank })
 )
 
-const emptyAccount = {
-  accounted: false,
-  accountTimeString: '',
-  nextAccountTime: -1
-}
-export const accountSelector = createSelector(
+export const timerSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ account: state.account || emptyAccount })
-)
+  state => {
+    console.log(state);
+    return {
+      timer: state.timer
+    }
 
-const emptyRefresh = {
-  refreshTimeString: '',
-  nextRefreshTime: -1
-}
-export const refreshSelector = createSelector(
-  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ refresh: state.refresh || { baseExp: 0 } })
+  }
 )
 
 // export const activeRankSelector = createSelector(

@@ -53,8 +53,10 @@ export function getFinalTime(type) {
 }
 
 export function isLastDay() {
-  const today = new Date().setUTCHours(today.getUTCHours() + 9)    // mapping Tokyo(00:00) to UTC(00:00)
-  const tomorrow = new Date(today).setUTCDate(today.getUTCDate() + 1)
+  let today = new Date()
+  today.setUTCHours(today.getUTCHours() + 9)    // mapping Tokyo(00:00) to UTC(00:00)
+  let tomorrow = new Date(today)
+  tomorrow.setUTCDate(today.getUTCDate() + 1)
 
   return today.getUTCMonth() !== tomorrow.getUTCMonth()
 }

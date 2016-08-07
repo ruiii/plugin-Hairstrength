@@ -13,10 +13,14 @@ import { activeRankChange } from '../redux/actions'
 //   deltaListSelector,
 //   updatedListSelector,
 // } from '../redux/selectors'
-import { rankSelector } from '../redux/selectors'
+import { rankSelector, timerSelector } from '../redux/selectors'
 
 export default connect(
-  rankSelector,
+  createSelector([
+    rankSelector,
+    timerSelector
+  ], (rank, timer) =>
+    ({ rank, timer})),
   { activeRankChange }
 )(class RankList extends Component{
   constructor(props) {
@@ -37,15 +41,17 @@ export default connect(
     this.props.activeRankChange(activeRank)
   }
   render() {
-    const { show, ranks } = this.state
+    const { show, ranks, timer } = this.state
     const {
       activeRank,
-      updated,
       rankList,
       rateList,
-      deltaList,
-      updatedList
+      deltaList
     } = this.props.rank
+    const {
+      isUpdated,
+      updatedList
+    } = this.props.timer
     const { onClickCheckbox } = this
     let checkbox = []
     let rankDom = []
@@ -84,7 +90,7 @@ export default connect(
         </div>
         <div className='col-container'>
           <Alert bsStyle='danger'
-                 className={updated ? 'hidden' : 'show'} >
+                 className={isUpdated ? 'hidden' : 'show'} >
             { __('It will save when all rates is updated') }
           </Alert>
           <div className='table-container'>

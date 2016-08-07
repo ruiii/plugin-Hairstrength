@@ -6,6 +6,8 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { timeToString } from './utils'
 import { showHistory } from '../redux/actions'
 
+const { i18n } = window
+const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 const rankName = ['', '元帥', '大将', '中将', '少将', '大佐', '中佐', '新米中佐', '少佐', '中堅少佐', '新米少佐']
 
 export default connect(
@@ -33,7 +35,7 @@ export default connect(
           <div className="rank">{ rankName[api_rank] }</div>
         </div>
         <h6 className="detail-time">
-          {__('By:　%s　', timeToString(data[data.length - 1][0]))}
+          {/*{__('By:　%s　', timeToString(data[data.length - 1][0]))}*/}
           <OverlayTrigger placement='top' overlay={
             <Tooltip id='show-rate-tip'>
               <span>{__('Click to show your rates this month')}</span>

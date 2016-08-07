@@ -1,6 +1,9 @@
 
 export const ACTIVE_RANK_UPDATE = 'ACTIVE_RANK_UPDATE'
-export const HISTORY_SHOW = 'HISTORY_SHOW'
+export const RATE_HISTORY_SHOW = 'RATE_HISTORY_SHOW'
+export const RATE_TIME_UP = 'RATE_TIME_UP'
+export const RATE_UPDATED = 'RATE_UPDATED'
+export const RATE_ACCOUNTED = 'RATE_ACCOUNTED'
 
 export function activeRankChange(activeRank) {
   return {
@@ -11,7 +14,25 @@ export function activeRankChange(activeRank) {
 
 export function showHistory(show) {
   return {
-    type: HISTORY_SHOW,
+    type: RATE_HISTORY_SHOW,
     show
+  }
+}
+
+export function rateTimeUp(){
+  return {
+    type: RATE_TIME_UP
+  }
+}
+
+export function rateUpdated(){
+  return {
+    type: RATE_UPDATED
+  }
+}
+
+export function rateAccounted(){
+  return {
+    type: RATE_ACCOUNTED
   }
 }

@@ -32,7 +32,7 @@ export default connect(
     let items = []
     forEach(historyData, (d, i) => {
       if ((new Date(d[0])).getUTCHours() === 18) {
-        continue
+        return
       }
       items.push(<DataItem key={i} data={d} />)
     })
