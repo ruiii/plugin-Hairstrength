@@ -5,7 +5,14 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
-import { getRate, getMemberId, getFilePath, getFinalTime, getRefreshTime } from '../components/utils'
+import {
+  getRate,
+  getMemberId,
+  getFilePath,
+  getFinalTime,
+  getRefreshTime,
+  getActiveRank
+} from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
   RATE_HISTORY_SHOW,
@@ -145,23 +152,23 @@ function initReducer() {
   // refresh timer
   let refreshString = __("Refresh time")
   let nextRefreshTime = getRefreshTime()
-  let isUpdated = [true, true, true, true, true]
+  let updatedList = [true, true, true, true, true]
   let isTimeUp = true
   // ???
   let _refreshTime = nextRefreshTime
   // if not refreshed, mark as timeup
   if (storeData.timer.updateTime !== _refreshTime) {
-    isUpdated = [false, false, false, false, false]
+    updatedList = [false, false, false, false, false]
   } else {
     isTimeUp = false
     nextRefreshTime = getRefreshTime('next')
     forEach(storeData.rank.rankList, (rank, idx) => {
       if (rank === 0) {
-        isUpdated[idx] = false
+        updatedList[idx] = false
       }
     })
   }
-  console.log('init');
+
   return {
     custom: {
       ...storeData.custom
@@ -182,7 +189,7 @@ function initReducer() {
       nextAccountTime,
       refreshString,
       nextRefreshTime,
-      isUpdated,
+      updatedList,
       isTimeUp
     }
   }
@@ -201,37 +208,53 @@ function customReducer(state = baseState.custom, action) {
   return state
 }
 
-function rankReducer(state = baseState.rank, { type, body, postBody }) {
-  switch (type) {
+function rankReducer(state = baseState.rank, action) {
+  switch (action.type) {
   // case '@@Response/kcsapi/api_req_ranking/getlist':
   case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
     // const { api_no, api_rate } = body
-    const api_no = body[apiMap.api_no]
-    const api_rate = body[apiMap.api_rate]
-    const idx = getActiveRank().indexOf(api_no)
-    if (!idx) {
+    const { type, body, postBody } = action
+
+    if (!body.api_list) {
       return state
     }
 
     const memberId = getMemberId()
-    let rateList = state.rateList
-    rateList[idx] = getRate(api_no, api_rate, memberId)
+    let rateList = [ ...state.rateList ]
+    let updated = false
+
+    forEach(body.api_list, (data) => {
+      const api_no = data[apiMap.api_no]
+      const api_rate = data[apiMap.api_rate]
+      const idx = getActiveRank().indexOf(api_no)
+
+      if (idx < 0) {
+        return
+      }
+
+      updated = true
+      rateList[idx] = getRate(api_no, api_rate, memberId)
+      // setImmediate(() => {
+      //   dispatch(rateUpdated(api_no))
+      // });
+    })
+
+    if (!updated) {
+      return state
+    }
 
     return {
       ...state,
       rateList
     }
-  }
-  return state
-}
 
-// [1, 5, 20, 100, 500]
-// const activeRank = [true, true, true, true, true]
-
-function activeRankReducer(state = {}, action) {
-  switch (action.type) {
   case ACTIVE_RANK_UPDATE:
-    return action.activeRank
+    // [1, 5, 20, 100, 500]
+    // const activeRank = [true, true, true, true, true]
+    return {
+      ...state,
+      activeRank: action.activeRank
+    }
   }
   return state
 }
@@ -256,16 +279,45 @@ function historyReducer(state = baseState.history, action) {
 // }
 function timerReducer(state = baseState.timer, action) {
   switch (action.type) {
+  case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
+    const { type, body, postBody } = action
+
+    if (body.api_list) {
+      let updatedList = [ ...state.updatedList ]
+      let updated = false
+
+      forEach(body.api_list, (data) => {
+        const api_no = data[apiMap.api_no]
+        const idx = getActiveRank().indexOf(api_no)
+
+        updated = true
+        updatedList[idx] = true
+      })
+
+      if (updated) {
+        return {
+          ...state,
+          updatedList
+        }
+      }
+    }
+    break;
   case RATE_TIME_UP:
     return {
       ...state,
       isTimeUp: true
     }
   case RATE_UPDATED:
-    return {
-      ...state,
-      isUpdated: true
+    if (action.rankNo) {
+      const idx = getActiveRank().indexOf(action.rankNo)
+      let updatedList = [ ...state.updatedList ]
+      updatedList[action.idx] = true
+      return {
+        ...state,
+        updatedList
+      }
     }
+    break;
   case RATE_ACCOUNTED:
     return {
       ...state,
@@ -285,7 +337,6 @@ function getLocalStorage() {
 
 export const reducer = combineReducers({
   rank: rankReducer,
-  activeRank: activeRankReducer,
   history: historyReducer,
   timer: timerReducer,
   custom: customReducer

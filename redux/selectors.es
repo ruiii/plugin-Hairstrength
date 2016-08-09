@@ -10,7 +10,7 @@ export const expSelector = createSelector(
 
 export const customSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => (state.custom)
+  state => ({ custom: state.custom })
 )
 
 

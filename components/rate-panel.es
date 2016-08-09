@@ -13,10 +13,8 @@ export default connect(
   createSelector([
     expSelector,
     customSelector
-  ], (exp, custom) => ({
-    exp: exp.exp,
-    custom
-  })),
+  ], ({ exp }, { custom }) =>
+    ({ exp, custom })),
   { customChange }
 )(class RatePanel extends Component{
   constructor(props) {

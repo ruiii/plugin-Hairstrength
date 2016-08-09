@@ -13,7 +13,8 @@ export function getRate(rankNo, obfsRate, memberId) {
 }
 
 export function getActiveRank() {
-  return [true, true, true, true, true]
+  //return [true, true, true, true, true]
+  return [ 1, 5, 20, 100, 500 ]
   //window.getStore('ext["poi-plugin-senka-calc"].activeRank')
 }
 

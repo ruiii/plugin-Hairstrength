@@ -10,7 +10,7 @@ const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 import { CountdownTimer } from 'views/components/main/parts/countdown-timer'
 
 export default connect(
-  timerSelector
+  timerSelector,
 )(class TimerPanel extends Component {
   constructor(props) {
     super(props)

@@ -20,19 +20,20 @@ export function showHistory(show) {
   }
 }
 
-export function rateTimeUp(){
+export function rateTimeUp() {
   return {
     type: RATE_TIME_UP
   }
 }
 
-export function rateUpdated(){
+export function rateUpdated(rankNo) {
   return {
-    type: RATE_UPDATED
+    type: RATE_UPDATED,
+    rankNo
   }
 }
 
-export function rateAccounted(){
+export function rateAccounted() {
   return {
     type: RATE_ACCOUNTED
   }

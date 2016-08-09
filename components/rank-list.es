@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Input, Alert, Button } from 'react-bootstrap'
-import { forEach } from 'lodash'
+import { Checkbox, Alert, Button } from 'react-bootstrap'
+import { forEach, sum } from 'lodash'
 import { getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
 // import {
@@ -16,14 +16,15 @@ import { activeRankChange } from '../redux/actions'
 import { rankSelector, timerSelector } from '../redux/selectors'
 const { i18n } = window
 const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
+
 export default connect(
   createSelector([
     rankSelector,
     timerSelector
-  ], (rank, timer) =>
-    ({ rank, timer})),
+  ], ({ rank }, { timer }) =>
+    ({ rank, timer })),
   { activeRankChange }
-)(class RankList extends Component{
+)(class RankList extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -37,7 +38,7 @@ export default connect(
     })
   }
   onClickCheckbox = (index) => {
-    let activeRank = this.props.activeRank
+    let activeRank = this.props.rank.activeRank
     activeRank[index] = !activeRank[index]
     this.props.activeRankChange(activeRank)
   }
@@ -48,21 +49,20 @@ export default connect(
       rateList,
       deltaList
     } = this.props.rank
-    const {
-      isUpdated,
-      updatedList
-    } = this.props.timer
+    const { updatedList } = this.props.timer
+    const isUpdated = (sum(updatedList) >= updatedList.length)
+
     const { onClickCheckbox } = this
     let checkbox = []
     let rankDom = []
     let rateDom = []
     forEach(activeRank, (active, i) => {
       checkbox.push(
-        <Input type='checkbox'
-               label={ranks[i]}
-               key={i}
+        <Checkbox key={i}
                onChange={onClickCheckbox.bind(this, i)}
-               checked={active}/>
+               checked={active}>
+          {ranks[i]}
+        </Checkbox>
       )
       if (!active) {
         return
@@ -81,7 +81,7 @@ export default connect(
       <div className='table-container'>
         <div className='col-container'>
           <div onClick={this.onShowFilter}>
-            <Divider text={__('Filter')} icon={true} hr={true} show={show}/>
+            {/*<Divider text={__('Filter')} icon={true} hr={true} show={show}/>*/}
           </div>
           <div style={{marginTop: '-15px'}}
                className={show ? 'show' : 'hidden'}>
