@@ -12,10 +12,10 @@ const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 
 import DetailPanel from './components/detail-panel'
 import TimerPanel from './components/timer-panel'
+import RatePanel from './components/rate-panel'
+import RankList from './components/rank-list'
 
 // import HistoryPanel from './components/history-panel'
-// import RatePanel from './components/rate-panel'
-// import RankList from './components/rank-list'
 
 import { reducer } from './redux'
 
@@ -27,9 +27,10 @@ export const reactClass = (class SenkaCalc extends Component {
         <link rel='stylesheet' href={join(__dirname , 'assets', 'Hairstrength.css')} />
         <DetailPanel />
         <TimerPanel />
-        {/*{<HistoryPanel />
         <RatePanel />
-        <RankList />}*/}
+        <RankList />
+        {/*{<HistoryPanel />
+        }*/}
       </div>
     )
   }

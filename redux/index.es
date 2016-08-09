@@ -12,7 +12,8 @@ import {
   HISTORY_HIDE,
   RATE_TIME_UP,
   RATE_UPDATED,
-  RATE_ACCOUNTED
+  RATE_ACCOUNTED,
+  RATE_CUSTOM_CHANGE
 } from './actions'
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 const { i18n } = window
@@ -89,7 +90,7 @@ const baseDetail = {
   custom: {
     baseExp: 0,
     baseRate: 0,
-    customRate: false
+    enable: false
   },
   rank: {
     exRate: [0, 0],
@@ -115,7 +116,12 @@ function initReducer() {
     storeData = baseDetail
   }
   // accounted timer
-  let accounted, eoAccounted, expAccounted, accountString, nextAccountTime
+  let accounted = false
+  let eoAccounted = false
+  let expAccounted = false
+  let accountString = ''
+  let nextAccountTime = getRefreshTime('account')
+
   const now = Date.now()
   const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
   if (now >= eoTime) {
@@ -184,23 +190,37 @@ function initReducer() {
 
 let baseState = initReducer()
 
-function rankListReducer(state = baseState.rank, { type, body, postBody }) {
+function customReducer(state = baseState.custom, action) {
+  switch (action.type) {
+  case RATE_CUSTOM_CHANGE:
+    return {
+      ...state,
+      ...action.custom
+    }
+  }
+  return state
+}
+
+function rankReducer(state = baseState.rank, { type, body, postBody }) {
   switch (type) {
   // case '@@Response/kcsapi/api_req_ranking/getlist':
   case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
     // const { api_no, api_rate } = body
     const api_no = body[apiMap.api_no]
     const api_rate = body[apiMap.api_rate]
-
-    if (!getActiveRank().indexOf(api_no)) {
+    const idx = getActiveRank().indexOf(api_no)
+    if (!idx) {
       return state
     }
 
     const memberId = getMemberId()
-    let rankList = state
-    rankList[api_no] = getRate(api_no, api_rate, memberId)
+    let rateList = state.rateList
+    rateList[idx] = getRate(api_no, api_rate, memberId)
 
-    return rankList
+    return {
+      ...state,
+      rateList
+    }
   }
   return state
 }
@@ -264,10 +284,9 @@ function getLocalStorage() {
 }
 
 export const reducer = combineReducers({
-  rank: {
-    rankList: rankListReducer
-  },
+  rank: rankReducer,
   activeRank: activeRankReducer,
   history: historyReducer,
-  timer: timerReducer
+  timer: timerReducer,
+  custom: customReducer
 })

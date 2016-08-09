@@ -4,6 +4,7 @@ export const RATE_HISTORY_SHOW = 'RATE_HISTORY_SHOW'
 export const RATE_TIME_UP = 'RATE_TIME_UP'
 export const RATE_UPDATED = 'RATE_UPDATED'
 export const RATE_ACCOUNTED = 'RATE_ACCOUNTED'
+export const RATE_CUSTOM_CHANGE = 'RATE_CUSTOM_CHANGE'
 
 export function activeRankChange(activeRank) {
   return {
@@ -34,5 +35,12 @@ export function rateUpdated(){
 export function rateAccounted(){
   return {
     type: RATE_ACCOUNTED
+  }
+}
+
+export function customChange(custom) {
+  return {
+    type: RATE_CUSTOM_CHANGE,
+    custom
   }
 }

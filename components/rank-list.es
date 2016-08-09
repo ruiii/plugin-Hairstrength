@@ -14,7 +14,8 @@ import { activeRankChange } from '../redux/actions'
 //   updatedListSelector,
 // } from '../redux/selectors'
 import { rankSelector, timerSelector } from '../redux/selectors'
-
+const { i18n } = window
+const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 export default connect(
   createSelector([
     rankSelector,
@@ -44,7 +45,6 @@ export default connect(
     const { show, ranks, timer } = this.state
     const {
       activeRank,
-      rankList,
       rateList,
       deltaList
     } = this.props.rank
@@ -65,10 +65,10 @@ export default connect(
                checked={active}/>
       )
       if (!active) {
-        continue
+        return
       }
       rankDom.push(
-        <span key={i}>{ rankList[i] }</span>
+        <span key={i}>{ ranks[i] }</span>
       )
       rateDom.push(
         <span key={i} style={getStatusStyle(updatedList[i])}>

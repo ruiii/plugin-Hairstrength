@@ -3,7 +3,7 @@ import { join } from 'path-extra'
 const { APPDATA_PATH } = window
 
 export function estimateSenka(exp, baseExp) {
-  return ((exp - baseExp) / 1428 - 0.0499).toFixed(1)
+  return (exp - baseExp) / 1428 - 0.0499
 }
 
 export function getRate(rankNo, obfsRate, memberId) {
@@ -13,7 +13,8 @@ export function getRate(rankNo, obfsRate, memberId) {
 }
 
 export function getActiveRank() {
-  return window.getStore('ext["poi-plugin-senka-calc"].activeRank')
+  return [true, true, true, true, true]
+  //window.getStore('ext["poi-plugin-senka-calc"].activeRank')
 }
 
 export function getMemberId() {

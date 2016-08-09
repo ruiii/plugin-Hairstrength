@@ -1,13 +1,16 @@
 import { createSelector } from 'reselect'
-import { extensionSelectorFactory } from 'views/utils/selectors'
+import { extensionSelectorFactory, basicSelector } from 'views/utils/selectors'
 
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 
-export const expSelector = (state) => ({ exp: state.info.basic.api_experience })
+export const expSelector = createSelector(
+  basicSelector,
+  basic => ({ exp: basic.api_experience })
+)
 
 export const customSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ custom: state.custom })
+  state => (state.custom)
 )
 
 
@@ -31,13 +34,7 @@ export const rankSelector = createSelector(
 
 export const timerSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => {
-    console.log(state);
-    return {
-      timer: state.timer
-    }
-
-  }
+  state => ({ timer: state.timer })
 )
 
 // export const activeRankSelector = createSelector(

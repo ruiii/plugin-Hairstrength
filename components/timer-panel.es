@@ -7,7 +7,7 @@ import { timerSelector } from '../redux/selectors'
 const { i18n } = window
 const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
-import CountdownTimer from 'views/components/main/parts/countdown-timer'
+import { CountdownTimer } from 'views/components/main/parts/countdown-timer'
 
 export default connect(
   timerSelector
@@ -29,10 +29,9 @@ export default connect(
     return nextProps.timer.nextAccountTime != this.props.timer.nextAccountTime || nextState.isLastDay != this.state.isLastDay
   }
   tick = (timeRemaining) => {
-    console.log(timeRemaining);
-    const isLastDay = isLastDay()
-    if (isLastDay != this.state.isLastDay)
-      this.setState({ isLastDay })
+    const _isLastDay = isLastDay()
+    if (_isLastDay != this.state.isLastDay)
+      this.setState({ isLastDay: _isLastDay })
   }
   render() {
     const {
