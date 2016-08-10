@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormControl, Panel, Checkbox } from 'react-bootstrap'
-import { expSelector, customSelector, updatedRateSelector } from '../redux/selectors'
+import { expSelector, customSelector, updatedRateSelector, customShowSelector } from '../redux/selectors'
 import { estimateSenka } from './utils'
 import { customChange } from '../redux/actions'
 
@@ -13,9 +13,10 @@ export default connect(
   createSelector([
     expSelector,
     customSelector,
-    updatedRateSelector
-  ], ({ exp }, { custom }, { updatedRate }) =>
-    ({ exp, custom, updatedRate })),
+    updatedRateSelector,
+    customShowSelector
+  ], ({ exp }, { custom }, { updatedRate }, { customShow }) =>
+    ({ exp, custom, updatedRate, customShow })),
   { customChange }
 )(class RatePanel extends Component{
   constructor(props) {
@@ -93,15 +94,6 @@ export default connect(
       _enable: e.target.checked
     })
   }
-  onCustomShow = (e) => {
-    this.setState({
-      customShow: !this.state.customShow,
-      _customExp: this.props.custom.baseExp,
-      _customRate: this.props.custom.baseRate,
-      _enable: this.props.custom.enable,
-      btnDisable: true
-    })
-  }
   onCustomChange = (e) => {
     const { _customExp, _customRate, _enable } = this.state
     this.props.customChange({
@@ -113,15 +105,24 @@ export default connect(
       btnDisable: true
     })
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.customShow != this.props.customShow && nextProps.customShow) {
+      this.setState({
+        _customExp: nextProps.custom.baseExp,
+        _customRate: nextProps.custom.baseRate,
+        _enable: nextProps.custom.enable,
+        btnDisable: true
+      })
+    }
+  }
   render() {
-    const { exp, custom } = this.props
+    const { exp, custom, customShow } = this.props
     const {
       baseExp,
       baseRate,
       enable
     } = custom
     const {
-      customShow,
       _customExp,
       _customRate,
       _enable,
@@ -130,8 +131,7 @@ export default connect(
     const rate = estimateSenka(exp, baseExp)
 
     return (
-      <div className='exp-listener'>
-        <Button onClick={this.onCustomShow}>{ __('Custom') }</Button>
+      <div>
         <Panel collapsible expanded={customShow}>
           <div>
             <FormControl type='number'
@@ -145,10 +145,8 @@ export default connect(
             </Button>
           </div>
           <div>
-            <Button onClick={this.onUseUpdatedRate}>
-              { __('Use updated rate') }
-            </Button>
             <Checkbox onChange={this.onEnableRate}
+                      label={__('Set rate')}
                       checked={_enable}/>
             <FormControl type='number'
                          label={ __('Base Rate') }
@@ -157,6 +155,10 @@ export default connect(
                          ref='customRate'
                          disabled={!_enable}
                          onChange={this.onRateChange} />
+            <Button onClick={this.onUseUpdatedRate}
+                    disabled={!_enable}>
+              { __('Use updated rate') }
+            </Button>
           </div>
           <Button onClick={this.onCustomChange}
                   disabled={btnDisable}>{ __('OK') }</Button>

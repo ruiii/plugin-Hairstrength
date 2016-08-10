@@ -5,24 +5,17 @@ import { Checkbox, Alert, Button } from 'react-bootstrap'
 import { forEach, sum, includes, reduce } from 'lodash'
 import { getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
-// import {
-//   activeRankSelector,
-//   updateStatusSelector,
-//   rankListSelector,
-//   rateListSelector,
-//   deltaListSelector,
-//   updatedListSelector,
-// } from '../redux/selectors'
-import { rankSelector, timerSelector } from '../redux/selectors'
+import { rankSelector, timerSelector, filterShowSelector } from '../redux/selectors'
 const { i18n } = window
 const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 export default connect(
   createSelector([
     rankSelector,
-    timerSelector
-  ], ({ rank }, { timer }) =>
-    ({ rank, timer })),
+    timerSelector,
+    filterShowSelector
+  ], ({ rank }, { timer }, { filterShow }) =>
+    ({ rank, timer, filterShow })),
   { activeRankChange }
 )(class RankList extends Component {
   constructor(props) {
@@ -31,11 +24,6 @@ export default connect(
       show: true,
       ranks: [1, 5, 20, 100, 500]
     }
-  }
-  onShowFilter = (e) => {
-    this.setState({
-      show: !this.state.show
-    })
   }
   onClickCheckbox = (index) => {
     let activeRank = this.props.rank.activeRank
@@ -79,27 +67,21 @@ export default connect(
     })
 
     return (
-      <div className='table-container'>
-        <div className='col-container'>
-          <div onClick={this.onShowFilter}>
-            {/*<Divider text={__('Filter')} icon={true} hr={true} show={show}/>*/}
-          </div>
-          <div style={{marginTop: '-15px'}}
-               className={show ? 'show' : 'hidden'}>
-             { checkbox }
-          </div>
+      <div>
+        <div className={this.props.filterShow ? 'show' : 'hidden'}>
+           { checkbox }
         </div>
-        <div className='col-container'>
+        <div>
           <Alert bsStyle='danger'
                  className={isUpdated ? 'hidden' : 'show'}>
             { __('It will save when all rates is updated') }
           </Alert>
-          <div className='table-container' style={getStatusStyle(cover)} >
-            <div className='col-container'>
+          <div style={getStatusStyle(cover)} >
+            <div>
               <span className='title'>{ __('Ranking') }</span>
               { rankDom }
             </div>
-            <div className='col-container'>
+            <div>
               <span className='title'>{ __('Rate') }</span>
               { rateDom }
             </div>

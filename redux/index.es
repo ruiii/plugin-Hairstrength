@@ -26,6 +26,8 @@ import {
 import {
   ACTIVE_RANK_UPDATE,
   RATE_HISTORY_SHOW,
+  RATE_CUSTOM_SHOW,
+  RATE_FILTER_SHOW,
   RATE_HISTORY_UPDATE,
   HISTORY_HIDE,
   RATE_TIME_UP,
@@ -138,6 +140,11 @@ const baseDetail = {
   },
   timer: {
     updateTime: -1
+  },
+  setting: {
+    historyShow: false,
+    customShow: false,
+    filterShow: false
   }
 }
 
@@ -221,7 +228,6 @@ function initReducer() {
       ...storeData.rank
     },
     history: {
-      historyShow: false,
       historyData
     },
     timer: {
@@ -236,6 +242,9 @@ function initReducer() {
       updatedList,
       isTimeUp,
       isUpdated
+    },
+    setting: {
+      ...storeData.setting
     }
   }
 }
@@ -331,11 +340,6 @@ function rankReducer(state = baseState.rank, action) {
 
 function historyReducer(state = baseState.history, action) {
   switch (action.type) {
-  case RATE_HISTORY_SHOW:
-    return {
-      ...state,
-      historyShow: action.show
-    }
   case RATE_HISTORY_UPDATE:
     const rank = rankSelector(window.getStore()).rank
     return {
@@ -432,6 +436,26 @@ function timerReducer(state = baseState.timer, action) {
   return state
 }
 
+function settingReducer(state = baseState.setting, action) {
+  switch (action.type) {
+  case RATE_HISTORY_SHOW:
+    return {
+      ...state,
+      historyShow: !state.historyShow
+    }
+  case RATE_CUSTOM_SHOW:
+    return {
+      ...state,
+      customShow: !state.customShow
+    }
+  case RATE_FILTER_SHOW:
+    return {
+      ...state,
+      filterShow: !state.filterShow
+    }
+  }
+  return state
+}
 function getLocalStorage() {
   try {
     return JSON.parse(localStorage.getItem(storePath) || '{}')
@@ -444,5 +468,6 @@ export const reducer = combineReducers({
   rank: rankReducer,
   history: historyReducer,
   timer: timerReducer,
-  custom: customReducer
+  custom: customReducer,
+  setting: settingReducer
 })

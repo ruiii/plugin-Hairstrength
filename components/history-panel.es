@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react'
+import { createSelector } from 'reselect'
 import { Table } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { forEach } from 'lodash'
 import { dateToString } from './utils'
-import { historySelector } from '../redux/selectors'
+import { historyDataSelector, historyShowSelector } from '../redux/selectors'
 
 const DataItem = connect(
   state => ({}),
@@ -23,12 +24,15 @@ const DataItem = connect(
   )
 })
 
-
 export default connect(
-  historySelector,
+  createSelector([
+    historyShowSelector,
+    historyDataSelector
+  ], ({ historyShow }, { historyData }) =>
+    ({ historyShow, historyData }))
 )(class HistoryPanel extends Component{
   render() {
-    const { historyData, historyShow } = this.props.history
+    const { historyShow, historyData } = this.props
     let items = []
     forEach(historyData, (d, i) => {
       if ((new Date(d[0])).getUTCHours() === 18) {

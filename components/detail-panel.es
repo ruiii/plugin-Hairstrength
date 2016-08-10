@@ -1,10 +1,7 @@
 import React, { Component, PropTypes } from 'react'
-import FontAwesome from 'react-fontawesome'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { timeToString } from './utils'
-import { showHistory } from '../redux/actions'
 import { timerSelector, rankSelector } from '../redux/selectors'
 
 const { i18n } = window
@@ -17,20 +14,8 @@ export default connect(
     timerSelector,
     rankSelector
   ], ({ basic }, { timer }, { rank }) =>
-    ({ basic, timer, rank })),
-  { showHistory }
+    ({ basic, timer, rank }))
 )(class DetailPanel extends Component{
-  constructor(props) {
-    super(props)
-    this.state = {
-      show: false
-    }
-  }
-  onShowHistory = (e) => {
-    const show = !this.state.show
-    this.props.showHistory(show)
-    this.setState({ show })
-  }
   render() {
     const { basic, timer, rank } = this.props
     const { api_nickname, api_rank } = basic
@@ -44,26 +29,23 @@ export default connect(
     return (
       <div>
         <div>
-          <div className="name">{ api_nickname }</div>
-          <div className="rank">{ rankName[api_rank] }</div>
+          <div>{ api_nickname }</div>
+          <div>{ rankName[api_rank] }</div>
         </div>
-        <h6 className="detail-time">
-          {__('By:　%s　', timeToString(timer.updateTime))}
-          <OverlayTrigger placement='top' overlay={
-            <Tooltip id='show-rate-tip'>
-              <span>{__('Click to show your rates this month')}</span>
-            </Tooltip>
-          }>
-            <FontAwesome key={0} name='book' onClick={this.onShowHistory} />
-          </OverlayTrigger>
-        </h6>
-        <h6>
-          { __('Ranking') }: { updatedRank }
-          { rankDelta > 0 ? `(↓${rankDelta})` : `(↑${Math.abs(rankDelta)})` }
-          &nbsp;&nbsp;
-          { __('Rate') }: { updatedRate }
-          { rateDelta > 0 ? `(↑${rateDelta})` : ''}
-        </h6>
+        <div>
+          <h6>
+            {__('By:　%s　', timeToString(timer.updateTime))}
+          </h6>
+          <h6>
+            { __('Rate') }: { updatedRate }
+            { rateDelta > 0 ? `(↑${rateDelta})` : ''}
+          </h6>
+          <h6>
+            { __('Ranking') }: { updatedRank }
+            { rankDelta > 0 ? `(↓${rankDelta})` : `(↑${Math.abs(rankDelta)})` }
+          </h6>
+        </div>
+
       </div>
     )
   }

@@ -50,7 +50,6 @@ export default connect(
   }
   render() {
     const {
-    //  presumedSenka,
       accounted,
       accountString,
       nextAccountTime,
@@ -61,20 +60,16 @@ export default connect(
       isUpdated
     } = this.props.timer
     return (
-      <div className='table-container'
-           style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
+      <div style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
           (accounted && !isUpdated)
           ? (
-            <div className='col-container'>
+            <div>
               <span>{__('Accounted')}</span>
-              <span>{'  '}</span>
-              <span>{__('Presumed rate')}</span>
-              {/*<span>{presumedSenka}</span>*/}
             </div>
           )
           : (
-            <div className='col-container'>
+            <div>
               <span>{accountString}</span>
               <span>{timeToString(nextAccountTime)}</span>
               <span>{__('Before account')}</span>
@@ -84,14 +79,14 @@ export default connect(
             </div>
           )
         }
-        <div className='col-container'>
+        <div>
           <span>{refreshString}</span>
           <span>{timeToString(nextRefreshTime)}</span>
           {
             (isTimeUp && !isUpdated)
             ? <span>please update rank list</span>
             :(
-              <div className='col-container'>
+              <div>
                 <span>{__('Before refresh')}</span>
                 <CountdownTimer countdownId="sanka-refresh"
                                 completeTime={nextRefreshTime}

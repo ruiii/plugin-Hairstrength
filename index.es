@@ -5,24 +5,22 @@ import { createSelector } from 'reselect'
 import { Alert } from 'react-bootstrap'
 import { join } from 'path-extra'
 
-// const { i18n } = window
-// const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
-
+import { reducer, observeInit } from './redux'
 import DetailPanel from './components/detail-panel'
+import SettingPanel from './components/setting-panel'
 import TimerPanel from './components/timer-panel'
 import RatePanel from './components/rate-panel'
 import RankList from './components/rank-list'
 
 // import HistoryPanel from './components/history-panel'
 
-import { reducer, observeInit } from './redux'
-
 export const reactClass = (class SenkaCalc extends Component {
   render() {
     return (
       <div id="Senka Calc" className="Senka Calc">
-        <link rel='stylesheet' href={join(__dirname , 'assets', 'Hairstrength.css')} />
+        <link rel='stylesheet' href={join(__dirname , 'assets', 'senka-calc.css')} />
         <DetailPanel />
+        <SettingPanel />
         <TimerPanel />
         <RatePanel />
         <RankList />

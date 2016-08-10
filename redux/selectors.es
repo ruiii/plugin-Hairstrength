@@ -13,6 +13,20 @@ export const customSelector = createSelector(
   state => ({ custom: state.custom })
 )
 
+export const historyShowSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ historyShow: state.setting.historyShow })
+)
+
+export const filterShowSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ filterShow: state.setting.filterShow })
+)
+
+export const customShowSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ customShow: state.setting.customShow })
+)
 
 export const historySelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
