@@ -279,12 +279,13 @@ function rankReducer(state = baseState.rank, action) {
       const api_no = data[apiMap.api_no]
       const api_rate = data[apiMap.api_rate]
 
-      if (api_nickname === nickname && timer.isTimeUp) {
+
+      if (api_nickname === nickname && timer.isTimeUp && updatedTime !== getRefreshTime()) {
         updatedRate = getRate(api_no, api_rate, memberId)
         updatedRank = api_no
         rateDelta = updatedRate - state.updatedRate
         rankDelta = updatedRank - state.updatedRank
-        updatedTime = Date.now()
+        updatedTime = getRefreshTime()
         updated = true
       }
 
