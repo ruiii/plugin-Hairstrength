@@ -5,6 +5,7 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
+import { baseDetailSelector } from './selectors'
 import {
   getRate,
   getMemberId,
@@ -63,20 +64,31 @@ const emptyRank = {
   rate: -1
 }
 
-
-
-const storePath = 'plugin-senka'
-const path = 'state.plugin.poi_plugin_senka_calc'
 const storeItems = ['detail', 'custom']
 const dataPath = join(APPDATA_PATH, 'senka-calc')
 
-observe(store,[observer(
-  (state) =>
-    get(state, path + '.baseDetail'),
-  (dispatch, current, previous) =>
-    localStorage.setItem(storePath, JSON.stringify(current))
-)])
+export function observeInit() {
+  const storePath = 'plugin-senka'
+  // run after plugin loaded
+  observe(store,[observer(
+    // (state) =>
+    //   get(state, path + '.baseDetail'),
+    baseDetailSelector,
+    (dispatch, current, previous) => {
+      const baseDetail = baseDetailSelector(current)
+      localStorage.setItem(storePath, JSON.stringify(baseDetail))
+    }
+  )])
 
+  observe(store, [observer(
+    // (state) =>
+    //   get(state, path + '.history.historyData'),
+    historyDataSelector,
+    (dispatch, current, previous) =>
+      const historyData = historyDataSelector(current)
+      saveHistoryData(historyData)
+  )])
+}
 
 function saveHistoryData(historyData) {
   fileWriter.write(
@@ -86,12 +98,6 @@ function saveHistoryData(historyData) {
     })
   )
 }
-observe(store, [observer(
-  (state) =>
-    get(state, path + '.history.historyData'),
-  (dispatch, current, previous) =>
-    saveHistoryData(current)
-)])
 
 const baseDetail = {
   custom: {
@@ -121,6 +127,12 @@ function initReducer() {
   let storeData = getLocalStorage()
   if (Object.keys(storeData).length === 0) {
     storeData = baseDetail
+  } else {
+    for (let k in baseDetail) {
+      if (!storeData[k] || Object.keys(storeData[k]).length === 0) {
+        storeData[k] = baseDetail[k]
+      }
+    }
   }
   // accounted timer
   let accounted = false
@@ -157,7 +169,8 @@ function initReducer() {
   // ???
   let _refreshTime = nextRefreshTime
   // if not refreshed, mark as timeup
-  if (storeData.timer.updateTime !== _refreshTime) {
+  if (!storeData.rank
+      || (storeData.timer && storeData.timer.updateTime !== _refreshTime)) {
     updatedList = [false, false, false, false, false]
   } else {
     isTimeUp = false
@@ -196,6 +209,7 @@ function initReducer() {
 }
 
 let baseState = initReducer()
+console.log(baseState)
 
 function customReducer(state = baseState.custom, action) {
   switch (action.type) {

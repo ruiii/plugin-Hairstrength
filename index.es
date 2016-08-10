@@ -5,10 +5,8 @@ import { createSelector } from 'reselect'
 import { Alert } from 'react-bootstrap'
 import { join } from 'path-extra'
 
-import { extendReducer } from 'views/createStore'
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
-const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
+// const { i18n } = window
+// const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 import DetailPanel from './components/detail-panel'
 import TimerPanel from './components/timer-panel'
@@ -17,8 +15,7 @@ import RankList from './components/rank-list'
 
 // import HistoryPanel from './components/history-panel'
 
-import { reducer } from './redux'
-
+import { reducer, observeInit } from './redux'
 
 export const reactClass = (class SenkaCalc extends Component {
   render() {
@@ -37,3 +34,12 @@ export const reactClass = (class SenkaCalc extends Component {
 })
 
 export { reducer }
+
+export function pluginDidLoad() {
+  observeInit()
+}
+
+export function pluginWillUnload() {
+  // will unload
+  // TODO: save data or ...
+}

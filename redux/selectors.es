@@ -22,10 +22,10 @@ export const historySelector = createSelector(
 //   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
 //   state => ({ historyShow: state.history.historyShow || false })
 // )
-// export const historyDataSelector = createSelector(
-//   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-//   state => ({ historyData: state.history.historyData || [] })
-// )
+export const historyDataSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ historyData: state.history.historyData || [] })
+)
 
 export const rankSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
@@ -66,3 +66,12 @@ export const timerSelector = createSelector(
 //   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
 //   state => ({ updatedList: state.rank.updatedList || [] })
 // )
+
+export const baseDetailSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({
+    custom: state.custom,
+    rank: state.rank,
+    timer: state.timer
+  })
+)
