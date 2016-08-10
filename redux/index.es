@@ -277,7 +277,6 @@ function rankReducer(state = baseState.rank, action) {
         rateDelta = updatedRate - state.updatedRate
         rankDelta = updatedRank - state.updatedRank
         updatedTime = Date.now()
-        let historyData = historyDataSelector()
         updated = true
       }
 
