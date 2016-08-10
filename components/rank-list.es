@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Checkbox, Alert, Button } from 'react-bootstrap'
-import { forEach, sum } from 'lodash'
+import { forEach, sum, includes, reduce } from 'lodash'
 import { getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
 // import {
@@ -47,12 +47,13 @@ export default connect(
     const {
       activeRank,
       rateList,
-      deltaList
+      deltaList,
+      updatedTime
     } = this.props.rank
-    const { updatedList } = this.props.timer
-    const isUpdated = (sum(updatedList) >= updatedList.length)
+    const { updatedList, isUpdated } = this.props.timer
 
     const { onClickCheckbox } = this
+    const cover = includes(updatedList, true)
     let checkbox = []
     let rankDom = []
     let rateDom = []
@@ -90,10 +91,10 @@ export default connect(
         </div>
         <div className='col-container'>
           <Alert bsStyle='danger'
-                 className={isUpdated ? 'hidden' : 'show'} >
+                 className={isUpdated ? 'hidden' : 'show'}>
             { __('It will save when all rates is updated') }
           </Alert>
-          <div className='table-container'>
+          <div className='table-container' style={getStatusStyle(cover)} >
             <div className='col-container'>
               <span className='title'>{ __('Ranking') }</span>
               { rankDom }
