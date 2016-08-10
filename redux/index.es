@@ -4,6 +4,7 @@ import { combineReducers } from 'redux'
 import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
+import { checkIsUpdated } from '../components/utils'
 import { basicSelector } from 'views/utils/selectors'
 import FileWriter from 'views/utils/fileWriter'
 import CSON from 'cson'
@@ -31,6 +32,7 @@ import {
   RATE_UPDATED,
   RATE_ACCOUNTED,
   RATE_CUSTOM_CHANGE,
+  rateUpdated,
   storeHistoryData
 } from './actions'
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
@@ -82,7 +84,7 @@ const dataPath = join(APPDATA_PATH, 'senka-calc')
 export function observeInit() {
 
   // run after plugin loaded
-  observe(store,[observer(
+  observe(store, [observer(
     // (state) =>
     //   get(state, path + '.baseDetail'),
     baseDetailSelector,
@@ -91,7 +93,7 @@ export function observeInit() {
     }
   )])
 
-  observe(store,[observer(
+  observe(store, [observer(
     rankSelector,
     (dispatch, current, previous) => {
       if (current.rank.updatedTime !== previous.rank.updatedTime) {
@@ -209,6 +211,7 @@ function initReducer() {
       }
     })
   }
+  let isUpdated = checkIsUpdated(storeData.rank.activeRank, updatedList)
 
   return {
     custom: {
@@ -231,7 +234,8 @@ function initReducer() {
       refreshString,
       nextRefreshTime,
       updatedList,
-      isTimeUp
+      isTimeUp,
+      isUpdated
     }
   }
 }
@@ -293,9 +297,9 @@ function rankReducer(state = baseState.rank, action) {
       updated = true
       rateList[idx] = getRate(api_no, api_rate, memberId)
       deltaList[idx] = rateList[idx] - state.rateList[idx]
-      // setImmediate(() => {
-      //   dispatch(rateUpdated(api_no))
-      // });
+
+      // TODO: move this to observe
+      setImmediate(() => dispatch(rateUpdated(api_no)));
     })
 
     if (!updated) {
@@ -357,7 +361,7 @@ function historyReducer(state = baseState.history, action) {
 // }
 function timerReducer(state = baseState.timer, action) {
   switch (action.type) {
-  case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
+  /* case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
     const { type, body, postBody } = action
 
     if (body.api_list) {
@@ -379,20 +383,36 @@ function timerReducer(state = baseState.timer, action) {
         }
       }
     }
-    break
+    break */
   case RATE_TIME_UP:
     return {
       ...state,
       isTimeUp: true
     }
+  case ACTIVE_RANK_UPDATE: {
+      let isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
+      if (isUpdated !== state.isUpdated) {
+        return {
+          ...state,
+          isUpdated
+        }
+      }
+      break
+    }
   case RATE_UPDATED:
     if (action.rankNo) {
+      const rank = rankSelector(window.getStore()).rank
       const idx = getActiveRank().indexOf(action.rankNo)
+      if (idx < 0) {
+        break
+      }
       let updatedList = [ ...state.updatedList ]
-      updatedList[action.idx] = true
+      updatedList[idx] = true
+      let isUpdated = checkIsUpdated(rank.activeRank, updatedList)
       return {
         ...state,
-        updatedList
+        updatedList,
+        isUpdated
       }
     }
     break

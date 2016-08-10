@@ -1,4 +1,5 @@
 import { join } from 'path-extra'
+import { reduce } from 'lodash'
 
 const { APPDATA_PATH } = window
 
@@ -110,4 +111,11 @@ export function dateToString(time) {
   }
   const date = new Data(time)
   return `${date.getMonth() + 1}-${date.getDate()}`
+}
+
+export function checkIsUpdated(activeRank, updatedList) {
+  return !reduce(activeRank, function(sum, active, i) {
+    if (active && !updatedList[i]) sum++
+    return sum
+  }, 0)
 }
