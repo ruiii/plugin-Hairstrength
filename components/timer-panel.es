@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { isLastDay } from './utils'
+import { isLastDay, timeToString } from './utils'
 import { timerSelector } from '../redux/selectors'
 
 const { i18n } = window
@@ -40,7 +40,8 @@ export default connect(
       accountString,
       nextAccountTime,
       refreshString,
-      nextRefreshTime
+      nextRefreshTime,
+      isTimeUp
     } = this.props.timer
     return (
       <div className='table-container'
@@ -69,10 +70,20 @@ export default connect(
         <div className='col-container'>
           <span>{refreshString}</span>
           <span>{timeToString(nextRefreshTime)}</span>
-          <span>{__('Before refresh')}</span>
-          <CountdownTimer countdownId="sanka-refresh"
-                          completeTime={nextRefreshTime}
-                          tickCallback={this.tick} />
+          {
+            !isTimeUp
+            ? (
+              <div>
+                <span>{__('Before refresh')}</span>
+                <CountdownTimer countdownId="sanka-refresh"
+                                completeTime={nextRefreshTime}
+                                tickCallback={this.tick} />
+              </div>
+            )
+            : (
+              <span>please update rank list</span>
+            )
+          }
         </div>
       </div>
     )

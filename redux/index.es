@@ -5,14 +5,15 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
-import { baseDetailSelector, historyDataSelector } from './selectors'
+import { baseDetailSelector, historyDataSelector, timerSelector } from './selectors'
 import {
   getRate,
   getMemberId,
   getFilePath,
   getFinalTime,
   getRefreshTime,
-  getActiveRank
+  getActiveRank,
+  getUserNickname
 } from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
@@ -109,7 +110,11 @@ const baseDetail = {
     exRate: [0, 0],
     activeRank: [true, true, true, true, true],
     rateList: [0, 0, 0, 0, 0],
-    deltaList: [0, 0, 0, 0, 0]
+    deltaList: [0, 0, 0, 0, 0],
+    updatedRate: 0,
+    updatedRank: 0,
+    rateDelta: 0,
+    rankDelta: 0
   },
   timer: {
     updateTime: -1
@@ -118,10 +123,12 @@ const baseDetail = {
 
 function initReducer() {
   // historyData
-  let historyData = {}
+  let historyData
   try {
+    fs.ensureDirSync(getFilePath())
     historyData = fs.readJsonSync(getFilePath(true))
   } catch (e) {
+    historyData = []
   }
   // baseDetail
   let storeData = getLocalStorage()
@@ -234,12 +241,28 @@ function rankReducer(state = baseState.rank, action) {
     }
 
     const memberId = getMemberId()
+    const nickname = getUserNickname()
+    const timer = timerSelector(window.getStore()).timer
     let rateList = [ ...state.rateList ]
+    let deltaList = [ ...state.deltaList ]
+    let { updatedRate, updatedRank, rateDelta, rankDelta } = state
     let updated = false
 
     forEach(body.api_list, (data) => {
+
+      const api_nickname = data[apiMap.api_nickname]
       const api_no = data[apiMap.api_no]
       const api_rate = data[apiMap.api_rate]
+
+      if (api_nickname === nickname && timer.isTimeUp) {
+        updatedRate = getRate(api_no, api_rate, memberId)
+        updatedRank = api_no
+        rateDelta = updatedRate - state.updatedRate
+        rankDelta = updatedRank - state.updatedRank
+        let historyData = historyDataSelector()
+        updated = true
+      }
+
       const idx = getActiveRank().indexOf(api_no)
 
       if (idx < 0) {
@@ -248,6 +271,7 @@ function rankReducer(state = baseState.rank, action) {
 
       updated = true
       rateList[idx] = getRate(api_no, api_rate, memberId)
+      deltaList[idx] = rateList[idx] - state.rateList[idx]
       // setImmediate(() => {
       //   dispatch(rateUpdated(api_no))
       // });
@@ -259,7 +283,12 @@ function rankReducer(state = baseState.rank, action) {
 
     return {
       ...state,
-      rateList
+      rateList,
+      deltaList,
+      updatedRate,
+      updatedRank,
+      rateDelta,
+      rankDelta
     }
 
   case ACTIVE_RANK_UPDATE:

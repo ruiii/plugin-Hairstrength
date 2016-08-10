@@ -22,6 +22,10 @@ export function getMemberId() {
   return window.getStore('info.basic.api_member_id')
 }
 
+export function getUserNickname() {
+  return window.getStore('info.basic.api_nickname')
+}
+
 export function getFilePath(filename = false) {
   const userPath = join(APPDATA_PATH, 'senka-calc', getMemberId().toString())
   return filename
@@ -96,7 +100,7 @@ export function timeToString(time, isFilename = false) {
 }
 
 export function getStatusStyle(flag) {
-  return flag ? { opacity: 0.4 } : {}
+  return flag ? {} : { opacity: 0.4 }
 }
 
 export function dateToString(time) {
