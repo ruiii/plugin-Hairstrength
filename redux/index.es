@@ -5,7 +5,12 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
-import { baseDetailSelector, historyDataSelector, timerSelector } from './selectors'
+import {
+  baseDetailSelector,
+  historyDataSelector,
+  timerSelector,
+  rankSelector
+} from './selectors'
 import {
   getRate,
   getMemberId,
@@ -18,11 +23,13 @@ import {
 import {
   ACTIVE_RANK_UPDATE,
   RATE_HISTORY_SHOW,
+  RATE_HISTORY_UPDATE,
   HISTORY_HIDE,
   RATE_TIME_UP,
   RATE_UPDATED,
   RATE_ACCOUNTED,
-  RATE_CUSTOM_CHANGE
+  RATE_CUSTOM_CHANGE,
+  storeHistoryData
 } from './actions'
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 const { i18n } = window
@@ -81,6 +88,15 @@ export function observeInit() {
     }
   )])
 
+  observe(store,[observer(
+    rankSelector,
+    (dispatch, current, previous) => {
+      if (current.updateTime !== previous.updateTime) {
+        dispatch(storeHistoryData())
+      }
+    }
+  )])
+
   observe(store, [observer(
     // (state) =>
     //   get(state, path + '.history.historyData'),
@@ -114,7 +130,8 @@ const baseDetail = {
     updatedRate: 0,
     updatedRank: 0,
     rateDelta: 0,
-    rankDelta: 0
+    rankDelta: 0,
+    updatedTime: 0
   },
   timer: {
     updateTime: -1
@@ -245,7 +262,7 @@ function rankReducer(state = baseState.rank, action) {
     const timer = timerSelector(window.getStore()).timer
     let rateList = [ ...state.rateList ]
     let deltaList = [ ...state.deltaList ]
-    let { updatedRate, updatedRank, rateDelta, rankDelta } = state
+    let { updatedRate, updatedRank, rateDelta, rankDelta, updatedTime } = state
     let updated = false
 
     forEach(body.api_list, (data) => {
@@ -259,6 +276,7 @@ function rankReducer(state = baseState.rank, action) {
         updatedRank = api_no
         rateDelta = updatedRate - state.updatedRate
         rankDelta = updatedRank - state.updatedRank
+        updatedTime = Date.now()
         let historyData = historyDataSelector()
         updated = true
       }
@@ -288,7 +306,8 @@ function rankReducer(state = baseState.rank, action) {
       updatedRate,
       updatedRank,
       rateDelta,
-      rankDelta
+      rankDelta,
+      updatedTime
     }
 
   case ACTIVE_RANK_UPDATE:
@@ -308,6 +327,19 @@ function historyReducer(state = baseState.history, action) {
     return {
       ...state,
       historyShow: action.show
+    }
+  case RATE_HISTORY_UPDATE:
+    const rank = rankSelector(window.getStore()).rank
+    return {
+      ...state,
+      historyData: [
+        ...state.historyData,
+        {
+          rate: rank.updatedRate,
+          rank: rank.updatedRank,
+          time: rank.updatedTime
+        }
+      ]
     }
   }
   return state
@@ -344,7 +376,7 @@ function timerReducer(state = baseState.timer, action) {
         }
       }
     }
-    break;
+    break
   case RATE_TIME_UP:
     return {
       ...state,
@@ -360,11 +392,17 @@ function timerReducer(state = baseState.timer, action) {
         updatedList
       }
     }
-    break;
+    break
   case RATE_ACCOUNTED:
     return {
       ...state,
       accounted: true
+    }
+  case RATE_HISTORY_UPDATE:
+    const rank = rankSelector(window.getStore()).rank
+    return {
+      ...state,
+      updateTime: rank.updatedTime
     }
   }
   return state
