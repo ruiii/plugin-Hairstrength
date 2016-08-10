@@ -5,6 +5,8 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
+import FileWriter from 'views/utils/fileWriter'
+import CSON from 'cson'
 import {
   baseDetailSelector,
   historyDataSelector,
@@ -34,6 +36,7 @@ import {
 const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 const { i18n } = window
 const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
+const fileWriter = new FileWriter()
 /*
 *    api_req_ranking/getlist	：ランキング
 *    	api_count			：最大読み込み可能数？
@@ -91,7 +94,7 @@ export function observeInit() {
   observe(store,[observer(
     rankSelector,
     (dispatch, current, previous) => {
-      if (current.updateTime !== previous.updateTime) {
+      if (current.rank.updatedTime !== previous.rank.updatedTime) {
         dispatch(storeHistoryData())
       }
     }
@@ -102,7 +105,7 @@ export function observeInit() {
     //   get(state, path + '.history.historyData'),
     historyDataSelector,
     (dispatch, current, previous) => {
-      saveHistoryData(current)
+      saveHistoryData(current.historyData)
     }
   )])
 }
@@ -110,9 +113,7 @@ export function observeInit() {
 function saveHistoryData(historyData) {
   fileWriter.write(
     getFilePath(true),
-    CSON.stringify({
-      ...historyData
-    })
+    CSON.stringify(historyData)
   )
 }
 
@@ -144,6 +145,9 @@ function initReducer() {
   try {
     fs.ensureDirSync(getFilePath())
     historyData = fs.readJsonSync(getFilePath(true))
+    if (!(historyData instanceof Array)) {
+      historyData = []
+    }
   } catch (e) {
     historyData = []
   }
@@ -177,7 +181,7 @@ function initReducer() {
   } else if (now >= normalTime) {
     accountString = __('Normal map final time')
     nextAccountTime = expTime
-  } else if (now >= storeData.updateTime + 11 * 3600 * 1000) {
+  } else if (now >= storeData.timer.updateTime + 11 * 3600 * 1000) {
     storeData.rank.exRate[0] = storeData.rank.exRate[1]
     storeData.rank.exRate[1] = 0
     accounted = true
