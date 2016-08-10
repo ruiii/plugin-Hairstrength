@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormControl, Panel, Checkbox } from 'react-bootstrap'
-import { expSelector, customSelector } from '../redux/selectors'
+import { expSelector, customSelector, updatedRateSelector } from '../redux/selectors'
 import { estimateSenka } from './utils'
 import { customChange } from '../redux/actions'
 
@@ -12,9 +12,10 @@ const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 export default connect(
   createSelector([
     expSelector,
-    customSelector
-  ], ({ exp }, { custom }) =>
-    ({ exp, custom })),
+    customSelector,
+    updatedRateSelector
+  ], ({ exp }, { custom }, { updatedRate }) =>
+    ({ exp, custom, updatedRate })),
   { customChange }
 )(class RatePanel extends Component{
   constructor(props) {
@@ -30,6 +31,16 @@ export default connect(
   componentWillMount() {
     this.setState({
       _enable: this.props.custom.enable,
+    })
+  }
+  onUseCurrentExp = (e) => {
+    this.check({
+      _customExp: this.props.exp
+    })
+  }
+  onUseUpdatedRate = (e) => {
+    this.check({
+      _customRate: this.props.updatedRate
     })
   }
   onExpChange = (e) => {
@@ -120,25 +131,35 @@ export default connect(
 
     return (
       <div className='exp-listener'>
-        <Button onClick={this.onCustomShow}>custom</Button>
+        <Button onClick={this.onCustomShow}>{ __('Custom') }</Button>
         <Panel collapsible expanded={customShow}>
-          <FormControl type='number'
-                 label="exp"
-                 placeholder="exp"
-                 value={_customExp}
-                 ref='customExp'
-                 onChange={this.onExpChange} />
-          <Checkbox onChange={this.onEnableRate}
-                    checked={_enable}/>
-          <FormControl type='number'
-                 label="rate"
-                 placeholder="rate"
-                 value={_customRate}
-                 ref='customRate'
-                 disabled={!_enable}
-                 onChange={this.onRateChange} />
+          <div>
+            <FormControl type='number'
+                         label={ __('Base Exp') }
+                         placeholder="exp"
+                         value={_customExp}
+                         ref='customExp'
+                         onChange={this.onExpChange} />
+            <Button onClick={this.onUseCurrentExp}>
+              { __('Use current exp') }
+            </Button>
+          </div>
+          <div>
+            <Button onClick={this.onUseUpdatedRate}>
+              { __('Use updated rate') }
+            </Button>
+            <Checkbox onChange={this.onEnableRate}
+                      checked={_enable}/>
+            <FormControl type='number'
+                         label={ __('Base Rate') }
+                         placeholder="rate"
+                         value={_customRate}
+                         ref='customRate'
+                         disabled={!_enable}
+                         onChange={this.onRateChange} />
+          </div>
           <Button onClick={this.onCustomChange}
-                  disabled={btnDisable}>save</Button>
+                  disabled={btnDisable}>{ __('OK') }</Button>
         </Panel>
         <span>{__('Experience')}</span>
         <span>{baseExp}　->　{exp}</span>

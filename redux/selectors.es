@@ -32,6 +32,11 @@ export const rankSelector = createSelector(
   state => ({ rank: state.rank })
 )
 
+export const updatedRateSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ updatedRate: state.rank.updatedRate })
+)
+
 export const timerSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ timer: state.timer })
