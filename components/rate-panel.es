@@ -128,9 +128,9 @@ export default connect(
     const rate = estimateSenka(exp, baseExp)
 
     return (
-      <div>
+      <div className="rate-panel">
         <Panel collapsible expanded={customShow}>
-          <div>
+          <div className="custom-panel">
             <FormControl type='number'
                          label={ __('Base Exp') }
                          placeholder="exp"
@@ -141,10 +141,10 @@ export default connect(
               { __('Use current exp') }
             </Button>
           </div>
-          <div>
-            <Checkbox onChange={this.onEnableRate}
-                      label={__('Set rate')}
-                      checked={_enable}/>
+          <span>{__('Set rate')}</span>
+          <Checkbox onChange={this.onEnableRate}
+                    checked={_enable}/>
+          <div className="custom-panel">
             <FormControl type='number'
                          label={ __('Base Rate') }
                          placeholder="rate"
@@ -160,13 +160,22 @@ export default connect(
           <Button onClick={this.onCustomChange}
                   disabled={btnDisable}>{ __('OK') }</Button>
         </Panel>
-        <span>{__('Experience')}</span>
-        <span>{baseExp}　->　{exp}</span>
-        <span>( ↑ {exp - baseExp} )</span>
-        <span>{__('Rate')}</span>
-        <span>{rate.toFixed(1)} {baseRate} {
-          enable ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)
-        }</span>
+        <div className="rate-calc">
+          <div className="rate-container">
+            <span className="rate-part">{__('Experience')}</span>
+            <div className="rate-part">
+              <span>{baseExp}　->　{exp}</span>
+              <span>( ↑ {exp - baseExp} )</span>
+            </div>
+          </div>
+          <div className="rate-container">
+            <span className="rate-part">{__('Rate')}</span>
+            <div className="rate-part">
+              <span> {baseRate} -> {enable ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
+              { enable ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

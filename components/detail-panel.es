@@ -25,23 +25,23 @@ export default connect(
     } = rank
 
     return (
-      <div>
-        <div>
-          <div>{ api_nickname }</div>
-          <div>{ rankName[api_rank] }</div>
+      <div className="detail-panel">
+        <div className="user-container">
+          <div className="nickname">{ api_nickname }</div>
+          <div className="rank">{ rankName[api_rank] }</div>
         </div>
-        <div>
-          <h6>
+        <div className="rate-container">
+          <span>
             {__('By:　%s　', timeToString(timer.updateTime))}
-          </h6>
-          <h6>
+          </span>
+          <span>
             { __('Rate') }: { updatedRate }
-            { rateDelta > 0 ? `(↑${rateDelta})` : ''}
-          </h6>
-          <h6>
+            { rateDelta > 0 ? ` ( ↑${rateDelta} )` : ''}
+          </span>
+          <span>
             { __('Ranking') }: { updatedRank }
-            { rankDelta > 0 ? `(↓${rankDelta})` : `(↑${Math.abs(rankDelta)})` }
-          </h6>
+            { rankDelta > 0 ? ` ( ↓${rankDelta} )` : ` ( ↑${Math.abs(rankDelta)} )` }
+          </span>
         </div>
 
       </div>

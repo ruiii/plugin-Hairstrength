@@ -57,33 +57,39 @@ export default connect(
       isUpdated
     } = this.props.timer
     return (
-      <div style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
+      <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
           (accounted && !isUpdated)
           ? (
-            <div>
+            <div className="timer-container">
               <span>{__('Accounted')}</span>
             </div>
           )
           : (
-            <div>
-              <span>{accountString}</span>
-              <span>{timeToString(nextAccountTime)}</span>
-              <span>{__('Before account')}</span>
-              <CountdownTimer countdownId="sanka-account"
-                              completeTime={nextAccountTime}
-                              tickCallback={this.accountTick} />
+            <div className="timer-container">
+              <div className="timer-part">
+                <span>{accountString}</span>
+                <span>{timeToString(nextAccountTime)}</span>
+              </div>
+              <div className="timer-part">
+                <span>{__('Before account')}</span>
+                <CountdownTimer countdownId="sanka-account"
+                                completeTime={nextAccountTime}
+                                tickCallback={this.accountTick} />
+              </div>
             </div>
           )
         }
-        <div>
-          <span>{refreshString}</span>
-          <span>{timeToString(nextRefreshTime)}</span>
+        <div className="timer-container">
+          <div className="timer-part">
+            <span>{refreshString}</span>
+            <span>{timeToString(nextRefreshTime)}</span>
+          </div>
           {
             (isTimeUp && !isUpdated)
             ? <span>please update rank list</span>
             :(
-              <div>
+              <div className="timer-part">
                 <span>{__('Before refresh')}</span>
                 <CountdownTimer countdownId="sanka-refresh"
                                 completeTime={nextRefreshTime}

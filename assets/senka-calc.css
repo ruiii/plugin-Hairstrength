@@ -1,4 +1,65 @@
-#Senka\ Calc .container {
-  margin-top: 15px;
-  padding: 15px;
-}
+#Senka\ Calc .detail-panel {
+  width: 200px;
+  margin: 0 auto; }
+  #Senka\ Calc .detail-panel .user-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-around;
+    margin: 10px auto; }
+    #Senka\ Calc .detail-panel .user-container .nickname {
+      font-size: 25px; }
+    #Senka\ Calc .detail-panel .user-container .rank {
+      font-size: 15px; }
+  #Senka\ Calc .detail-panel .rate-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; }
+    #Senka\ Calc .detail-panel .rate-container span {
+      padding: 2px;
+      font-size: 14px;
+      color: gray; }
+#Senka\ Calc .setting-panel {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 10px; }
+  #Senka\ Calc .setting-panel .setting-icon {
+    font-size: 17px;
+    margin: 5px; }
+#Senka\ Calc .timer-panel {
+  display: flex;
+  justify-content: space-around;
+  margin: 15px; }
+  #Senka\ Calc .timer-panel .timer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    width: 50%; }
+    #Senka\ Calc .timer-panel .timer-container .timer-part {
+      margin: 3px 0;
+      width: 100%; }
+      #Senka\ Calc .timer-panel .timer-container .timer-part span {
+        margin-left: 10px; }
+#Senka\ Calc .rate-panel {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  font-size: 17px; }
+  #Senka\ Calc .rate-panel .rate-calc {
+    width: 100%; }
+    #Senka\ Calc .rate-panel .rate-calc .rate-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center; }
+      #Senka\ Calc .rate-panel .rate-calc .rate-container .rate-part {
+        display: flex;
+        flex-direction: column;
+        width: 50%; }
+        #Senka\ Calc .rate-panel .rate-calc .rate-container .rate-part:nth-child(odd) {
+          text-align: center; }
+    #Senka\ Calc .rate-panel .rate-calc span {
+      margin: 3px auto; }
+
+/*# sourceMappingURL=senka-calc.css.map */

@@ -20,9 +20,9 @@ export default connect(
   }
   render() {
     return (
-      <div>
+      <div className="setting-panel">
         <DropdownButton title={
-          <FontAwesome key={0} name='gear' />
+          <FontAwesome className="setting-icon" key={0} name='gear' />
         } id="bg-nested-dropdown">
           <MenuItem onSelect={this.onCustomShow} eventKey="1">
             { __('Custom calc') }

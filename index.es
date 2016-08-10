@@ -18,8 +18,8 @@ export const reactClass = (class SenkaCalc extends Component {
     return (
       <div id="Senka Calc" className="Senka Calc">
         <link rel='stylesheet' href={join(__dirname , 'assets', 'senka-calc.css')} />
-        <DetailPanel />
         <SettingPanel />
+        <DetailPanel />
         <TimerPanel />
         <RatePanel />
         <RankList />

@@ -1,0 +1,86 @@
+#Senka\ Calc {
+  .detail-panel {
+    width: 200px;
+    margin: 0 auto;
+    .user-container {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-around;
+      margin: 10px auto;
+      .nickname {
+        font-size: 25px;
+      }
+      .rank {
+        font-size: 15px;
+      }
+    }
+    .rate-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      span {
+        padding: 2px;
+        font-size: 14px;
+        color: gray;
+      }
+    }
+  }
+  .setting-panel {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    .setting-icon {
+      font-size: 17px;
+      margin: 5px;
+    }
+  }
+  .timer-panel {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px;
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      width: 50%;
+      .timer-part {
+        margin: 3px 0;
+        width: 100%;
+        span {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+  .rate-panel {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 17px;
+    .rate-calc {
+      width: 100%;
+      .rate-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        .rate-part {
+          display: flex;
+          flex-direction: column;
+          width: 50%;
+          &:nth-child(odd) {
+            text-align: center;
+          }
+        }
+      }
+      span {
+        margin: 3px auto;
+      }
+    }
+    .custom-panel {
+
+    }
+  }
+}
