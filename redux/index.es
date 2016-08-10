@@ -5,7 +5,7 @@ import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
 import { basicSelector } from 'views/utils/selectors'
-import { baseDetailSelector } from './selectors'
+import { baseDetailSelector, historyDataSelector } from './selectors'
 import {
   getRate,
   getMemberId,
@@ -84,9 +84,10 @@ export function observeInit() {
     // (state) =>
     //   get(state, path + '.history.historyData'),
     historyDataSelector,
-    (dispatch, current, previous) =>
+    (dispatch, current, previous) => {
       const historyData = historyDataSelector(current)
       saveHistoryData(historyData)
+    }
   )])
 }
 
