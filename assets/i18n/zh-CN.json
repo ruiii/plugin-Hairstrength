@@ -19,5 +19,11 @@
   "Accounted": "已结算",
   "EO map final time": "EO海图战果结算时间",
   "Normal map final time": "普通海图战果结算时间",
-  "Click to show your rates this month": "点击查看本月战绩"
+  "Click to show your rates this month": "点击查看本月战绩",
+  "Custom": "自定义",
+  "Base Exp": "基础经验值",
+  "Use current exp": "使用当前经验值",
+  "Base Rate": "基础战果值",
+  "Use updated rate": "使用榜上的战果值",
+  "OK": "确定"
 }
