@@ -6,7 +6,6 @@ import { expSelector, customSelector, updatedRateSelector, customShowSelector } 
 import { __, estimateSenka } from './utils'
 import { customChange } from '../redux/actions'
 
-
 export default connect(
   createSelector([
     expSelector,

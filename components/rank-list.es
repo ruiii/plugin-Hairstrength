@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Checkbox, Alert, Button } from 'react-bootstrap'
+import { Checkbox, Alert } from 'react-bootstrap'
 import { forEach, sum, includes, reduce } from 'lodash'
 import { __, getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'

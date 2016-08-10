@@ -9,16 +9,13 @@ import { historyDataSelector, historyShowSelector } from '../redux/selectors'
 const DataItem = connect(
   state => ({})
 )(({ data }) => {
-  let td = []
-  forEach(data, (d, i) =>
-    td.push(
-      (i === 0)
-      ? <td style={{padding: 2}} key={i}>{ dateToString(d) }</td>
-      : <td style={{padding: 2}} key={i}>{ d }</td>
-    )
-  )
+  const { time, rank, rate } = data
   return (
-    <tr>{ td }</tr>
+    <tr>
+      <td style={{padding: 2}}>{ dateToString(time) }</td>
+      <td style={{padding: 2}}>{ rank }</td>
+      <td style={{padding: 2}}>{ rate }</td>
+    </tr>
   )
 })
 
@@ -40,7 +37,7 @@ export default connect(
     })
     return (
       <div className={`histort-panel ${historyShow ? 'show' : 'hidden'}`}>
-        <Table striped bordered condensed hover Responsive>
+        <Table striped bordered condensed hover responsive>
           <thead>
             <tr>
               <th>{__('Time')}</th>

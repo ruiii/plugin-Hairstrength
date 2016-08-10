@@ -111,7 +111,7 @@ export function dateToString(time) {
   if (!time) {
     return
   }
-  const date = new Data(time)
+  const date = new Date(time)
   return `${date.getMonth() + 1}-${date.getDate()}`
 }
 
