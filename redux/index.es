@@ -64,19 +64,19 @@ const emptyRank = {
   rate: -1
 }
 
+const storePath = 'plugin-senka'
 const storeItems = ['detail', 'custom']
 const dataPath = join(APPDATA_PATH, 'senka-calc')
 
 export function observeInit() {
-  const storePath = 'plugin-senka'
+
   // run after plugin loaded
   observe(store,[observer(
     // (state) =>
     //   get(state, path + '.baseDetail'),
     baseDetailSelector,
     (dispatch, current, previous) => {
-      const baseDetail = baseDetailSelector(current)
-      localStorage.setItem(storePath, JSON.stringify(baseDetail))
+      localStorage.setItem(storePath, JSON.stringify(current))
     }
   )])
 
@@ -85,8 +85,7 @@ export function observeInit() {
     //   get(state, path + '.history.historyData'),
     historyDataSelector,
     (dispatch, current, previous) => {
-      const historyData = historyDataSelector(current)
-      saveHistoryData(historyData)
+      saveHistoryData(current)
     }
   )])
 }
@@ -176,8 +175,8 @@ function initReducer() {
   } else {
     isTimeUp = false
     nextRefreshTime = getRefreshTime('next')
-    forEach(storeData.rank.rankList, (rank, idx) => {
-      if (rank === 0) {
+    forEach(storeData.rank.rateList, (rate, idx) => {
+      if (rate === 0) {
         updatedList[idx] = false
       }
     })
@@ -210,7 +209,7 @@ function initReducer() {
 }
 
 let baseState = initReducer()
-console.log(baseState)
+console.log('baseState', baseState)
 
 function customReducer(state = baseState.custom, action) {
   switch (action.type) {
