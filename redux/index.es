@@ -144,7 +144,7 @@ function initReducer() {
   let historyData
   try {
     fs.ensureDirSync(getFilePath())
-    historyData = fs.readJsonSync(getFilePath(true))
+    historyData = CSON.parseCSONFile(getFilePath(true))
     if (!(historyData instanceof Array)) {
       historyData = []
     }
