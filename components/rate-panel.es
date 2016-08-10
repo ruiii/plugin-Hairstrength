@@ -3,11 +3,9 @@ import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormControl, Panel, Checkbox } from 'react-bootstrap'
 import { expSelector, customSelector, updatedRateSelector, customShowSelector } from '../redux/selectors'
-import { estimateSenka } from './utils'
+import { __, estimateSenka } from './utils'
 import { customChange } from '../redux/actions'
 
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 export default connect(
   createSelector([

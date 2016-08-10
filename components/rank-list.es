@@ -3,11 +3,9 @@ import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Checkbox, Alert, Button } from 'react-bootstrap'
 import { forEach, sum, includes, reduce } from 'lodash'
-import { getStatusStyle } from './utils'
+import { __, getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
 import { rankSelector, timerSelector, filterShowSelector } from '../redux/selectors'
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 export default connect(
   createSelector([

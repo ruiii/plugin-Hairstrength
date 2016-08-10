@@ -11,8 +11,7 @@ import SettingPanel from './components/setting-panel'
 import TimerPanel from './components/timer-panel'
 import RatePanel from './components/rate-panel'
 import RankList from './components/rank-list'
-
-// import HistoryPanel from './components/history-panel'
+import HistoryPanel from './components/history-panel'
 
 export const reactClass = (class SenkaCalc extends Component {
   render() {
@@ -24,8 +23,7 @@ export const reactClass = (class SenkaCalc extends Component {
         <TimerPanel />
         <RatePanel />
         <RankList />
-        {/*{<HistoryPanel />
-        }*/}
+        <HistoryPanel />
       </div>
     )
   }

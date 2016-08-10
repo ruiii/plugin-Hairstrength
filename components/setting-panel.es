@@ -3,9 +3,7 @@ import FontAwesome from 'react-fontawesome'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { showCustom, showRankFilter, showHistory } from '../redux/actions'
-
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
+import { __ } from './utils'
 
 export default connect(
   (state) => ({}),

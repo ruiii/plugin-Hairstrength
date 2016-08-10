@@ -1,7 +1,9 @@
 import { join } from 'path-extra'
 import { reduce } from 'lodash'
 
-const { APPDATA_PATH } = window
+const { APPDATA_PATH, i18n } = window
+
+export const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 export function estimateSenka(exp, baseExp) {
   return (exp - baseExp) / 1428 - 0.0499

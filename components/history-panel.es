@@ -3,14 +3,12 @@ import { createSelector } from 'reselect'
 import { Table } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { forEach } from 'lodash'
-import { dateToString } from './utils'
+import { __, dateToString } from './utils'
 import { historyDataSelector, historyShowSelector } from '../redux/selectors'
 
 const DataItem = connect(
-  state => ({}),
-  { dateToString }
-)((dateToString, data) => {
-  const { data, dateToString } = this.props
+  state => ({})
+)(({ data }) => {
   let td = []
   forEach(data, (d, i) =>
     td.push(

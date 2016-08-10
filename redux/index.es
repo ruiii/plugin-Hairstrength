@@ -4,7 +4,7 @@ import { combineReducers } from 'redux'
 import { observer, observe } from 'redux-observers'
 import { get, set, forEach } from 'lodash'
 import { store } from 'views/createStore'
-import { checkIsUpdated } from '../components/utils'
+import { checkIsUpdated, __ } from '../components/utils'
 import { basicSelector } from 'views/utils/selectors'
 import FileWriter from 'views/utils/fileWriter'
 import CSON from 'cson'
@@ -37,10 +37,9 @@ import {
   rateUpdated,
   storeHistoryData
 } from './actions'
-const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
+
 const fileWriter = new FileWriter()
+
 /*
 *    api_req_ranking/getlist	：ランキング
 *    	api_count			：最大読み込み可能数？

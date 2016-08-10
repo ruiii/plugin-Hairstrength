@@ -2,12 +2,9 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { includes } from 'lodash'
-import { isLastDay, timeToString } from './utils'
+import { __, isLastDay, timeToString } from './utils'
 import { timerSelector } from '../redux/selectors'
 import { rateAccounted, rateTimeUp } from '../redux/actions'
-
-const { i18n } = window
-const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 import { CountdownTimer } from 'views/components/main/parts/countdown-timer'
 
