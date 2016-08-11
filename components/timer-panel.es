@@ -84,7 +84,7 @@ export default connect(
           </div>
           {
             (isTimeUp && !isUpdated)
-            ? <span>please update rank list</span>
+            ? ''
             :(
               <div className="timer-part">
                 <span>{__('Before refresh')}</span>
