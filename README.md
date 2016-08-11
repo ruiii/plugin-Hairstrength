@@ -4,7 +4,7 @@
 
 (a.k.a [poi-plugin-senka-calc][npm-url])
 
-Senka calculation for [poi](https://github.com/poooi/poi)
+Senka calculator for [poi](https://github.com/poooi/poi)
 
 [中文说明](/README.zh-CN.md)
 
