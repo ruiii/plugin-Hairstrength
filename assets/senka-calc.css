@@ -39,7 +39,8 @@
     width: 50%; }
     #Senka\ Calc .timer-panel .timer-container .timer-part {
       margin: 3px 0;
-      width: 100%; }
+      width: 100%;
+      text-align: center; }
       #Senka\ Calc .timer-panel .timer-container .timer-part span {
         margin-left: 10px; }
 #Senka\ Calc .rate-panel {
