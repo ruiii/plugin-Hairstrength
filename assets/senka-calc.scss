@@ -112,12 +112,16 @@
       .checkbox {
         font-size: 15px;
       }
-      .panel-body > button {
-        &:last-child {
-          width: 80%;
-          display: block;
-          margin: 0 auto;
-        }
+      .rate-btns {
+        display: flex;
+        justify-content: space-around;
+        & > button {
+         &:last-child, &:nth-last-child(2) {
+           width: 40%;
+           display: block;
+           margin: 0 auto;
+         }
+       }
       }
     }
   }
@@ -157,7 +161,15 @@
     top: 52px;
     .panel-body {
       height: 412px;
-      overflow-y: auto;
+      .table-responsive {
+        height: 85%;
+        overflow-y: auto;
+      }
+      button {
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+      }
     }
   }
 }

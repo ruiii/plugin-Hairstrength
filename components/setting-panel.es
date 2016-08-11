@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import FontAwesome from 'react-fontawesome'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { connect } from 'react-redux'
+import { includes } from 'lodash'
+import { settingSelector } from '../redux/selectors'
 import { showCustom, showRankFilter, showHistory } from '../redux/actions'
 import { __ } from './utils'
 
 export default connect(
-  (state) => ({}),
+  settingSelector,
   { showCustom, showRankFilter, showHistory }
 )(class SettingPanel extends Component {
   onCustomShow = (e) => {
@@ -19,11 +21,12 @@ export default connect(
     this.props.showHistory()
   }
   render() {
+    const disabled = includes(this.props.setting, true)
     return (
       <div className="setting-panel">
         <DropdownButton title={
           <FontAwesome className="setting-icon" key={0} name='gear' />
-        } id="bg-nested-dropdown">
+        } id="bg-nested-dropdown" disabled={disabled}>
           <MenuItem onSelect={this.onCustomShow} eventKey="1">
             { __('Custom calc') }
           </MenuItem>

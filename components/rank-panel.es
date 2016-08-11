@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Checkbox, Alert, Panel } from 'react-bootstrap'
+import { Button, Checkbox, Alert, Panel } from 'react-bootstrap'
+import FontAwesome from 'react-fontawesome'
 import { forEach, includes } from 'lodash'
 import { __, getStatusStyle } from './utils'
-import { activeRankChange } from '../redux/actions'
+import { activeRankChange, showRankFilter } from '../redux/actions'
 import { rankSelector, timerSelector, filterShowSelector } from '../redux/selectors'
 
 export default connect(
@@ -14,7 +15,7 @@ export default connect(
     filterShowSelector,
   ], ({ rank }, { timer }, { filterShow }) =>
     ({ rank, timer, filterShow })),
-  { activeRankChange }
+  { activeRankChange, showRankFilter }
 )(class RankPanel extends Component {
   constructor(props) {
     super(props)
@@ -26,6 +27,9 @@ export default connect(
     const activeRank = this.props.rank.activeRank
     activeRank[index] = !activeRank[index]
     this.props.activeRankChange(activeRank)
+  }
+  onFilterClose = (e) => {
+    this.props.showRankFilter()
   }
   render() {
     const { ranks } = this.state
@@ -65,6 +69,9 @@ export default connect(
     return (
       <div className="rank-panel">
         <Panel collapsible expanded={this.props.filterShow}>
+          <Button onClick={this.onFilterClose}>
+            <FontAwesome className="setting-icon" key={0} name='close' />
+          </Button>
           { checkbox }
         </Panel>
         <Alert bsStyle='danger'

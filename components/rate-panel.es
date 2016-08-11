@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
+import FontAwesome from 'react-fontawesome'
 import { expSelector, customSelector, updatedRateSelector, customShowSelector } from '../redux/selectors'
 import { __, estimateSenka, getStatusStyle } from './utils'
-import { customChange } from '../redux/actions'
+import { customChange, showCustom } from '../redux/actions'
 
 export default connect(
   createSelector([
@@ -14,7 +15,7 @@ export default connect(
     customShowSelector,
   ], ({ exp }, { custom }, { updatedRate }, { customShow }) =>
     ({ exp, custom, updatedRate, customShow })),
-  { customChange }
+  { customChange, showCustom }
 )(class RatePanel extends Component{
   constructor(props) {
     super(props)
@@ -102,6 +103,9 @@ export default connect(
       btnDisable: true,
     })
   }
+  onCustomClose = (e) => {
+    this.props.showCustom()
+  }
   componentWillReceiveProps(nextProps) {
     if (nextProps.customShow != this.props.customShow && nextProps.customShow) {
       this.setState({
@@ -158,8 +162,13 @@ export default connect(
                { __('Use updated rate') }
              </Button>
           </FormGroup>
-          <Button onClick={this.onCustomChange}
-                  disabled={btnDisable}>{ __('OK') }</Button>
+          <div className="rate-btns">
+            <Button onClick={this.onCustomChange}
+                    disabled={btnDisable}>{ __('OK') }</Button>
+            <Button onClick={this.onCustomClose}>
+              <FontAwesome className="setting-icon" key={0} name='close' />
+            </Button>
+          </div>
         </Panel>
         <div className={`rate-calc ${customShow ? 'on-custom' : ''}`}>
           <div className="rate-container">

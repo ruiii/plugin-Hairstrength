@@ -80,7 +80,7 @@ export function observeInit() {
   observe(store, [observer(
     rankSelector,
     (dispatch, current, previous) => {
-      if (!current.rank) {
+      if (!current.rank || !previous.rank) {
         return
       }
       if (current.rank.updatedTime !== previous.rank.updatedTime) {
@@ -411,21 +411,15 @@ function settingReducer(state = baseState.setting, action) {
     return {
       ...state,
       historyShow: !state.historyShow,
-      customShow: false,
-      filterShow: false,
     }
   case RATE_CUSTOM_SHOW:
     return {
       ...state,
-      historyShow: false,
       customShow: !state.customShow,
-      filterShow: false,
     }
   case RATE_FILTER_SHOW:
     return {
       ...state,
-      historyShow: false,
-      customShow: false,
       filterShow: !state.filterShow,
     }
   }

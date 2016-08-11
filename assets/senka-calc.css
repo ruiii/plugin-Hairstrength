@@ -88,10 +88,13 @@
         font-size: 14px; }
     #Senka\ Calc .rate-panel .panel .checkbox {
       font-size: 15px; }
-    #Senka\ Calc .rate-panel .panel .panel-body > button:last-child {
-      width: 80%;
-      display: block;
-      margin: 0 auto; }
+    #Senka\ Calc .rate-panel .panel .rate-btns {
+      display: flex;
+      justify-content: space-around; }
+      #Senka\ Calc .rate-panel .panel .rate-btns > button:last-child, #Senka\ Calc .rate-panel .panel .rate-btns > button:nth-last-child(2) {
+        width: 40%;
+        display: block;
+        margin: 0 auto; }
 #Senka\ Calc .rank-panel {
   margin: 20px auto; }
   #Senka\ Calc .rank-panel .panel {
@@ -120,7 +123,13 @@
   width: 100%;
   top: 52px; }
   #Senka\ Calc .history-panel .panel-body {
-    height: 412px;
-    overflow-y: auto; }
+    height: 412px; }
+    #Senka\ Calc .history-panel .panel-body .table-responsive {
+      height: 85%;
+      overflow-y: auto; }
+    #Senka\ Calc .history-panel .panel-body button {
+      display: block;
+      width: 80%;
+      margin: 10px auto; }
 
 /*# sourceMappingURL=senka-calc.css.map */

@@ -13,6 +13,11 @@ export const customSelector = createSelector(
   state => ({ custom: state.custom })
 )
 
+export const settingSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ setting: state.setting })
+)
+
 export const historyShowSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ historyShow: state.setting.historyShow })
