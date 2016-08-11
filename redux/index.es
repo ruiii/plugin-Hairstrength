@@ -393,11 +393,18 @@ function timerReducer(state = baseState.timer, action) {
       }
       const updatedList = [ ...state.updatedList ]
       updatedList[idx] = true
+
       const isUpdated = checkIsUpdated(rank.activeRank, updatedList)
+      let nextRefreshTime = state.nextRefreshTime
+      if (isUpdated) {
+        nextRefreshTime = getRefreshTime('next')
+      }
+      
       return {
         ...state,
         updatedList,
         isUpdated,
+        nextRefreshTime
       }
     }
     break
