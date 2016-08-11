@@ -48,18 +48,78 @@
   flex-direction: column;
   font-size: 17px; }
   #Senka\ Calc .rate-panel .rate-calc {
-    width: 100%; }
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    transition-delay: .7s;
+    transition: .3s; }
+    #Senka\ Calc .rate-panel .rate-calc.on-custom {
+      margin-top: 40px; }
     #Senka\ Calc .rate-panel .rate-calc .rate-container {
       display: flex;
+      flex-direction: column;
       justify-content: space-around;
-      align-items: center; }
+      align-items: center;
+      width: 50%; }
       #Senka\ Calc .rate-panel .rate-calc .rate-container .rate-part {
         display: flex;
-        flex-direction: column;
-        width: 50%; }
+        flex-direction: column; }
         #Senka\ Calc .rate-panel .rate-calc .rate-container .rate-part:nth-child(odd) {
           text-align: center; }
+        #Senka\ Calc .rate-panel .rate-calc .rate-container .rate-part:nth-child(even) {
+          font-size: 14px; }
     #Senka\ Calc .rate-panel .rate-calc span {
       margin: 3px auto; }
+  #Senka\ Calc .rate-panel .panel {
+    position: absolute;
+    width: 100%;
+    top: 52px; }
+    #Senka\ Calc .rate-panel .panel .form-group {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end; }
+      #Senka\ Calc .rate-panel .panel .form-group label {
+        font-size: 16px; }
+      #Senka\ Calc .rate-panel .panel .form-group input {
+        width: 100px;
+        display: inline-block;
+        margin-left: 15px;
+        font-size: 14px; }
+    #Senka\ Calc .rate-panel .panel .checkbox {
+      font-size: 15px; }
+    #Senka\ Calc .rate-panel .panel .panel-body > button:last-child {
+      width: 80%;
+      display: block;
+      margin: 0 auto; }
+#Senka\ Calc .rank-panel {
+  margin-top: 20px; }
+  #Senka\ Calc .rank-panel .panel {
+    position: absolute;
+    width: 100%;
+    top: 52px; }
+    #Senka\ Calc .rank-panel .panel .panel-body {
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline; }
+  #Senka\ Calc .rank-panel .alert {
+    margin: 10px 0; }
+  #Senka\ Calc .rank-panel .list-container {
+    display: flex;
+    justify-content: space-around; }
+    #Senka\ Calc .rank-panel .list-container .list {
+      width: 50%;
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center; }
+      #Senka\ Calc .rank-panel .list-container .list .title {
+        font-size: 16px; }
+#Senka\ Calc .history-panel {
+  position: absolute;
+  width: 100%;
+  top: 52px; }
+  #Senka\ Calc .history-panel .panel-body {
+    height: 412px;
+    overflow-y: auto; }
 
 /*# sourceMappingURL=senka-calc.css.map */

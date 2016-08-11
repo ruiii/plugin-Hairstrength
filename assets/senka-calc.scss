@@ -62,16 +62,27 @@
     font-size: 17px;
     .rate-calc {
       width: 100%;
+      display: flex;
+      align-items: baseline;
+      transition-delay: .7s;
+      transition: .3s;
+      &.on-custom {
+        margin-top: 40px;
+      }
       .rate-container {
         display: flex;
+        flex-direction: column;
         justify-content: space-around;
         align-items: center;
+        width: 50%;
         .rate-part {
           display: flex;
           flex-direction: column;
-          width: 50%;
           &:nth-child(odd) {
             text-align: center;
+          }
+          &:nth-child(even) {
+            font-size: 14px;
           }
         }
       }
@@ -79,8 +90,73 @@
         margin: 3px auto;
       }
     }
-    .custom-panel {
-
+    .panel {
+      position: absolute;
+      width: 100%;
+      top: 52px;
+      .form-group {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        label {
+          font-size: 16px;
+        }
+        input {
+          width: 100px;
+          display: inline-block;
+          margin-left: 15px;
+          font-size: 14px;
+        }
+      }
+      .checkbox {
+        font-size: 15px;
+      }
+      .panel-body > button {
+        &:last-child {
+          width: 80%;
+          display: block;
+          margin: 0 auto;
+        }
+      }
+    }
+  }
+  .rank-panel {
+    margin-top: 20px;
+    .panel {
+      position: absolute;
+      width: 100%;
+      top: 52px;
+      .panel-body {
+        display: flex;
+        justify-content: space-around;
+        align-items: baseline;
+      }
+    }
+    .alert {
+      margin: 10px 0;
+    }
+    .list-container {
+      display: flex;
+      justify-content: space-around;
+      .list {
+        width: 50%;
+        font-size: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .title {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  .history-panel {
+    position: absolute;
+    width: 100%;
+    top: 52px;
+    .panel-body {
+      height: 412px;
+      overflow-y: auto;
     }
   }
 }
