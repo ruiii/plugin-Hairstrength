@@ -119,6 +119,7 @@ const baseDetail = {
   },
   timer: {
     updateTime: -1,
+    updatedList: [false, false, false, false, false],
   },
   setting: {
     historyShow: false,
@@ -371,6 +372,7 @@ function timerReducer(state = baseState.timer, action) {
       isTimeUp: true,
       isUpdated: false,
       accounted: false,
+      updatedList: baseDetail.timer.updatedList,
       nextAccountTime: getRefreshTime('account'),
     }
   case ACTIVE_RANK_UPDATE: {
