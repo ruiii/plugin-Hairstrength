@@ -93,7 +93,7 @@
       display: block;
       margin: 0 auto; }
 #Senka\ Calc .rank-panel {
-  margin-top: 20px; }
+  margin: 20px auto; }
   #Senka\ Calc .rank-panel .panel {
     position: absolute;
     width: 100%;
