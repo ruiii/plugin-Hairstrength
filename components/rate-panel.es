@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button, FormControl, Panel, Checkbox } from 'react-bootstrap'
+import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
 import { expSelector, customSelector, updatedRateSelector, customShowSelector } from '../redux/selectors'
-import { __, estimateSenka } from './utils'
+import { __, estimateSenka, getStatusStyle } from './utils'
 import { customChange } from '../redux/actions'
 
 export default connect(
@@ -38,7 +38,7 @@ export default connect(
   }
   onUseUpdatedRate = (e) => {
     this.check({
-      _customRate: this.props.updatedRate
+      _customRate: parseFloat(this.props.updatedRate.toFixed(1))
     })
   }
   onExpChange = (e) => {
@@ -130,37 +130,38 @@ export default connect(
     return (
       <div className="rate-panel">
         <Panel collapsible expanded={customShow}>
-          <div className="custom-panel">
+          <FormGroup>
+            <ControlLabel>{__('Base Exp')}</ControlLabel>
             <FormControl type='number'
-                         label={ __('Base Exp') }
                          placeholder="exp"
                          value={_customExp}
                          ref='customExp'
                          onChange={this.onExpChange} />
-            <Button onClick={this.onUseCurrentExp}>
-              { __('Use current exp') }
-            </Button>
-          </div>
-          <span>{__('Set rate')}</span>
+             <Button onClick={this.onUseCurrentExp}>
+               { __('Use current exp') }
+             </Button>
+          </FormGroup>
           <Checkbox onChange={this.onEnableRate}
-                    checked={_enable}/>
-          <div className="custom-panel">
+                    checked={_enable}>
+            {__('Set rate')}
+          </Checkbox>
+          <FormGroup style={getStatusStyle(_enable)}>
+            <ControlLabel>{__('Base Rate')}</ControlLabel>
             <FormControl type='number'
-                         label={ __('Base Rate') }
                          placeholder="rate"
                          value={_customRate}
                          ref='customRate'
                          disabled={!_enable}
                          onChange={this.onRateChange} />
-            <Button onClick={this.onUseUpdatedRate}
-                    disabled={!_enable}>
-              { __('Use updated rate') }
-            </Button>
-          </div>
+             <Button onClick={this.onUseUpdatedRate}
+                     disabled={!_enable}>
+               { __('Use updated rate') }
+             </Button>
+          </FormGroup>
           <Button onClick={this.onCustomChange}
                   disabled={btnDisable}>{ __('OK') }</Button>
         </Panel>
-        <div className="rate-calc">
+        <div className={`rate-calc ${customShow ? 'on-custom' : ''}`}>
           <div className="rate-container">
             <span className="rate-part">{__('Experience')}</span>
             <div className="rate-part">

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { createSelector } from 'reselect'
-import { Table } from 'react-bootstrap'
+import { Table, Panel } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { forEach } from 'lodash'
 import { __, dateToString } from './utils'
@@ -14,7 +14,7 @@ const DataItem = connect(
     <tr>
       <td style={{padding: 2}}>{ dateToString(time) }</td>
       <td style={{padding: 2}}>{ rank }</td>
-      <td style={{padding: 2}}>{ rate }</td>
+      <td style={{padding: 2}}>{ rate.toFixed(1) }</td>
     </tr>
   )
 })
@@ -36,7 +36,7 @@ export default connect(
       items.push(<DataItem key={i} data={d} />)
     })
     return (
-      <div className={`histort-panel ${historyShow ? 'show' : 'hidden'}`}>
+      <Panel className="history-panel" collapsible expanded={historyShow}>
         <Table striped bordered condensed hover responsive>
           <thead>
             <tr>
@@ -47,7 +47,7 @@ export default connect(
           </thead>
           <tbody>{ items }</tbody>
         </Table>
-      </div>
+      </Panel>
     )
   }
 })

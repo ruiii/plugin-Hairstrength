@@ -35,12 +35,12 @@ export default connect(
             {__('By:　%s　', timeToString(timer.updateTime))}
           </span>
           <span>
-            { __('Rate') }: { updatedRate }
-            { rateDelta > 0 ? ` ( ↑${rateDelta} )` : ''}
+            { __('Rate') }: { updatedRate.toFixed(1) }
+            { rateDelta > 0 ? ` ( ↑${rateDelta.toFixed(1)} )` : ''}
           </span>
           <span>
-            { __('Ranking') }: { updatedRank }
-            { rankDelta > 0 ? ` ( ↓${rankDelta} )` : ` ( ↑${Math.abs(rankDelta)} )` }
+            { __('Ranking') }: { updatedRank.toFixed(1) }
+            { rankDelta > 0 ? ` ( ↓${rankDelta.toFixed(1)} )` : ` ( ↑${Math.abs(rankDelta).toFixed(1)} )` }
           </span>
         </div>
 

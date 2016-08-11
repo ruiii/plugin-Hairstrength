@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Checkbox, Alert } from 'react-bootstrap'
+import { Checkbox, Alert, Panel } from 'react-bootstrap'
 import { forEach, sum, includes, reduce } from 'lodash'
 import { __, getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
@@ -15,7 +15,7 @@ export default connect(
   ], ({ rank }, { timer }, { filterShow }) =>
     ({ rank, timer, filterShow })),
   { activeRankChange }
-)(class RankList extends Component {
+)(class RankPanel extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -59,30 +59,28 @@ export default connect(
       )
       rateDom.push(
         <span key={i} style={getStatusStyle(updatedList[i])}>
-          { `${rateList[i]}(↑${deltaList[i]})` }
+          { `${rateList[i]} ( ↑${deltaList[i]} )` }
         </span>
       )
     })
 
     return (
-      <div>
-        <div className={this.props.filterShow ? 'show' : 'hidden'}>
-           { checkbox }
-        </div>
-        <div>
-          <Alert bsStyle='danger'
-                 className={isUpdated ? 'hidden' : 'show'}>
-            { __('It will save when all rates is updated') }
-          </Alert>
-          <div style={getStatusStyle(cover)} >
-            <div>
-              <span className='title'>{ __('Ranking') }</span>
-              { rankDom }
-            </div>
-            <div>
-              <span className='title'>{ __('Rate') }</span>
-              { rateDom }
-            </div>
+      <div className="rank-panel">
+        <Panel collapsible expanded={this.props.filterShow}>
+          { checkbox }
+        </Panel>
+        <Alert bsStyle='danger'
+               className={isUpdated ? 'hidden' : 'show'}>
+          { __('It will save when all rates is updated') }
+        </Alert>
+        <div className="list-container" style={getStatusStyle(cover)} >
+          <div className="list">
+            <span className="title">{ __('Ranking') }</span>
+            { rankDom }
+          </div>
+          <div className="list">
+            <span className="title">{ __('Rate') }</span>
+            { rateDom }
           </div>
         </div>
       </div>

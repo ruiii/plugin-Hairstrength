@@ -59,7 +59,7 @@ export default connect(
     return (
       <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
-          (accounted && !isUpdated)
+          accounted
           ? (
             <div className="timer-container">
               <span>{__('Accounted')}</span>
