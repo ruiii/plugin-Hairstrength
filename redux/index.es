@@ -275,7 +275,7 @@ function rankReducer(state = baseState.rank, action) {
 
       const idx = getActiveRank().indexOf(api_no)
 
-      if (idx < 0) {
+      if (idx < 0 || timer.updatedList[idx]) {
         return
       }
 
