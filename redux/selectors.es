@@ -35,7 +35,11 @@ export const historySelector = createSelector(
 
 export const historyDataSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ historyData: state.history.historyData || [] })
+  state => {
+    return (state.history && state.history.historyData)
+          ? { historyData: state.history.historyData }
+          : { historyData: {} }
+  }
 )
 
 export const rankSelector = createSelector(

@@ -70,6 +70,9 @@ export function observeInit() {
     //   get(state, path + '.baseDetail'),
     baseDetailSelector,
     (dispatch, current, previous) => {
+      if (!current.custom) {
+        return
+      }
       localStorage.setItem(storePath, JSON.stringify(current))
     }
   )])
@@ -77,6 +80,9 @@ export function observeInit() {
   observe(store, [observer(
     rankSelector,
     (dispatch, current, previous) => {
+      if (!current.rank) {
+        return
+      }
       if (current.rank.updatedTime !== previous.rank.updatedTime) {
         dispatch(storeHistoryData())
       }
@@ -88,6 +94,9 @@ export function observeInit() {
     //   get(state, path + '.history.historyData'),
     historyDataSelector,
     (dispatch, current, previous) => {
+      if (!current.historyData) {
+        return
+      }
       saveHistoryData(current.historyData)
     }
   )])
@@ -334,38 +343,8 @@ function historyReducer(state = baseState.history, action) {
   return state
 }
 
-// export const emptyTimer = {
-//   accounted: false,
-//   accountTimeString: '',
-//   nextAccountTime: -1,
-//   refreshTimeString: '',
-//   nextRefreshTime: -1
-// }
 function timerReducer(state = baseState.timer, action) {
   switch (action.type) {
-  /* case `@@Response/kcsapi/api_req_ranking/${apiMap.api}`:
-    const { type, body, postBody } = action
-
-    if (body.api_list) {
-      let updatedList = [ ...state.updatedList ]
-      let updated = false
-
-      forEach(body.api_list, (data) => {
-        const api_no = data[apiMap.api_no]
-        const idx = getActiveRank().indexOf(api_no)
-
-        updated = true
-        updatedList[idx] = true
-      })
-
-      if (updated) {
-        return {
-          ...state,
-          updatedList
-        }
-      }
-    }
-    break */
   case RATE_TIME_UP:
     return {
       ...state,
@@ -461,6 +440,7 @@ function getLocalStorage() {
 }
 
 export const reducer = combineReducers({
+
   rank: rankReducer,
   history: historyReducer,
   timer: timerReducer,
