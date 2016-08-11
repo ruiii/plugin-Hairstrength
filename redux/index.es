@@ -399,12 +399,12 @@ function timerReducer(state = baseState.timer, action) {
       if (isUpdated) {
         nextRefreshTime = getRefreshTime('next')
       }
-      
+
       return {
         ...state,
         updatedList,
         isUpdated,
-        nextRefreshTime
+        nextRefreshTime,
       }
     }
     break
