@@ -34,7 +34,9 @@
 
 ## 许可协议
 
-MIT
+[![MIT][license-image]][license-url]
 
 [npm-url]: https://www.npmjs.org/package/poi-plugin-senka-calc
-[npm-image]: http://img.shields.io/npm/v/poi-plugin-senka-calc.svg
+[npm-image]: http://img.shields.io/npm/v/poi-plugin-senka-calc.svg?style=flat-square
+[license-image]: http://img.shields.io/npm/l/poi-plugin-senka-calc.svg?style=flat-square
+[license-url]: #
