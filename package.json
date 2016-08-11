@@ -34,6 +34,9 @@
     "title": "Senka Calc",
     "description": "Senka calculator",
     "icon": "fa/child",
-    "priority": 7
+    "priority": 7,
+    "apiVer": {
+      "6.99.99": "2.1.1"
+    }
   }
 }
