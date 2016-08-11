@@ -1,8 +1,8 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Checkbox, Alert, Panel } from 'react-bootstrap'
-import { forEach, sum, includes, reduce } from 'lodash'
+import { forEach, includes } from 'lodash'
 import { __, getStatusStyle } from './utils'
 import { activeRankChange } from '../redux/actions'
 import { rankSelector, timerSelector, filterShowSelector } from '../redux/selectors'
@@ -11,7 +11,7 @@ export default connect(
   createSelector([
     rankSelector,
     timerSelector,
-    filterShowSelector
+    filterShowSelector,
   ], ({ rank }, { timer }, { filterShow }) =>
     ({ rank, timer, filterShow })),
   { activeRankChange }
@@ -19,22 +19,20 @@ export default connect(
   constructor(props) {
     super(props)
     this.state = {
-      show: true,
-      ranks: [1, 5, 20, 100, 500]
+      ranks: [1, 5, 20, 100, 500],
     }
   }
   onClickCheckbox = (index) => {
-    let activeRank = this.props.rank.activeRank
+    const activeRank = this.props.rank.activeRank
     activeRank[index] = !activeRank[index]
     this.props.activeRankChange(activeRank)
   }
   render() {
-    const { show, ranks, timer } = this.state
+    const { ranks } = this.state
     const {
       activeRank,
       rateList,
       deltaList,
-      updatedTime
     } = this.props.rank
     const { updatedList, isUpdated } = this.props.timer
 

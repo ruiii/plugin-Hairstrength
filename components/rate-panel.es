@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
@@ -11,7 +11,7 @@ export default connect(
     expSelector,
     customSelector,
     updatedRateSelector,
-    customShowSelector
+    customShowSelector,
   ], ({ exp }, { custom }, { updatedRate }, { customShow }) =>
     ({ exp, custom, updatedRate, customShow })),
   { customChange }
@@ -23,7 +23,7 @@ export default connect(
       _customExp: '',
       _customRate: '',
       _enable: false,
-      btnDisable: true
+      btnDisable: true,
     }
   }
   componentWillMount() {
@@ -33,12 +33,12 @@ export default connect(
   }
   onUseCurrentExp = (e) => {
     this.check({
-      _customExp: this.props.exp
+      _customExp: this.props.exp,
     })
   }
   onUseUpdatedRate = (e) => {
     this.check({
-      _customRate: parseFloat(this.props.updatedRate.toFixed(1))
+      _customRate: parseFloat(this.props.updatedRate.toFixed(1)),
     })
   }
   onExpChange = (e) => {
@@ -50,7 +50,7 @@ export default connect(
       customExp = 0
     }
     this.check({
-      _customExp: customExp
+      _customExp: customExp,
     })
   }
   onRateChange = (e) => {
@@ -59,20 +59,20 @@ export default connect(
       customRate = 0
     }
     this.check({
-      _customRate: customRate
+      _customRate: customRate,
     })
   }
   check(newState) {
     const { baseExp, baseRate, enable } = this.props.custom
     const _state = {
       ...this.state,
-      ...newState
+      ...newState,
     }
     const { _customExp, _customRate, _enable } = _state
     if (_enable && !_customRate) {
       this.setState({
         ...newState,
-        btnDisable: true
+        btnDisable: true,
       })
     } else {
       this.setState({
@@ -82,13 +82,13 @@ export default connect(
           && baseExp === _customExp
           && enable === _enable
           && baseRate === _customRate
-        )
+        ),
       })
     }
   }
   onEnableRate = (e) => {
     this.check({
-      _enable: e.target.checked
+      _enable: e.target.checked,
     })
   }
   onCustomChange = (e) => {
@@ -96,10 +96,10 @@ export default connect(
     this.props.customChange({
       baseExp: _customExp,
       baseRate: _customRate,
-      enable: _enable
+      enable: _enable,
     })
     this.setState({
-      btnDisable: true
+      btnDisable: true,
     })
   }
   componentWillReceiveProps(nextProps) {
@@ -108,7 +108,7 @@ export default connect(
         _customExp: nextProps.custom.baseExp,
         _customRate: nextProps.custom.baseRate,
         _enable: nextProps.custom.enable,
-        btnDisable: true
+        btnDisable: true,
       })
     }
   }
@@ -117,13 +117,13 @@ export default connect(
     const {
       baseExp,
       baseRate,
-      enable
+      enable,
     } = custom
     const {
       _customExp,
       _customRate,
       _enable,
-      btnDisable
+      btnDisable,
     } = this.state
     const rate = estimateSenka(exp, baseExp)
 

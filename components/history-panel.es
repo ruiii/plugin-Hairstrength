@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { createSelector } from 'reselect'
 import { Table, Panel } from 'react-bootstrap'
 import { connect } from 'react-redux'
@@ -22,7 +22,7 @@ const DataItem = connect(
 export default connect(
   createSelector([
     historyShowSelector,
-    historyDataSelector
+    historyDataSelector,
   ], ({ historyShow }, { historyData }) =>
     ({ historyShow, historyData }))
 )(class HistoryPanel extends Component{

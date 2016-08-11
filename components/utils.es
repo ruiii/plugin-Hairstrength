@@ -12,7 +12,7 @@ export function estimateSenka(exp, baseExp) {
 export function getRate(rankNo, obfsRate, memberId) {
   const MAGIC_R_NUMS = [ 8831, 1201, 1175, 555, 4569, 4732, 3779, 4568, 5695, 4619, 4912, 5669, 6569 ]
   const MAGIC_L_NUMS = [ 21, 58, 78, 29, 71, 32, 15, 64, 91, 91 ]
-  let rate = obfsRate / MAGIC_R_NUMS[rankNo % 13] / MAGIC_L_NUMS[memberId % 10] - 73 - 18
+  const rate = obfsRate / MAGIC_R_NUMS[rankNo % 13] / MAGIC_L_NUMS[memberId % 10] - 73 - 18
   return rate > 0 ? rate : 0
 }
 
@@ -38,7 +38,7 @@ export function getFilePath(filename = false) {
 }
 
 export function getFinalTime(type) {
-  let finalDate = new Date()
+  const finalDate = new Date()
   finalDate.setUTCHours(finalDate.getUTCHours() + 9)    // mapping Tokyo(00:00) to UTC(00:00)
   finalDate.setUTCDate(1)                               // in case next month's day less than this month
   finalDate.setUTCMonth(finalDate.getUTCMonth() + 1)
@@ -47,10 +47,10 @@ export function getFinalTime(type) {
   switch (type) {
   case 'eo':
     finalDate.setUTCHours(15)
-    break;
+    break
   case 'exp':
     finalDate.setUTCHours(13)
-    break;
+    break
   default:
     finalDate.setUTCHours(6)
   }
@@ -63,16 +63,16 @@ export function getFinalTime(type) {
 }
 
 export function isLastDay() {
-  let today = new Date()
+  const today = new Date()
   today.setUTCHours(today.getUTCHours() + 9)    // mapping Tokyo(00:00) to UTC(00:00)
-  let tomorrow = new Date(today)
+  const tomorrow = new Date(today)
   tomorrow.setUTCDate(today.getUTCDate() + 1)
 
   return today.getUTCMonth() !== tomorrow.getUTCMonth()
 }
 
 export function getRefreshTime(type) {
-  let date = new Date()
+  const date = new Date()
   const hour = date.getUTCHours()
   const offset =
     type === 'next' ? 12 :

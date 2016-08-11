@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { __, timeToString } from './utils'
@@ -10,7 +10,7 @@ export default connect(
   createSelector([
     state => ({ basic: state.info.basic }),
     timerSelector,
-    rankSelector
+    rankSelector,
   ], ({ basic }, { timer }, { rank }) =>
     ({ basic, timer, rank }))
 )(class DetailPanel extends Component{
@@ -21,7 +21,7 @@ export default connect(
       updatedRate,
       updatedRank,
       rateDelta,
-      rankDelta
+      rankDelta,
     } = rank
 
     return (

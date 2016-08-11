@@ -1,7 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createSelector } from 'reselect'
-import { includes } from 'lodash'
 import { __, isLastDay, timeToString } from './utils'
 import { timerSelector } from '../redux/selectors'
 import { rateAccounted, rateTimeUp } from '../redux/actions'
@@ -39,7 +37,7 @@ export default connect(
       const _isLastDay = isLastDay()
       if (_isLastDay != this.state.isLastDay) {
         this.setState({
-          isLastDay: _isLastDay
+          isLastDay: _isLastDay,
         })
       }
     }
@@ -52,9 +50,8 @@ export default connect(
       nextAccountTime,
       refreshString,
       nextRefreshTime,
-      updatedList,
       isTimeUp,
-      isUpdated
+      isUpdated,
     } = this.props.timer
     return (
       <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>

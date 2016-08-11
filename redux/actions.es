@@ -18,50 +18,50 @@ export function activeRankChange(activeRank) {
 
 export function showHistory() {
   return {
-    type: RATE_HISTORY_SHOW
+    type: RATE_HISTORY_SHOW,
   }
 }
 
 export function showCustom() {
   return {
-    type: RATE_CUSTOM_SHOW
+    type: RATE_CUSTOM_SHOW,
   }
 }
 
 export function showRankFilter() {
   return {
-    type: RATE_FILTER_SHOW
+    type: RATE_FILTER_SHOW,
   }
 }
 
 export function rateTimeUp() {
   return {
-    type: RATE_TIME_UP
+    type: RATE_TIME_UP,
   }
 }
 
 export function rateUpdated(rankNo) {
   return {
     type: RATE_UPDATED,
-    rankNo
+    rankNo,
   }
 }
 
 export function rateAccounted() {
   return {
-    type: RATE_ACCOUNTED
+    type: RATE_ACCOUNTED,
   }
 }
 
 export function customChange(custom) {
   return {
     type: RATE_CUSTOM_CHANGE,
-    custom
+    custom,
   }
 }
 
 export function storeHistoryData() {
   return {
-    type: RATE_HISTORY_UPDATE
+    type: RATE_HISTORY_UPDATE,
   }
 }

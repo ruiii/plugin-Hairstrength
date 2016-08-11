@@ -1,8 +1,4 @@
-import React, { Component, PropTypes } from 'react'
-import { combineReducers } from 'redux'
-import { connect } from 'react-redux'
-import { createSelector } from 'reselect'
-import { Alert } from 'react-bootstrap'
+import React, { Component } from 'react'
 import { join } from 'path-extra'
 
 import { reducer, observeInit } from './redux'
