@@ -1,9 +1,37 @@
 # plugin-Hairstrength
-senka-cal for poi  
 
-使用方法：  
-  下载后，解压并放入插件路径下  
-  win：poi\resources\app\plugins\  
-  mac：/Applications/Poi.app/Contents/Resources/app/plugins
+(a.k.a [poi-plugin-senka-calc](https://www.npmjs.com/package/poi-plugin-senka-calc))
 
-![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/Hairstrength.png)
+Senka calculation for [poi](https://github.com/poooi/poi)
+
+[中文说明](/README.zh-CN.md)
+
+## Screenshot
+
+![Screenshot](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/Hairstrength.en.png)
+
+## Usage
+
+### From POI Plugins Center
+
+1. Enter plugins center:
+
+![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-1.en.png)
+
+2. Got **Senka Calc**:
+
+![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-2.en.png)
+
+### Manual Installation ( for test only )
+
+Download & Extract to following directory:
+
+* Windows: `%APP_DATA%\poi\plugins\node_modules\`
+
+* macOS (Mac OS X): `~/Library/Application\ Support/poi/plugins/node_modules/`
+
+* Linux: `~/.config/poi/plugins/node_modules/`
+
+## License
+
+MIT
