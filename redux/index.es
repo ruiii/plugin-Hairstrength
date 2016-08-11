@@ -369,6 +369,7 @@ function timerReducer(state = baseState.timer, action) {
     return {
       ...state,
       isTimeUp: true,
+      isUpdated: false,
       accounted: false,
       nextAccountTime: getRefreshTime('account'),
     }
