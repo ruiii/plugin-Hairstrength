@@ -1,6 +1,8 @@
 # plugin-Hairstrength
 
-(a.k.a [poi-plugin-senka-calc](https://www.npmjs.com/package/poi-plugin-senka-calc))
+[![npm version][npm-image]][npm-url]
+
+(a.k.a [poi-plugin-senka-calc][npm-url])
 
 Senka calculation for [poi](https://github.com/poooi/poi)
 
@@ -15,11 +17,9 @@ Senka calculation for [poi](https://github.com/poooi/poi)
 ### From POI Plugins Center
 
 1. Enter plugins center:
-
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-1.en.png)
 
 2. Got **Senka Calc**:
-
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-2.en.png)
 
 ### Manual Installation ( for test only )
@@ -35,3 +35,6 @@ Download & Extract to following directory:
 ## License
 
 MIT
+
+[npm-url]: https://www.npmjs.org/package/poi-plugin-senka-calc
+[npm-image]: http://img.shields.io/npm/v/poi-plugin-senka-calc.svg

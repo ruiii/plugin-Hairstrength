@@ -1,6 +1,8 @@
 # plugin-Hairstrength
 
-(a.k.a [poi-plugin-senka-calc](https://www.npmjs.com/package/poi-plugin-senka-calc))
+[![npm version][npm-image]][npm-url]
+
+(a.k.a [poi-plugin-senka-calc][npm-url])
 
 一个 [poi](https://github.com/poooi/poi) 的战果计算插件
 
@@ -15,11 +17,9 @@
 ### poi 的插件中心
 
 1. 进入插件中心：
-
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-1.zh-CN.png)
 
 2. 找到 **我变强了**：
-
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-2.zh-CN.png)
 
 ### 手动安装（用于测试最新功能）
@@ -35,3 +35,6 @@
 ## 许可协议
 
 MIT
+
+[npm-url]: https://www.npmjs.org/package/poi-plugin-senka-calc
+[npm-image]: http://img.shields.io/npm/v/poi-plugin-senka-calc.svg
