@@ -249,7 +249,6 @@ function initReducer() {
 }
 
 let baseState = initReducer()
-console.log('baseState', baseState)
 
 function customReducer(state = baseState.custom, action) {
   switch (action.type) {
@@ -391,14 +390,17 @@ function timerReducer(state = baseState.timer, action) {
   case RATE_TIME_UP:
     return {
       ...state,
-      isTimeUp: true
+      isTimeUp: true,
+      accounted: false,
+      nextAccountTime: getRefreshTime('account')
     }
   case ACTIVE_RANK_UPDATE: {
       let isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
       if (isUpdated !== state.isUpdated) {
         return {
           ...state,
-          isUpdated
+          isUpdated,
+          nextRefreshTime: getRefreshTime('next')
         }
       }
       break
@@ -440,16 +442,22 @@ function settingReducer(state = baseState.setting, action) {
   case RATE_HISTORY_SHOW:
     return {
       ...state,
-      historyShow: !state.historyShow
+      historyShow: !state.historyShow,
+      customShow: false,
+      filterShow: false
     }
   case RATE_CUSTOM_SHOW:
     return {
       ...state,
-      customShow: !state.customShow
+      historyShow: false,
+      customShow: !state.customShow,
+      filterShow: false
     }
   case RATE_FILTER_SHOW:
     return {
       ...state,
+      historyShow: false,
+      customShow: false,
       filterShow: !state.filterShow
     }
   }
