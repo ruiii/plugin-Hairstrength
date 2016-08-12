@@ -11,7 +11,7 @@ export function estimateSenka(exp, baseExp) {
 
 export function getRate(rankNo, obfsRate, memberId) {
   const MAGIC_R_NUMS = [ 8831, 1201, 1175, 555, 4569, 4732, 3779, 4568, 5695, 4619, 4912, 5669, 6569 ]
-  const MAGIC_L_NUMS = [ 21, 58, 78, 29, 71, 32, 15, 64, 91, 91 ]
+  const MAGIC_L_NUMS = [ 21, 70, 48, 36, 72, 55, 30, 54, 95, 43 ]
   const rate = obfsRate / MAGIC_R_NUMS[rankNo % 13] / MAGIC_L_NUMS[memberId % 10] - 73 - 18
   return rate > 0 ? rate : 0
 }
