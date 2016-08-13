@@ -41,7 +41,6 @@ export default connect(
         })
       }
     }
-
   }
   render() {
     const {

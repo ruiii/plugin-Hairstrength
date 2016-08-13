@@ -1,9 +1,6 @@
 import { combineReducers } from 'redux'
 import { forEach, isEmpty } from 'lodash'
-import {
-  timerSelector,
-  rankSelector,
-} from './selectors'
+import { timerSelector, rankSelector } from './selectors'
 import {
   getRate,
   getMemberId,

@@ -8,9 +8,7 @@ import { __, dateToString } from './utils'
 import { historyDataSelector, historyShowSelector } from '../redux/selectors'
 import { showHistory } from '../redux/actions'
 
-const DataItem = connect(
-  state => ({})
-)(({ data }) => {
+const DataItem = ({ data }) => {
   const { time, rank, rate } = data
   return (
     <tr>
@@ -19,7 +17,7 @@ const DataItem = connect(
       <td style={{padding: 2}}>{ rate.toFixed(1) }</td>
     </tr>
   )
-})
+}
 
 export default connect(
   createSelector([
@@ -27,7 +25,7 @@ export default connect(
     historyDataSelector,
   ], ({ historyShow }, { historyData }) =>
     ({ historyShow, historyData })),
-    { showHistory }
+  { showHistory }
 )(class HistoryPanel extends Component{
   onHistoryClose = (e) => {
     this.props.showHistory()

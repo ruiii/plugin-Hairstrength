@@ -118,17 +118,8 @@ export default connect(
   }
   render() {
     const { exp, custom, customShow } = this.props
-    const {
-      baseExp,
-      baseRate,
-      enable,
-    } = custom
-    const {
-      _customExp,
-      _customRate,
-      _enable,
-      btnDisable,
-    } = this.state
+    const { baseExp, baseRate, enable } = custom
+    const { _customExp, _customRate, _enable, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp)
 
     return (

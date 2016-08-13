@@ -2,27 +2,21 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { __, timeToString } from './utils'
-import { timerSelector, rankSelector } from '../redux/selectors'
+import { updateTimeSelector, userDetailInitSelector } from '../redux/selectors'
 
 const rankName = ['', '元帥', '大将', '中将', '少将', '大佐', '中佐', '新米中佐', '少佐', '中堅少佐', '新米少佐']
 
 export default connect(
   createSelector([
-    state => ({ basic: state.info.basic }),
-    timerSelector,
-    rankSelector,
-  ], ({ basic }, { timer }, { rank }) =>
-    ({ basic, timer, rank }))
+    updateTimeSelector,
+    userDetailInitSelector,
+  ], ({ updateTime }, userDetail) =>
+    ({ updateTime, userDetail }))
 )(class DetailPanel extends Component{
   render() {
-    const { basic, timer, rank } = this.props
-    const { api_nickname, api_rank } = basic
-    const {
-      updatedRate,
-      updatedRank,
-      rateDelta,
-      rankDelta,
-    } = rank
+    const { updateTime, userDetail } = this.props
+    const { api_nickname, api_rank } = window.getStore('info.basic')
+    const { updatedRate, updatedRank, rateDelta, rankDelta } = userDetail
 
     return (
       <div className="detail-panel">
@@ -32,7 +26,7 @@ export default connect(
         </div>
         <div className="rate-container">
           <span>
-            {__('By:　%s　', timeToString(timer.updateTime))}
+            {__('By:　%s　', timeToString(updateTime))}
           </span>
           <span>
             { __('Rate') }: { updatedRate.toFixed(1) }

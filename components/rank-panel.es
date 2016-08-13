@@ -6,15 +6,15 @@ import FontAwesome from 'react-fontawesome'
 import { forEach, includes } from 'lodash'
 import { __, getStatusStyle } from './utils'
 import { activeRankChange, showRankFilter } from '../redux/actions'
-import { rankSelector, timerSelector, filterShowSelector } from '../redux/selectors'
+import { rankDetailSelector, updateTimerDetailSelector, filterShowSelector } from '../redux/selectors'
 
 export default connect(
   createSelector([
-    rankSelector,
-    timerSelector,
+    rankDetailSelector,
+    updateTimerDetailSelector,
     filterShowSelector,
-  ], ({ rank }, { timer }, { filterShow }) =>
-    ({ rank, timer, filterShow })),
+  ], (rankDetail, timerDetail, { filterShow }) =>
+    ({ rankDetail, timerDetail, filterShow })),
   { activeRankChange, showRankFilter }
 )(class RankPanel extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ export default connect(
     }
   }
   onClickCheckbox = (index) => {
-    const activeRank = this.props.rank.activeRank
+    const activeRank = this.props.rankDetail.activeRank
     activeRank[index] = !activeRank[index]
     this.props.activeRankChange(activeRank)
   }
@@ -32,15 +32,11 @@ export default connect(
     this.props.showRankFilter()
   }
   render() {
-    const { ranks } = this.state
-    const {
-      activeRank,
-      rateList,
-      deltaList,
-    } = this.props.rank
-    const { updatedList, isUpdated } = this.props.timer
+    const { activeRank, rateList, deltaList } = this.props.rankDetail
+    const { updatedList, isUpdated } = this.props.timerDetail
 
     const { onClickCheckbox } = this
+    const { ranks } = this.state
     const cover = includes(updatedList, true)
     let checkbox = []
     let rankDom = []

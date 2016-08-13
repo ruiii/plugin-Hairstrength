@@ -59,9 +59,38 @@ export const updatedRateSelector = createSelector(
   state => ({ updatedRate: state.rank.updatedRate })
 )
 
+export const updateTimeSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ updateTime: state.timer.updateTime })
+)
+
+export const userDetailInitSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => {
+    const { updatedRate, updatedRank, rateDelta, rankDelta } = state.rank
+    return { updatedRate, updatedRank, rateDelta, rankDelta }
+  }
+)
+
 export const timerSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ timer: state.timer })
+)
+
+export const rankDetailSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => {
+    const { activeRank, rateList, deltaList } = state.rank
+    return { activeRank, rateList, deltaList }
+  }
+)
+
+export const updateTimerDetailSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => {
+    const { updatedList, isUpdated } = state.timer
+    return { updatedList, isUpdated }
+  }
 )
 
 export const baseDetailSelector = createSelector(
