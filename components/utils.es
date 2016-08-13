@@ -5,9 +5,7 @@ import { reduce } from 'lodash'
 import FileWriter from 'views/utils/fileWriter'
 
 const { APPDATA_PATH, i18n } = window
-
 export const storePath = 'plugin-senka'
-
 export const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
 
 const fileWriter = new FileWriter()
