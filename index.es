@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { isEmpty } from 'lodash'
 import { join } from 'path-extra'
 import { observer, observe } from 'redux-observers'
 
@@ -47,11 +48,11 @@ export function pluginDidLoad() {
   unsubBaseDetailObserve = observe(store, [observer(
     baseDetailSelector,
     (dispatch, current, previous) => {
-      if (!current.custom) {
+      if (isEmpty(current.custom)) {
         return
       }
       const id = getMemberId()
-      const data = JSON.parse(localStorage.getItem(storePath))
+      const data = JSON.parse(localStorage.getItem(storePath) || '{}')
       data[id] = current
       localStorage.setItem(storePath, JSON.stringify(data))
     }

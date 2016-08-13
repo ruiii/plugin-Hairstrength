@@ -52,7 +52,7 @@ const apiMap = {
   api_nickname: 'api_mtjmdcwtvhdr',
 }
 
-let baseState = {
+const baseDetail = {
   custom: {
     baseExp: 0,
     baseRate: 0,
@@ -83,16 +83,21 @@ let baseState = {
   },
 }
 
+
+
+let baseState = {}
+
 function initStatusReducer(state = { init: false }, action) {
   if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
     const historyData = loadHistoryData()
+    // baseDetail
     let storeData = getLocalStorage()
     if (Object.keys(storeData).length === 0) {
-      storeData = baseState
+      storeData = baseDetail
     } else {
-      for (const k in baseState) {
+      for (const k in baseDetail) {
         if (!storeData[k] || Object.keys(storeData[k]).length === 0) {
-          storeData[k] = baseState[k]
+          storeData[k] = baseDetail[k]
         }
       }
     }
@@ -180,7 +185,7 @@ function initStatusReducer(state = { init: false }, action) {
   return state
 }
 
-function customReducer(state = baseState.custom, action) {
+function customReducer(state = {}, action) {
   if (isEmpty(state) && !isEmpty(baseState)) {
     state = baseState.custom
   }
@@ -302,16 +307,23 @@ function timerReducer(state = {}, action) {
       isTimeUp: true,
       isUpdated: false,
       accounted: false,
-      updatedList: [false, false, false, false, false],
+      updatedList: baseDetail.timer.updatedList,
       nextAccountTime: getRefreshTime('account'),
     }
   case ACTIVE_RANK_UPDATE: {
     const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
     if (isUpdated !== state.isUpdated) {
+      const nextAccountTime = getRefreshTime('account')
+      let accounted = true
+      if (nextAccountTime > (new Date()).getTime()) {
+        accounted = false
+      }
       return {
         ...state,
         isUpdated,
+        accounted,
         nextRefreshTime: getRefreshTime('next'),
+        nextAccountTime,
       }
     }
     break
@@ -327,16 +339,23 @@ function timerReducer(state = {}, action) {
       updatedList[idx] = true
 
       const isUpdated = checkIsUpdated(rank.activeRank, updatedList)
-      let nextRefreshTime = state.nextRefreshTime
+      let { nextRefreshTime, nextAccountTime, accounted } = state
+
       if (isUpdated) {
         nextRefreshTime = getRefreshTime('next')
+        nextAccountTime = getRefreshTime('account')
+        if (nextAccountTime > (new Date()).getTime()) {
+          accounted = false
+        }
       }
 
       return {
         ...state,
         updatedList,
         isUpdated,
+        accounted,
         nextRefreshTime,
+        nextAccountTime,
       }
     }
     break

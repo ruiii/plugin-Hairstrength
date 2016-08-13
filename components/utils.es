@@ -119,11 +119,8 @@ export function getRefreshTime(type) {
 }
 
 export function timeToString(time, isFilename = false) {
-  if (!time) {
-    return
-  }
 
-  const date = new Date(time)
+  const date = new Date(time || 0)
 
   return isFilename
          ? `${date.getFullYear()}-${date.getMonth() + 1}`
