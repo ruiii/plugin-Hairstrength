@@ -1,9 +1,36 @@
+import fs from 'fs-extra'
 import { join } from 'path-extra'
+import CSON from 'cson'
 import { reduce } from 'lodash'
+import FileWriter from 'views/utils/fileWriter'
 
 const { APPDATA_PATH, i18n } = window
 
+export const storePath = 'plugin-senka'
+
 export const __ = i18n["poi-plugin-senka-calc"].__.bind(i18n["poi-plugin-senka-calc"])
+
+const fileWriter = new FileWriter()
+export function saveHistoryData(historyData) {
+  fileWriter.write(
+    getFilePath(true),
+    CSON.stringify(historyData)
+  )
+}
+
+export function loadHistoryData() {
+  let historyData
+  try {
+    fs.ensureDirSync(getFilePath())
+    historyData = CSON.parseCSONFile(getFilePath(true))
+    if (!(historyData instanceof Array)) {
+      historyData = []
+    }
+  } catch (e) {
+    historyData = []
+  }
+  return historyData
+}
 
 export function estimateSenka(exp, baseExp) {
   return (exp - baseExp) / 1428 - 0.0499

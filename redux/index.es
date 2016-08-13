@@ -1,26 +1,20 @@
-import fs from 'fs-extra'
 import { combineReducers } from 'redux'
-import { observer, observe } from 'redux-observers'
 import { forEach } from 'lodash'
-import { store } from 'views/createStore'
-import FileWriter from 'views/utils/fileWriter'
-import CSON from 'cson'
 import {
-  baseDetailSelector,
-  historyDataSelector,
   timerSelector,
   rankSelector,
 } from './selectors'
 import {
   getRate,
   getMemberId,
-  getFilePath,
   getFinalTime,
   getRefreshTime,
   getActiveRank,
   getUserNickname,
   checkIsUpdated,
+  loadHistoryData,
   __,
+  storePath,
 } from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
@@ -33,10 +27,7 @@ import {
   RATE_ACCOUNTED,
   RATE_CUSTOM_CHANGE,
   rateUpdated,
-  storeHistoryData,
 } from './actions'
-
-const fileWriter = new FileWriter()
 
 /*
 *    api_req_ranking/getlist	：ランキング
@@ -60,54 +51,6 @@ const apiMap = {
   api_rate: 'api_wuhnhojjxmke',
   api_nickname: 'api_mtjmdcwtvhdr',
 }
-const storePath = 'plugin-senka'
-
-export function observeInit() {
-
-  // run after plugin loaded
-  observe(store, [observer(
-    // (state) =>
-    //   get(state, path + '.baseDetail'),
-    baseDetailSelector,
-    (dispatch, current, previous) => {
-      if (!current.custom) {
-        return
-      }
-      localStorage.setItem(storePath, JSON.stringify(current))
-    }
-  )])
-
-  observe(store, [observer(
-    rankSelector,
-    (dispatch, current, previous) => {
-      if (!current.rank || !previous.rank) {
-        return
-      }
-      if (current.rank.updatedTime !== previous.rank.updatedTime) {
-        dispatch(storeHistoryData())
-      }
-    }
-  )])
-
-  observe(store, [observer(
-    // (state) =>
-    //   get(state, path + '.history.historyData'),
-    historyDataSelector,
-    (dispatch, current, previous) => {
-      if (!current.historyData) {
-        return
-      }
-      saveHistoryData(current.historyData)
-    }
-  )])
-}
-
-function saveHistoryData(historyData) {
-  fileWriter.write(
-    getFilePath(true),
-    CSON.stringify(historyData)
-  )
-}
 
 const baseDetail = {
   custom: {
@@ -126,6 +69,9 @@ const baseDetail = {
     rankDelta: 0,
     updatedTime: 0,
   },
+  history: {
+    historyData: [],
+  },
   timer: {
     updateTime: -1,
     updatedList: [false, false, false, false, false],
@@ -137,18 +83,9 @@ const baseDetail = {
   },
 }
 
-function initReducer() {
+function initState() {
   // historyData
-  let historyData
-  try {
-    fs.ensureDirSync(getFilePath())
-    historyData = CSON.parseCSONFile(getFilePath(true))
-    if (!(historyData instanceof Array)) {
-      historyData = []
-    }
-  } catch (e) {
-    historyData = []
-  }
+  const historyData = loadHistoryData()
   // baseDetail
   let storeData = getLocalStorage()
   if (Object.keys(storeData).length === 0) {
@@ -217,6 +154,7 @@ function initReducer() {
       ...storeData.rank,
     },
     history: {
+      ...storeData.history,
       historyData,
     },
     timer: {
@@ -238,7 +176,18 @@ function initReducer() {
   }
 }
 
-const baseState = initReducer()
+let baseState = baseDetail
+
+function initStatusReducer(state = { init: false }, action) {
+  if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
+    baseState = initState()
+    return {
+      ...state,
+      init: true,
+    }
+  }
+  return state
+}
 
 function customReducer(state = baseState.custom, action) {
   switch (action.type) {
@@ -434,7 +383,7 @@ function getLocalStorage() {
 }
 
 export const reducer = combineReducers({
-
+  initStatus: initStatusReducer,
   rank: rankReducer,
   history: historyReducer,
   timer: timerReducer,
