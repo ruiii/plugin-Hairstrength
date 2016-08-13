@@ -32,7 +32,7 @@ export default connect(
         </div>
         <div className="rate-container">
           <span>
-            {__('By:　%s　', timeToString(timer.updateTime))}
+            {__('By:　%s　', timeToString(timer.updateTime || 0))}
           </span>
           <span>
             { __('Rate') }: { updatedRate.toFixed(1) }

@@ -7,7 +7,7 @@ import { store } from 'views/createStore'
 import { reducer } from './redux'
 import { initStatusSelector, baseDetailSelector, historyDataSelector, rankSelector } from './redux/selectors'
 import { storeHistoryData } from './redux/actions'
-import { saveHistoryData, storePath } from './components/utils'
+import { saveHistoryData, storePath, getMemberId } from './components/utils'
 import SettingPanel from './components/setting-panel'
 import DetailPanel from './components/detail-panel'
 import TimerPanel from './components/timer-panel'
@@ -50,7 +50,10 @@ export function pluginDidLoad() {
       if (!current.custom) {
         return
       }
-      localStorage.setItem(storePath, JSON.stringify(current))
+      const id = getMemberId()
+      const data = JSON.parse(localStorage.getItem(storePath))
+      data[id] = current
+      localStorage.setItem(storePath, JSON.stringify(data))
     }
   )])
 

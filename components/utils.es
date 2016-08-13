@@ -19,7 +19,7 @@ export function saveHistoryData(historyData) {
 }
 
 export function loadHistoryData() {
-  let historyData
+  let historyData = []
   try {
     fs.ensureDirSync(getFilePath())
     historyData = CSON.parseCSONFile(getFilePath(true))
