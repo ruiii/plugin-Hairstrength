@@ -5,7 +5,7 @@ const REDUCER_EXTENSION_KEY = 'poi-plugin-senka-calc'
 
 export const initStatusSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ init: state.initStatus.init || false })
+  state => ({ init: (state.initStatus || {init: false}).init })
 )
 
 export const expSelector = (state) => ({ exp: state.info.basic.api_experience })
