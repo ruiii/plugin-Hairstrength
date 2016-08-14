@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { join } from 'path-extra'
 import CSON from 'cson'
-import { reduce } from 'lodash'
+import { reduce, uniqBy } from 'lodash'
 import FileWriter from 'views/utils/fileWriter'
 
 const { APPDATA_PATH, i18n } = window
@@ -12,7 +12,7 @@ const fileWriter = new FileWriter()
 export function saveHistoryData(historyData) {
   fileWriter.write(
     getFilePath(true),
-    CSON.stringify(historyData)
+    CSON.stringify(uniqBy(historyData, 'time'))
   )
 }
 
