@@ -2,20 +2,20 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { __, timeToString } from './utils'
-import { updateTimeSelector, userDetailInitSelector } from '../redux/selectors'
+import { userInitInfoSelector, updateTimeSelector, userDetailInitSelector } from '../redux/selectors'
 
 const rankName = ['', '元帥', '大将', '中将', '少将', '大佐', '中佐', '新米中佐', '少佐', '中堅少佐', '新米少佐']
 
 export default connect(
   createSelector([
+    userInitInfoSelector,
     updateTimeSelector,
     userDetailInitSelector,
-  ], ({ updateTime }, userDetail) =>
-    ({ updateTime, userDetail }))
+  ], ({ api_nickname, api_rank }, { updateTime }, userDetail) =>
+    ({ api_nickname, api_rank, updateTime, userDetail }))
 )(class DetailPanel extends Component{
   render() {
-    const { updateTime, userDetail } = this.props
-    const { api_nickname, api_rank } = window.getStore('info.basic')
+    const { api_nickname, api_rank, updateTime, userDetail } = this.props
     const { updatedRate, updatedRank, rateDelta, rankDelta } = userDetail
 
     return (

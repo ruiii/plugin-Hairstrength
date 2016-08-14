@@ -10,6 +10,11 @@ export const initStatusSelector = createSelector(
 
 export const expSelector = (state) => ({ exp: state.info.basic.api_experience })
 
+export const userInitInfoSelector = (state) => {
+  const { api_nickname, api_rank } = state.info.basic
+  return { api_nickname, api_rank }
+}
+
 export const customSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ custom: state.custom })
@@ -42,11 +47,7 @@ export const historySelector = createSelector(
 
 export const historyDataSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => {
-    return (state.history && state.history.historyData)
-          ? { historyData: state.history.historyData }
-          : { historyData: {} }
-  }
+  state => ({ historyData: state.history.historyData })
 )
 
 export const rankSelector = createSelector(

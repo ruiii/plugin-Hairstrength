@@ -49,131 +49,61 @@ const apiMap = {
   api_nickname: 'api_mtjmdcwtvhdr',
 }
 
-const baseDetail = {
-  custom: {
-    baseExp: 0,
-    baseRate: 0,
-    enable: false,
+const initialState = {
+  "initStatus": {
+    "init": false,
   },
-  rank: {
-    exRate: [0, 0],
-    activeRank: [true, true, true, true, true],
-    rateList: [0, 0, 0, 0, 0],
-    deltaList: [0, 0, 0, 0, 0],
-    updatedRate: 0,
-    updatedRank: 0,
-    rateDelta: 0,
-    rankDelta: 0,
-    updatedTime: 0,
+  "rank": {
+    "exRate": [0, 0],
+    "activeRank": [true, true, true, true, true],
+    "rateList": [0, 0, 0, 0, 0],
+    "deltaList": [0, 0, 0, 0, 0],
+    "updatedRate": 0,
+    "updatedRank": 0,
+    "rateDelta": 0,
+    "rankDelta": 0,
+    "updatedTime": 0,
   },
-  history: {
-    historyData: [],
+  "history": {
+    "historyData": [
+      {
+        "rate": 0,
+        "rank": 0,
+        "time": 0,
+      },
+    ],
   },
-  timer: {
-    updateTime: -1,
-    updatedList: [false, false, false, false, false],
+  "timer": {
+    "updateTime": 0,
+    "updatedList": [false, false, false, false, false],
+    "accounted": false,
+    "eoAccounted": false,
+    "expAccounted": false,
+    "accountString": "",
+    "nextAccountTime": 0,
+    "refreshString": "",
+    "nextRefreshTime": 0,
+    "isTimeUp": false,
+    "isUpdated": false,
   },
-  setting: {
-    historyShow: false,
-    customShow: false,
-    filterShow: false,
+  "custom": {
+    "baseExp": 0,
+    "baseRate": 0,
+    "enable": false,
+  },
+  "setting": {
+    "historyShow": false,
+    "customShow": false,
+    "filterShow": false,
   },
 }
-
-
-
-let baseState = {}
-
-function initStatusReducer(state = { init: false }, action) {
+const emptyStoreData = {
+  rank: initialState.rank,
+  timer: initialState.timer,
+  custom: initialState.custom,
+}
+function initStatusReducer(state = initialState.initStatus, action) {
   if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
-    const historyData = loadHistoryData()
-    // baseDetail
-    let storeData = getLocalStorage()
-    if (Object.keys(storeData).length === 0) {
-      storeData = baseDetail
-    } else {
-      for (const k in baseDetail) {
-        if (!storeData[k] || Object.keys(storeData[k]).length === 0) {
-          storeData[k] = baseDetail[k]
-        }
-      }
-    }
-    // accounted timer
-    let accounted = false
-    let eoAccounted = false
-    let expAccounted = false
-    let accountString = ''
-    let nextAccountTime = getRefreshTime('account')
-
-    const now = Date.now()
-    const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
-    if (now >= eoTime) {
-      accounted = true
-      eoAccounted = true
-    } else if (now >= expTime) {
-      expAccounted = true
-      accountString = __('EO map final time')
-      nextAccountTime = eoTime
-    } else if (now >= normalTime) {
-      accountString = __('Normal map final time')
-      nextAccountTime = expTime
-    } else if (now >= storeData.timer.updateTime + 11 * 3600 * 1000) {
-      storeData.rank.exRate[0] = storeData.rank.exRate[1]
-      storeData.rank.exRate[1] = 0
-      accounted = true
-    } else {
-      accountString = __('Account time')
-      accounted = false
-    }
-    // refresh timer
-    const refreshString = __("Refresh time")
-    let nextRefreshTime = getRefreshTime()
-    let updatedList = [true, true, true, true, true]
-    let isTimeUp = true
-    // ???
-    const _refreshTime = nextRefreshTime
-    // if not refreshed, mark as timeup
-    if (!storeData.rank
-        || (storeData.timer && storeData.timer.updateTime !== _refreshTime)) {
-      updatedList = [false, false, false, false, false]
-    } else {
-      isTimeUp = false
-      nextRefreshTime = getRefreshTime('next')
-      forEach(storeData.rank.rateList, (rate, idx) => {
-        if (rate === 0) {
-          updatedList[idx] = false
-        }
-      })
-    }
-    const isUpdated = checkIsUpdated(storeData.rank.activeRank, updatedList)
-    baseState = {
-      custom: {
-        ...storeData.custom,
-      },
-      rank: {
-        ...storeData.rank,
-      },
-      history: {
-        ...storeData.history,
-        historyData,
-      },
-      timer: {
-        ...storeData.timer,
-        accounted,
-        eoAccounted,
-        expAccounted,
-        accountString,
-        nextAccountTime,
-        refreshString,
-        nextRefreshTime,
-        updatedList,
-        isTimeUp,
-        isUpdated,
-      },
-      setting: {
-        ...storeData.setting,
-      },
-    }
     return {
       ...state,
       init: true,
@@ -182,11 +112,19 @@ function initStatusReducer(state = { init: false }, action) {
   return state
 }
 
-function customReducer(state = {}, action) {
-  if (isEmpty(state) && !isEmpty(baseState)) {
-    state = baseState.custom
-  }
+function customReducer(state = initialState.custom, action) {
   switch (action.type) {
+  case '@@Response/kcsapi/api_get_member/require_info': {
+    const storeData = getLocalStorage().custom
+    if (!storeData || isEmpty(storeData)) {
+      return state
+    } else {
+      return {
+        ...state,
+        ...storeData,
+      }
+    }
+  }
   case RATE_CUSTOM_CHANGE:
     return {
       ...state,
@@ -196,11 +134,18 @@ function customReducer(state = {}, action) {
   return state
 }
 
-function rankReducer(state = {}, action) {
-  if (isEmpty(state) && !isEmpty(baseState)) {
-    state = baseState.rank
-  }
-  if (action.type.includes(apiMap.api)) {
+function rankReducer(state = initialState.rank, action) {
+  if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
+    const storeData = getLocalStorage().rank
+    if (!storeData || isEmpty(storeData)) {
+      return state
+    } else {
+      return {
+        ...state,
+        ...storeData,
+      }
+    }
+  } else if (action.type.includes(apiMap.api)) {
     const { body } = action
 
     if (!body.api_list) {
@@ -270,11 +215,21 @@ function rankReducer(state = {}, action) {
   }
 }
 
-function historyReducer(state = {}, action) {
-  if (isEmpty(state) && !isEmpty(baseState)) {
-    state = baseState.history
-  }
+function historyReducer(state = initialState.history, action) {
   switch (action.type) {
+  case '@@Response/kcsapi/api_get_member/require_info': {
+    const historyData = loadHistoryData()
+    if (historyData.length === 0) {
+      return state
+    } else {
+      return {
+        ...state,
+        historyData: [
+          ...historyData,
+        ],
+      }
+    }
+  }
   case RATE_HISTORY_UPDATE: {
     const rank = rankSelector(window.getStore()).rank
     return {
@@ -293,18 +248,91 @@ function historyReducer(state = {}, action) {
   return state
 }
 
-function timerReducer(state = {}, action) {
-  if (isEmpty(state) && !isEmpty(baseState)) {
-    state = baseState.timer
-  }
+function timerReducer(state = initialState.timer, action) {
   switch (action.type) {
+  case '@@Response/kcsapi/api_get_member/require_info': {
+    let storeData = getLocalStorage()
+    if (isEmpty(storeData)) {
+      storeData = emptyStoreData
+    } else {
+      for (const k in emptyStoreData) {
+        if (!storeData[k] || isEmpty(storeData[k])) {
+          storeData[k] = emptyStoreData[k]
+        }
+      }
+    }
+
+    let {
+      accounted,
+      eoAccounted,
+      expAccounted,
+      accountString,
+      nextAccountTime,
+      refreshString,
+      nextRefreshTime,
+      updatedList,
+      isTimeUp,
+      isUpdated,
+    } = state
+    nextAccountTime = getRefreshTime('account')
+    const now = Date.now()
+    const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
+    if (now >= eoTime) {
+      accounted = true
+      eoAccounted = true
+    } else if (now >= expTime) {
+      expAccounted = true
+      accountString = __('EO map final time')
+      nextAccountTime = eoTime
+    } else if (now >= normalTime) {
+      accountString = __('Normal map final time')
+      nextAccountTime = expTime
+    } else if (now >= storeData.timer.updateTime + 11 * 3600 * 1000) {
+      storeData.rank.exRate[0] = storeData.rank.exRate[1]
+      storeData.rank.exRate[1] = 0
+      accounted = true
+    } else {
+      accountString = __('Account time')
+      accounted = false
+    }
+    // refresh timer
+    refreshString = __("Refresh time")
+    nextRefreshTime = getRefreshTime()
+    // if not refreshed, mark as timeup
+    if (!storeData.rank
+        || (storeData.timer && storeData.timer.updateTime !== nextRefreshTime)) {
+      updatedList = [false, false, false, false, false]
+    } else {
+      isTimeUp = false
+      nextRefreshTime = getRefreshTime('next')
+      forEach(storeData.rank.rateList, (rate, idx) => {
+        if (rate === 0) {
+          updatedList[idx] = false
+        }
+      })
+    }
+    isUpdated = checkIsUpdated(storeData.rank.activeRank, updatedList)
+    return {
+      ...state,
+      accounted,
+      eoAccounted,
+      expAccounted,
+      accountString,
+      nextAccountTime,
+      refreshString,
+      nextRefreshTime,
+      updatedList,
+      isTimeUp,
+      isUpdated,
+    }
+  }
   case RATE_TIME_UP:
     return {
       ...state,
       isTimeUp: true,
       isUpdated: false,
       accounted: false,
-      updatedList: baseDetail.timer.updatedList,
+      updatedList: initialState.timer.updatedList,
       nextAccountTime: getRefreshTime('account'),
     }
   case ACTIVE_RANK_UPDATE: {
@@ -372,10 +400,7 @@ function timerReducer(state = {}, action) {
   return state
 }
 
-function settingReducer(state = {}, action) {
-  if (isEmpty(state) && !isEmpty(baseState)) {
-    state = baseState.setting
-  }
+function settingReducer(state = initialState.setting, action) {
   switch (action.type) {
   case RATE_HISTORY_SHOW:
     return {
