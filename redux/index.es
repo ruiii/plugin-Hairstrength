@@ -75,7 +75,7 @@ const initialState = {
   },
   "timer": {
     "updateTime": 0,
-    "updatedList": [false, false, false, false, false],
+    "updatedList": [true, true, true, true, true],
     "accounted": false,
     "eoAccounted": false,
     "expAccounted": false,
@@ -335,7 +335,7 @@ function timerReducer(state = initialState.timer, action) {
       isTimeUp: true,
       isUpdated: false,
       accounted: false,
-      updatedList: initialState.timer.updatedList,
+      updatedList: [false, false, false, false, false],
       nextAccountTime: getRefreshTime('account'),
     }
   case ACTIVE_RANK_UPDATE: {
