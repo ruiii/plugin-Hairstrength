@@ -79,6 +79,8 @@ export function pluginDidLoad() {
       saveHistoryData(current.historyData)
     }
   )])
+
+  store.dispatch({ type: '@@poi-plugin-senka-calc@init' })
 }
 
 export function pluginWillUnload() {

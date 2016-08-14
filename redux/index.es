@@ -103,7 +103,7 @@ const emptyStoreData = {
   custom: initialState.custom,
 }
 function initStatusReducer(state = initialState.initStatus, action) {
-  if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
+  if (action.type === '@@Response/kcsapi/api_get_member/require_info' || action.type === '@@poi-plugin-senka-calc@init') {
     return {
       ...state,
       init: true,
@@ -114,7 +114,8 @@ function initStatusReducer(state = initialState.initStatus, action) {
 
 function customReducer(state = initialState.custom, action) {
   switch (action.type) {
-  case '@@Response/kcsapi/api_get_member/require_info': {
+  case '@@Response/kcsapi/api_get_member/require_info':
+  case '@@poi-plugin-senka-calc@init': {
     const storeData = getLocalStorage().custom
     if (!storeData || isEmpty(storeData)) {
       return state
@@ -135,7 +136,7 @@ function customReducer(state = initialState.custom, action) {
 }
 
 function rankReducer(state = initialState.rank, action) {
-  if (action.type === '@@Response/kcsapi/api_get_member/require_info') {
+  if (action.type === '@@Response/kcsapi/api_get_member/require_info' || action.type === '@@poi-plugin-senka-calc@init') {
     const storeData = getLocalStorage().rank
     if (!storeData || isEmpty(storeData)) {
       return state
@@ -217,7 +218,8 @@ function rankReducer(state = initialState.rank, action) {
 
 function historyReducer(state = initialState.history, action) {
   switch (action.type) {
-  case '@@Response/kcsapi/api_get_member/require_info': {
+  case '@@Response/kcsapi/api_get_member/require_info':
+  case '@@poi-plugin-senka-calc@init': {
     const historyData = loadHistoryData()
     if (historyData.length === 0) {
       return state
@@ -250,7 +252,8 @@ function historyReducer(state = initialState.history, action) {
 
 function timerReducer(state = initialState.timer, action) {
   switch (action.type) {
-  case '@@Response/kcsapi/api_get_member/require_info': {
+  case '@@Response/kcsapi/api_get_member/require_info':
+  case '@@poi-plugin-senka-calc@init': {
     let storeData = getLocalStorage()
     if (isEmpty(storeData)) {
       storeData = emptyStoreData
