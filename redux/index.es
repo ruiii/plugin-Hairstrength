@@ -92,6 +92,11 @@ const initialState = {
         "delta": 0,
       },
     },
+    "finalTimes": {
+      refresh: 0,
+      exp: 0,
+      eo: 0,
+    },
     "updatedTime": 0,
   },
   "history": {
@@ -139,8 +144,16 @@ const emptyStoreData = {
   timer: initialState.timer,
   custom: initialState.custom,
 }
+const initActions = [
+  '@@Response/kcsapi/api_get_member/require_info',
+  '@@poi-plugin-senka-calc@init'
+]
+const eoActions = [
+  '@@Response/kcsapi/api_req_sortie/battleresult',
+  '@@Response/kcsapi/api_req_map/next'
+]
 function initStatusReducer(state = initialState.initStatus, action) {
-  if (action.type === '@@Response/kcsapi/api_get_member/require_info' || action.type === '@@poi-plugin-senka-calc@init') {
+  if (initActions.includes(action.type)) {
     return {
       ...state,
       init: true,
@@ -173,7 +186,8 @@ function customReducer(state = initialState.custom, action) {
 }
 
 function rankReducer(state = initialState.rank, action) {
-  if (action.type === '@@Response/kcsapi/api_get_member/require_info' || action.type === '@@poi-plugin-senka-calc@init') {
+  const { type, body } = action
+  if (initActions.includes(type)) {
     const storeData = getLocalStorage().rank
     if (!storeData || isEmpty(storeData)) {
       return state
@@ -183,8 +197,7 @@ function rankReducer(state = initialState.rank, action) {
         ...storeData,
       }
     }
-  } else if (action.type.includes(apiMap.api)) {
-    const { body } = action
+  } else if (type.includes(apiMap.api)) {
 
     if (!body.api_list) {
       return state
@@ -235,10 +248,19 @@ function rankReducer(state = initialState.rank, action) {
       updatedDetail,
       updatedTime,
     }
-  } else if (action.type === ACTIVE_RANK_UPDATE) {
+  } else if (type === ACTIVE_RANK_UPDATE) {
     return {
       ...state,
       updatedDetail: action.updatedDetail,
+    }
+  } else if (eoActions.includes(type)) {
+    let { exRate } = state
+    // in case of '0'
+    if (body.api_get_exmap_rate && body.api_get_exmap_rate != 0) {
+
+    }
+    return {
+      ...state,
     }
   } else {
     return state
