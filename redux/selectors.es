@@ -70,6 +70,11 @@ export const userDetailInitSelector = createSelector(
   state => ({ updatedDetail: this.state.rank.updatedDetail })
 )
 
+export const eoRateSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ eoRate: state.rank.eoRate })
+)
+
 export const timerSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => ({ timer: state.timer })

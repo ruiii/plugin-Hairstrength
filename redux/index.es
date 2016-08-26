@@ -54,7 +54,6 @@ const initialState = {
     "init": false,
   },
   "rank": {
-    "exRate": [0, 0],
     "activeRank": {
       "1": {
         active: true,
@@ -91,6 +90,9 @@ const initialState = {
         "value": 0,
         "delta": 0,
       },
+    "eoRate": {
+      "store": 0,
+      "new": 0,
     },
     "finalTimes": {
       refresh: 0,
@@ -146,12 +148,12 @@ const emptyStoreData = {
 }
 const initActions = [
   '@@Response/kcsapi/api_get_member/require_info',
-  '@@poi-plugin-senka-calc@init'
+  '@@poi-plugin-senka-calc@init',
 ]
-const eoActions = [
-  '@@Response/kcsapi/api_req_sortie/battleresult',
-  '@@Response/kcsapi/api_req_map/next'
-]
+const eoActions = {
+  '@@Response/kcsapi/api_req_sortie/battleresult': 'api_get_exmap_rate',
+  '@@Response/kcsapi/api_req_map/next': 'api_get_eo_rate',
+}
 function initStatusReducer(state = initialState.initStatus, action) {
   if (initActions.includes(action.type)) {
     return {
@@ -253,14 +255,24 @@ function rankReducer(state = initialState.rank, action) {
       ...state,
       updatedDetail: action.updatedDetail,
     }
-  } else if (eoActions.includes(type)) {
-    let { exRate } = state
+  } else if (type === '@@RATE_STORE_EORATE') {
+    let { eoRate } = state
+    eoRate.store = eoRate.new
+    eoRate.new = 0
+    return {
+      ...state,
+      eoRate,
+    }
+  } else if (Object.keys(eoActions).includes(type)) {
+    let { eoRate } = state
+    const rate = parseInt(body[eoActions[type]])
     // in case of '0'
-    if (body.api_get_exmap_rate && body.api_get_exmap_rate != 0) {
-
+    if (rate && rate !== 0) {
+      eoRate.new += rate
     }
     return {
       ...state,
+      eoRate,
     }
   } else {
     return state
@@ -343,8 +355,8 @@ function timerReducer(state = initialState.timer, action) {
       accountString = __('Normal map final time')
       nextAccountTime = expTime
     } else if (now >= storeData.timer.updateTime + 11 * 3600 * 1000) {
-      storeData.rank.exRate[0] = storeData.rank.exRate[1]
-      storeData.rank.exRate[1] = 0
+      storeData.rank.eoRate[0] = storeData.rank.eoRate[1]
+      storeData.rank.eoRate[1] = 0
       accounted = true
     } else {
       accountString = __('Account time')
