@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
-import { expSelector, customSelector, updatedRateSelector, customShowSelector } from '../redux/selectors'
+import { expSelector, customSelector, updatedRateSelector, customShowSelector, eoRateSelector } from '../redux/selectors'
 import { __, estimateSenka, getStatusStyle } from './utils'
 import { customChange, showCustom } from '../redux/actions'
 
@@ -13,8 +13,9 @@ export default connect(
     customSelector,
     updatedRateSelector,
     customShowSelector,
-  ], ({ exp }, { custom }, { updatedRate }, { customShow }) =>
-    ({ exp, custom, updatedRate, customShow })),
+    eoRateSelector,
+  ], ({ exp }, { custom }, { updatedRate }, { customShow }, { eoRate }) =>
+    ({ exp, custom, updatedRate, customShow, eoRate })),
   { customChange, showCustom }
 )(class RatePanel extends Component{
   constructor(props) {
@@ -135,10 +136,15 @@ export default connect(
     }
   }
   render() {
-    const { exp, custom, customShow } = this.props
+    const { exp, custom, customShow, eoRate } = this.props
     const { baseExp, baseRate, enable } = custom
+<<<<<<< ef9419782ddf32a87fd586611a6df6d51767ba11
     const { _customExp, _customRate, _enable, _auto, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp)
+=======
+    const { _customExp, _customRate, _enable, btnDisable } = this.state
+    const rate = estimateSenka(exp, baseExp) + eoRate.new
+>>>>>>> Add eoRate & accountTimeout & refreshTimeout
 
     return (
       <div className="rate-panel">

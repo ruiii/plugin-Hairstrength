@@ -137,3 +137,77 @@ export function checkIsUpdated(updatedDetail, updatedList) {
     return sum
   }, 0)
 }
+
+export function accountTimeout(timerState) {
+  let { finalTimes, nextAccountTime } = timerState
+  let { accounted, expAccounted, eoAccounted } = timerState
+  let { accountString } = timerState
+
+  const now = Date.now()
+  // some logic to determine account Stage
+  if (now >= finalTimes.eo) {
+    eoAccounted = true
+    accounted = true
+  } else if (now >= finalTimes.exp) {
+    expAccounted = true
+    accountString = __('EO map final time')
+    nextAccountTime = finalTimes.eo
+  } else if (now >= finalTimes.refresh) {
+    accountString = __('Normal map final time')
+    nextAccountTime = finalTimes.exp
+  } else if (now >= nextAccountTime) {
+    accounted = true
+  } else {
+    accountString = __('Account time')
+    accounted = false
+  }
+
+  return {
+    nextAccountTime,
+    accounted,
+    expAccounted,
+    eoAccounted,
+    accountString,
+  }
+}
+
+export function refreshTimeout(timerState) {
+  let { timeUp, updatedList } = timerState
+  let { accounted, expAccounted, eoAccounted } = timerState
+  let { accountString } = timerState
+  let { nextRefreshTime, finalTimes, nextAccountTime } = timerState
+
+  if (!timeUp) {
+    updatedList = [false, false, false, false, false]
+  } else {
+    nextRefreshTime = getRefreshTime('next')
+    nextAccountTime = getRefreshTime('account')
+    accounted = false
+    accountString = __('Account time')
+    if (eoAccounted) {
+      finalTimes = {
+        refresh: getFinalTime(),
+        exp: getFinalTime('exp'),
+        eo: getFinalTime('eo'),
+      }
+      expAccounted = false
+      eoAccounted = false
+    }
+    if (Date.now() >= finalTimes.refresh) {
+      accountString = __('Normal map final time')
+      nextAccountTime = finalTimes.exp
+    }
+  }
+
+  return {
+    updatedList,
+    accounted,
+    expAccounted,
+    eoAccounted,
+    nextAccountTime,
+    nextRefreshTime,
+    finalTimes,
+    accountString,
+    timeUp: !timeUp,
+  }
+}

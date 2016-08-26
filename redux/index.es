@@ -12,6 +12,8 @@ import {
   loadHistoryData,
   __,
   storePath,
+  accountTimeout,
+  refreshTimeout,
 } from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
@@ -128,6 +130,11 @@ const initialState = {
     "nextRefreshTime": 0,
     "isTimeUp": false,
     "isUpdated": false,
+    "finalTimes": {
+      refresh: getFinalTime(),
+      exp: getFinalTime('exp'),
+      eo: getFinalTime('eo'),
+    },
   },
   "custom": {
     "baseExp": 0,
@@ -329,39 +336,25 @@ function timerReducer(state = initialState.timer, action) {
       }
     }
 
+    let newState = {
+      ...state,
+    }
+    newState.nextAccountTime = getRefreshTime('account')
+    newState = {
+      ...accountTimeout(state),
+    }
+    if (Date.now() >= storeData.timer.updateTime + 11 * 3600 * 1000) {
+      newState.accounted = true
+    }
+
     let {
-      accounted,
-      eoAccounted,
-      expAccounted,
-      accountString,
-      nextAccountTime,
       refreshString,
       nextRefreshTime,
       updatedList,
       isTimeUp,
       isUpdated,
-    } = state
-    nextAccountTime = getRefreshTime('account')
-    const now = Date.now()
-    const [normalTime, expTime, eoTime] = [getFinalTime(), getFinalTime('exp'), getFinalTime('eo')]
-    if (now >= eoTime) {
-      accounted = true
-      eoAccounted = true
-    } else if (now >= expTime) {
-      expAccounted = true
-      accountString = __('EO map final time')
-      nextAccountTime = eoTime
-    } else if (now >= normalTime) {
-      accountString = __('Normal map final time')
-      nextAccountTime = expTime
-    } else if (now >= storeData.timer.updateTime + 11 * 3600 * 1000) {
-      storeData.rank.eoRate[0] = storeData.rank.eoRate[1]
-      storeData.rank.eoRate[1] = 0
-      accounted = true
-    } else {
-      accountString = __('Account time')
-      accounted = false
-    }
+    } = newState
+
     // refresh timer
     refreshString = __("Refresh time")
     nextRefreshTime = getRefreshTime()
@@ -380,12 +373,7 @@ function timerReducer(state = initialState.timer, action) {
     }
     isUpdated = checkIsUpdated(storeData.rank.activeRank, updatedList)
     return {
-      ...state,
-      accounted,
-      eoAccounted,
-      expAccounted,
-      accountString,
-      nextAccountTime,
+      ...newState,
       refreshString,
       nextRefreshTime,
       updatedList,
@@ -396,11 +384,7 @@ function timerReducer(state = initialState.timer, action) {
   case RATE_TIME_UP:
     return {
       ...state,
-      isTimeUp: true,
-      isUpdated: false,
-      accounted: false,
-      updatedList: [false, false, false, false, false],
-      nextAccountTime: getRefreshTime('account'),
+      ...refreshTimeout(state),
     }
   case ACTIVE_RANK_UPDATE: {
     const isUpdated = checkIsUpdated(action.updatedDetail, state.updatedList)
@@ -454,7 +438,7 @@ function timerReducer(state = initialState.timer, action) {
   case RATE_ACCOUNTED:
     return {
       ...state,
-      accounted: true,
+      ...accountTimeout(state),
     }
   case RATE_HISTORY_UPDATE: {
     const rank = rankSelector(window.getStore()).rank
