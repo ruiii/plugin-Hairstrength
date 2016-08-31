@@ -196,22 +196,28 @@ export default connect(
             </Button>
           </div>
         </Panel>
-        <div className={`rate-calc ${customShow ? 'on-custom' : ''}`}>
-          <div className="rate-container">
-            <span className="rate-part">{__('Experience')}</span>
-            <div className="rate-part">
-              <span>{baseExp}　->　{exp}</span>
-              <span>( ↑ {exp - baseExp} )</span>
+        {
+          !isNaN(exp)
+          ? (
+            <div className={`rate-calc ${customShow ? 'on-custom' : ''}`}>
+              <div className="rate-container">
+                <span className="rate-part">{__('Experience')}</span>
+                <div className="rate-part">
+                  <span>{baseExp}　->　{exp}</span>
+                  <span>( ↑ {exp - baseExp} )</span>
+                </div>
+              </div>
+              <div className="rate-container">
+                <span className="rate-part">{__('Rate')}</span>
+                <div className="rate-part">
+                  <span> {baseRate} -> {enable ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
+                  { enable ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="rate-container">
-            <span className="rate-part">{__('Rate')}</span>
-            <div className="rate-part">
-              <span> {baseRate} -> {enable ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
-              { enable ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
-            </div>
-          </div>
-        </div>
+          )
+          : undefined
+        }
       </div>
     )
   }
