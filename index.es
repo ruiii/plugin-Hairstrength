@@ -56,6 +56,10 @@ export function pluginDidLoad() {
           && current.rank.eoRate.new !== 0) {
         return dispatch({ type: '@@RATE_STORE_EORATE'})
       }
+      if (previous.rank.updatedRate
+          && previous.rank.updatedRate !== current.rank.updatedRate) {
+        return dispatch({ type: '@@RATE_RESET_RATE'})
+      }
       const id = getMemberId()
       const data = JSON.parse(localStorage.getItem(storePath) || '{}')
       data[id] = current

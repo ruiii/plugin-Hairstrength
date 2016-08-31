@@ -190,6 +190,12 @@ function customReducer(state = initialState.custom, action) {
       ...state,
       ...action.custom,
     }
+  case '@@RATE_RESET_RATE':
+    return {
+      ...state,
+      baseExp: 0,
+      baseRate: 0,
+    }
   }
   return state
 }
@@ -341,6 +347,7 @@ function timerReducer(state = initialState.timer, action) {
     }
     newState.nextAccountTime = getRefreshTime('account')
     newState = {
+      ...newState,
       ...accountTimeout(state),
     }
     if (Date.now() >= storeData.timer.updateTime + 11 * 3600 * 1000) {

@@ -172,13 +172,14 @@ export function accountTimeout(timerState) {
 }
 
 export function refreshTimeout(timerState) {
-  let { timeUp, updatedList } = timerState
+  let { isTimeUp, isUpdated, updatedList } = timerState
   let { accounted, expAccounted, eoAccounted } = timerState
   let { accountString } = timerState
   let { nextRefreshTime, finalTimes, nextAccountTime } = timerState
 
-  if (!timeUp) {
+  if (!isTimeUp) {
     updatedList = [false, false, false, false, false]
+    isUpdated = false
   } else {
     nextRefreshTime = getRefreshTime('next')
     nextAccountTime = getRefreshTime('account')
@@ -200,6 +201,7 @@ export function refreshTimeout(timerState) {
   }
 
   return {
+    isUpdated,
     updatedList,
     accounted,
     expAccounted,
@@ -208,6 +210,6 @@ export function refreshTimeout(timerState) {
     nextRefreshTime,
     finalTimes,
     accountString,
-    timeUp: !timeUp,
+    isTimeUp: !isTimeUp,
   }
 }
