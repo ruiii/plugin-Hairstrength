@@ -34,7 +34,7 @@ export default connect(
     const { historyShow, historyData } = this.props
     let items = []
     forEach(historyData, (d, i) => {
-      if ((new Date(d.time)).getUTCHours() === 18) {
+      if ((new Date(d.time)).getUTCHours() === 18 || d.rate === 0) {
         return
       }
       items.push(<DataItem key={i} data={d} />)
