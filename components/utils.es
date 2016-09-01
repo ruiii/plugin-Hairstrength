@@ -41,12 +41,6 @@ export function getRate(rankNo, obfsRate, memberId) {
   return rate > 0 ? rate : 0
 }
 
-export function getActiveRank() {
-  //return [true, true, true, true, true]
-  return [ 1, 5, 20, 100, 500 ]
-  //window.getStore('ext["poi-plugin-senka-calc"].activeRank')
-}
-
 export function getMemberId() {
   return window.getStore('info.basic.api_member_id')
 }
@@ -131,15 +125,15 @@ export function getStatusStyle(flag) {
 
 export function dateToString(time) {
   if (!time) {
-    return
+    time = 0
   }
   const date = new Date(time)
   return `${date.getMonth() + 1}-${date.getDate()}`
 }
 
-export function checkIsUpdated(activeRank, updatedList) {
-  return !reduce(activeRank, function(sum, active, i) {
-    if (active && !updatedList[i]) sum++
+export function checkIsUpdated(updatedDetail, updatedList) {
+  return !reduce(updatedDetail, function(sum, data, key) {
+    if (data.active && !updatedList[key]) sum++
     return sum
   }, 0)
 }

@@ -13,51 +13,45 @@ export default connect(
     rankDetailSelector,
     updateTimerDetailSelector,
     filterShowSelector,
-  ], (rankDetail, timerDetail, { filterShow }) =>
+  ], ({ rankDetail }, timerDetail, { filterShow }) =>
     ({ rankDetail, timerDetail, filterShow })),
   { activeRankChange, showRankFilter }
 )(class RankPanel extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      ranks: [1, 5, 20, 100, 500],
-    }
   }
   onClickCheckbox = (index) => {
-    const activeRank = this.props.rankDetail.activeRank
-    activeRank[index] = !activeRank[index]
-    this.props.activeRankChange(activeRank)
+    const detail = this.props.rankDetail
+    detail[index].active = !detail[index].active
+    this.props.activeRankChange(detail)
   }
   onFilterClose = (e) => {
     this.props.showRankFilter()
   }
   render() {
-    const { activeRank, rateList, deltaList } = this.props.rankDetail
-    const { updatedList, isUpdated } = this.props.timerDetail
+    const { rankDetail, timerDetail } = this.props
+    const { updatedList, isUpdated } = timerDetail
 
     const { onClickCheckbox } = this
-    const { ranks } = this.state
     const cover = includes(updatedList, true)
     let checkbox = []
     let rankDom = []
     let rateDom = []
-    forEach(activeRank, (active, i) => {
+    forEach(rankDetail, (data, i) => {
       checkbox.push(
         <Checkbox key={i}
-               onChange={onClickCheckbox.bind(this, i)}
-               checked={active}>
-          {ranks[i]}
+                  onChange={onClickCheckbox.bind(this, i)}
+                  checked={data.active}>
+          { i }
         </Checkbox>
       )
-      if (!active) {
+      if (!data.active) {
         return
       }
-      rankDom.push(
-        <span key={i}>{ ranks[i] }</span>
-      )
+      rankDom.push(<span key={i}>{ i }</span>)
       rateDom.push(
         <span key={i} style={getStatusStyle(updatedList[i])}>
-          { `${rateList[i]} ( ↑${deltaList[i]} )` }
+          { `${data.rate} ( ↑${data.delta} )` }
         </span>
       )
     })

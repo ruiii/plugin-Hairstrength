@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { forEach, isEmpty } from 'lodash'
+import { forEach, isEmpty, includes } from 'lodash'
 import { timerSelector, rankSelector } from './selectors'
 import {
   getRate,
@@ -55,13 +55,43 @@ const initialState = {
   },
   "rank": {
     "exRate": [0, 0],
-    "activeRank": [true, true, true, true, true],
-    "rateList": [0, 0, 0, 0, 0],
-    "deltaList": [0, 0, 0, 0, 0],
-    "updatedRate": 0,
-    "updatedRank": 0,
-    "rateDelta": 0,
-    "rankDelta": 0,
+    "activeRank": {
+      "1": {
+        active: true,
+        rate: 0,
+        delta: 0,
+      },
+      "5": {
+        active: true,
+        rate: 0,
+        delta: 0,
+      }
+      "20": {
+        active: true,
+        rate: 0,
+        delta: 0,
+      }
+      "100": {
+        active: true,
+        rate: 0,
+        delta: 0,
+      }
+      "500": {
+        active: true,
+        rate: 0,
+        delta: 0,
+      },
+    },
+    "updatedDetail": {
+      "rate": {
+        "value": 0,
+        "delta": 0,
+      },
+      "rank": {
+        "value": 0,
+        "delta": 0,
+      },
+    },
     "updatedTime": 0,
   },
   "history": {
@@ -75,7 +105,13 @@ const initialState = {
   },
   "timer": {
     "updateTime": 0,
-    "updatedList": [true, true, true, true, true],
+    "updatedList": {
+      "1": true,
+      "5": true,
+      "20": true,
+      "100": true,
+      "500": true,
+    },
     "accounted": false,
     "eoAccounted": false,
     "expAccounted": false,
@@ -156,9 +192,8 @@ function rankReducer(state = initialState.rank, action) {
     const memberId = getMemberId()
     const nickname = getUserNickname()
     const timer = timerSelector(window.getStore()).timer
-    const rateList = [ ...state.rateList ]
-    const deltaList = [ ...state.deltaList ]
-    let { updatedRate, updatedRank, rateDelta, rankDelta, updatedTime } = state
+    let { updatedDetail, updatedTime, activeRank } = state
+    let { rate, rank } = updatedDetail
     let updated = false
 
     forEach(body.api_list, (data) => {
@@ -166,25 +201,24 @@ function rankReducer(state = initialState.rank, action) {
       const api_nickname = data[apiMap.api_nickname]
       const api_no = data[apiMap.api_no]
       const api_rate = data[apiMap.api_rate]
+      const newRate = getRate(api_no, api_rate, memberId)
 
       if (api_nickname === nickname && timer.isTimeUp && updatedTime !== getRefreshTime()) {
-        updatedRate = getRate(api_no, api_rate, memberId)
-        updatedRank = api_no
-        rateDelta = updatedRate - state.updatedRate
-        rankDelta = updatedRank - state.updatedRank
+        rate.value = newRate
+        rank.value = api_no
+        rate.delta = rate.value - state.updatedDetail.rate.value
+        rank.delta = rank.value - state.updatedDetail.rank.value
         updatedTime = getRefreshTime()
         updated = true
       }
 
-      const idx = getActiveRank().indexOf(api_no)
-
-      if (idx < 0 || timer.updatedList[idx]) {
+      if (!includes(Object.keys(activeRank), String(api_no)) || timer.updatedList[api_no]) {
         return
       }
 
       updated = true
-      rateList[idx] = getRate(api_no, api_rate, memberId)
-      deltaList[idx] = rateList[idx] - state.rateList[idx]
+      activeRank[api_no].delta = newRate - activeRank[api_no].rate
+      activeRank[api_no].rate = newRate
 
       // TODO: move this to observe
       setImmediate(() => window.dispatch(rateUpdated(api_no)))
@@ -196,20 +230,14 @@ function rankReducer(state = initialState.rank, action) {
 
     return {
       ...state,
-      rateList,
-      deltaList,
-      updatedRate,
-      updatedRank,
-      rateDelta,
-      rankDelta,
+      activeRank,
+      updatedDetail,
       updatedTime,
     }
   } else if (action.type === ACTIVE_RANK_UPDATE) {
-    // [1, 5, 20, 100, 500]
-    // const activeRank = [true, true, true, true, true]
     return {
       ...state,
-      activeRank: action.activeRank,
+      updatedDetail: action.updatedDetail,
     }
   } else {
     return state
@@ -233,15 +261,16 @@ function historyReducer(state = initialState.history, action) {
     }
   }
   case RATE_HISTORY_UPDATE: {
-    const rank = rankSelector(window.getStore()).rank
+    const rankStore = rankSelector(window.getStore()).rank
+    const { rank, rate } = rankStore.updatedDetail
     return {
       ...state,
       historyData: [
         ...state.historyData,
         {
-          rate: rank.updatedRate,
-          rank: rank.updatedRank,
-          time: rank.updatedTime,
+          rate: rate.value,
+          rank: rank.value,
+          time: rankStore.updatedTime,
         },
       ],
     }
@@ -249,7 +278,7 @@ function historyReducer(state = initialState.history, action) {
   }
   return state
 }
-
+// TODO: change var
 function timerReducer(state = initialState.timer, action) {
   switch (action.type) {
   case '@@Response/kcsapi/api_get_member/require_info':
@@ -339,7 +368,7 @@ function timerReducer(state = initialState.timer, action) {
       nextAccountTime: getRefreshTime('account'),
     }
   case ACTIVE_RANK_UPDATE: {
-    const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
+    const isUpdated = checkIsUpdated(action.updatedDetail, state.updatedList)
     if (isUpdated !== state.isUpdated) {
       const nextAccountTime = getRefreshTime('account')
       let accounted = true

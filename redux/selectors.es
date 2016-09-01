@@ -57,7 +57,7 @@ export const rankSelector = createSelector(
 
 export const updatedRateSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ updatedRate: state.rank.updatedRate })
+  state => ({ updatedRate: state.rank.updatedDetail.rate.value })
 )
 
 export const updateTimeSelector = createSelector(
@@ -67,10 +67,7 @@ export const updateTimeSelector = createSelector(
 
 export const userDetailInitSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => {
-    const { updatedRate, updatedRank, rateDelta, rankDelta } = state.rank
-    return { updatedRate, updatedRank, rateDelta, rankDelta }
-  }
+  state => ({ updatedDetail: this.state.rank.updatedDetail })
 )
 
 export const timerSelector = createSelector(
@@ -80,10 +77,7 @@ export const timerSelector = createSelector(
 
 export const rankDetailSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => {
-    const { activeRank, rateList, deltaList } = state.rank
-    return { activeRank, rateList, deltaList }
-  }
+  state => ({ rankDetail: this.state.rank.activeRank })
 )
 
 export const updateTimerDetailSelector = createSelector(

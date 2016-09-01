@@ -11,12 +11,12 @@ export default connect(
     userInitInfoSelector,
     updateTimeSelector,
     userDetailInitSelector,
-  ], ({ api_nickname, api_rank }, { updateTime }, userDetail) =>
-    ({ api_nickname, api_rank, updateTime, userDetail }))
+  ], ({ api_nickname, api_rank }, { updateTime }, { updatedDetail }) =>
+    ({ api_nickname, api_rank, updateTime, updatedDetail }))
 )(class DetailPanel extends Component{
   render() {
-    const { api_nickname, api_rank, updateTime, userDetail } = this.props
-    const { updatedRate, updatedRank, rateDelta, rankDelta } = userDetail
+    const { api_nickname, api_rank, updateTime, updatedDetail } = this.props
+    const { rank, rate } = updatedDetail
 
     return (
       <div className="detail-panel">
@@ -29,12 +29,12 @@ export default connect(
             {__('By:　%s　', timeToString(updateTime))}
           </span>
           <span>
-            { __('Rate') }: { updatedRate.toFixed(1) }
-            { rateDelta > 0 ? ` ( ↑${rateDelta.toFixed(1)} )` : ''}
+            { __('Rate') }: { rate.value.toFixed(1) }
+            { rate.delta > 0 ? ` ( ↑${rate.delta.toFixed(1)} )` : ''}
           </span>
           <span>
-            { __('Ranking') }: { updatedRank.toFixed(1) }
-            { rankDelta > 0 ? ` ( ↓${rankDelta.toFixed(1)} )` : ` ( ↑${Math.abs(rankDelta).toFixed(1)} )` }
+            { __('Ranking') }: { rank.value.toFixed(1) }
+            { rank.delta > 0 ? ` ( ↓${rank.delta.toFixed(1)} )` : ` ( ↑${Math.abs(rank.delta).toFixed(1)} )` }
           </span>
         </div>
 
