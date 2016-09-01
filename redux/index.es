@@ -126,6 +126,7 @@ const initialState = {
     "baseExp": 0,
     "baseRate": 0,
     "enable": false,
+    "auto": false,
   },
   "setting": {
     "historyShow": false,

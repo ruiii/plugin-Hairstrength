@@ -24,12 +24,14 @@ export default connect(
       _customExp: '',
       _customRate: '',
       _enable: false,
+      _auto: false,
       btnDisable: true,
     }
   }
   componentWillMount() {
     this.setState({
       _enable: this.props.custom.enable,
+      _auto: this.props.custom.auto,
     })
   }
   onUseCurrentExp = (e) => {
@@ -64,11 +66,20 @@ export default connect(
     })
   }
   check(newState) {
-    const { baseExp, baseRate, enable } = this.props.custom
     const _state = {
       ...this.state,
       ...newState,
     }
+
+    if (_state._auto) {
+      this.setState({
+        ...newState,
+        btnDisable: false,
+      })
+      return
+    }
+
+    const { baseExp, baseRate, enable } = this.props.custom
     const { _customExp, _customRate, _enable } = _state
     if (_enable && !_customRate) {
       this.setState({
@@ -92,12 +103,18 @@ export default connect(
       _enable: e.target.checked,
     })
   }
+  onEnableAuto = (e) => {
+    this.check({
+      _auto: e.target.checked,
+    })
+  }
   onCustomChange = (e) => {
-    const { _customExp, _customRate, _enable } = this.state
+    const { _customExp, _customRate, _enable, _auto } = this.state
     this.props.customChange({
       baseExp: _customExp,
       baseRate: _customRate,
       enable: _enable,
+      auto: _auto,
     })
     this.setState({
       btnDisable: true,
@@ -112,6 +129,7 @@ export default connect(
         _customExp: nextProps.custom.baseExp,
         _customRate: nextProps.custom.baseRate,
         _enable: nextProps.custom.enable,
+        _auto : nextProps.custom.auto,
         btnDisable: true,
       })
     }
@@ -119,40 +137,46 @@ export default connect(
   render() {
     const { exp, custom, customShow } = this.props
     const { baseExp, baseRate, enable } = custom
-    const { _customExp, _customRate, _enable, btnDisable } = this.state
+    const { _customExp, _customRate, _enable, _auto, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp)
 
     return (
       <div className="rate-panel">
         <Panel collapsible expanded={customShow}>
-          <FormGroup>
-            <ControlLabel>{__('Base Exp')}</ControlLabel>
-            <FormControl type='number'
-                         placeholder="exp"
-                         value={_customExp}
-                         ref='customExp'
-                         onChange={this.onExpChange} />
-             <Button onClick={this.onUseCurrentExp}>
-               { __('Use current exp') }
-             </Button>
-          </FormGroup>
-          <Checkbox onChange={this.onEnableRate}
-                    checked={_enable}>
-            {__('Set rate')}
+          <div style={getStatusStyle(!_auto)}>
+            <FormGroup>
+              <ControlLabel>{__('Base Exp')}</ControlLabel>
+              <FormControl type='number'
+                           placeholder="exp"
+                           value={_customExp}
+                           ref='customExp'
+                           onChange={this.onExpChange} />
+               <Button onClick={this.onUseCurrentExp}>
+                 { __('Use current exp') }
+               </Button>
+            </FormGroup>
+            <Checkbox onChange={this.onEnableRate}
+                      checked={_enable}>
+              {__('Set rate')}
+            </Checkbox>
+            <FormGroup style={getStatusStyle(_enable)}>
+              <ControlLabel>{__('Base Rate')}</ControlLabel>
+              <FormControl type='number'
+                           placeholder="rate"
+                           value={_customRate}
+                           ref='customRate'
+                           disabled={!_enable}
+                           onChange={this.onRateChange} />
+               <Button onClick={this.onUseUpdatedRate}
+                       disabled={!_enable}>
+                 { __('Use updated rate') }
+               </Button>
+            </FormGroup>
+          </div>
+          <Checkbox onChange={this.onEnableAuto}
+                    checked={_auto}>
+            {__('auto set')}
           </Checkbox>
-          <FormGroup style={getStatusStyle(_enable)}>
-            <ControlLabel>{__('Base Rate')}</ControlLabel>
-            <FormControl type='number'
-                         placeholder="rate"
-                         value={_customRate}
-                         ref='customRate'
-                         disabled={!_enable}
-                         onChange={this.onRateChange} />
-             <Button onClick={this.onUseUpdatedRate}
-                     disabled={!_enable}>
-               { __('Use updated rate') }
-             </Button>
-          </FormGroup>
           <div className="rate-btns">
             <Button onClick={this.onCustomChange}
                     disabled={btnDisable}>{ __('OK') }</Button>
