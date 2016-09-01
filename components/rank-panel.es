@@ -64,7 +64,7 @@ export default connect(
           </Button>
           { checkbox }
         </Panel>
-        <Alert bsStyle='danger'
+        <Alert bsStyle="danger"
                className={isUpdated ? 'hidden' : 'show'}>
           { __('It will save when all rates is updated') }
         </Alert>

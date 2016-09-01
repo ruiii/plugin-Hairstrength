@@ -177,6 +177,11 @@ export default connect(
                     checked={_auto}>
             {__('auto set')}
           </Checkbox>
+          <Alert bsStyle="danger"
+                 className={_auto ? 'show' : 'hidden'}>
+            we will automatically set your ranking rate and current exp as the base rate & exp,
+            but the ranking rate may not relate to your current exp.
+          </Alert>
           <div className="rate-btns">
             <Button onClick={this.onCustomChange}
                     disabled={btnDisable}>{ __('OK') }</Button>
