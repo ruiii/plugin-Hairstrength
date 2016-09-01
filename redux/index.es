@@ -6,7 +6,6 @@ import {
   getMemberId,
   getFinalTime,
   getRefreshTime,
-  getActiveRank,
   getUserNickname,
   checkIsUpdated,
   loadHistoryData,
@@ -66,17 +65,17 @@ const initialState = {
         active: true,
         rate: 0,
         delta: 0,
-      }
+      },
       "20": {
         active: true,
         rate: 0,
         delta: 0,
-      }
+      },
       "100": {
         active: true,
         rate: 0,
         delta: 0,
-      }
+      },
       "500": {
         active: true,
         rate: 0,
@@ -109,6 +108,7 @@ const initialState = {
     ],
   },
   "timer": {
+    "isTimeUp": true,
     "updateTime": 0,
     "updatedList": {
       "1": true,
@@ -221,7 +221,7 @@ function rankReducer(state = initialState.rank, action) {
     const nickname = getUserNickname()
     const timer = timerSelector(window.getStore()).timer
     let { updatedDetail, updatedTime, activeRank } = state
-    let { rate, rank } = updatedDetail
+    const { rate, rank } = updatedDetail
     let updated = false
 
     forEach(body.api_list, (data) => {
@@ -240,7 +240,7 @@ function rankReducer(state = initialState.rank, action) {
         updated = true
       }
 
-      if (includes(Object.keys(activeRank), String(api_no)) || !timer.updatedList[api_no]) {
+      if (includes(Object.keys(activeRank), String(api_no)) && !timer.updatedList[api_no]) {
         activeRank[api_no].delta = newRate - activeRank[api_no].rate
         activeRank[api_no].rate = newRate
         updated = true
@@ -270,7 +270,7 @@ function rankReducer(state = initialState.rank, action) {
       updatedDetail: action.updatedDetail,
     }
   } else if (type === '@@RATE_STORE_EORATE') {
-    let { eoRate } = state
+    const { eoRate } = state
     eoRate.store = eoRate.new
     eoRate.new = 0
     return {
@@ -278,7 +278,7 @@ function rankReducer(state = initialState.rank, action) {
       eoRate,
     }
   } else if (Object.keys(eoActions).includes(type)) {
-    let { eoRate } = state
+    const { eoRate } = state
     const rate = parseInt(body[eoActions[type]])
     // in case of '0'
     if (rate && rate !== 0) {
@@ -352,8 +352,8 @@ function timerReducer(state = initialState.timer, action) {
       ...newState,
       ...accountTimeout(state),
     }
-    if (Date.now() >= storeData.timer.updateTime + 11 * 3600 * 1000) {
-      newState.counter.status = true
+    if (Date.now() >= storeTimer.updateTime + 11 * 3600 * 1000) {
+      newState.counter.accounted.status = true
     }
 
     let { counter, updatedList, isTimeUp } = newState
@@ -363,7 +363,7 @@ function timerReducer(state = initialState.timer, action) {
     counter.refreshed.nextTime = getRefreshTime()
     // if not refreshed, mark as timeup
     if (!storeData.rank
-        || (storeData.timer.updateTime !== counter.refreshed.nextTime)) {
+        || (storeTimer.updateTime && storeTimer.updateTime !== counter.refreshed.nextTime)) {
       reduce(updatedList, (newList, value, key) => {
         newList[key] = false
         return newList
@@ -380,11 +380,9 @@ function timerReducer(state = initialState.timer, action) {
     counter.refreshed.status = checkIsUpdated(storeData.rank.activeRank, updatedList)
     return {
       ...newState,
-      refreshString,
-      nextRefreshTime,
+      counter,
       updatedList,
       isTimeUp,
-      isUpdated,
     }
   }
   case RATE_TIME_UP:
@@ -394,8 +392,9 @@ function timerReducer(state = initialState.timer, action) {
     }
   case ACTIVE_RANK_UPDATE: {
     const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
-    let { status, nextTime } = state.couner.accounted
-    if (isUpdated !== state.counter.refreshed.status) {
+    const { counter } = state
+    let { status, nextTime } = counter.accounted
+    if (isUpdated !== counter.refreshed.status) {
       nextTime = getRefreshTime('account')
       status = true
       if (nextTime > Date.now()) {
@@ -405,9 +404,9 @@ function timerReducer(state = initialState.timer, action) {
     return {
       ...state,
       counter: {
-        ..counter,
+        ...counter,
         accounted: {
-          ...accounted,
+          ...counter.accounted,
           status,
           nextTime,
         },
@@ -416,19 +415,21 @@ function timerReducer(state = initialState.timer, action) {
           nextTime: getRefreshTime('next'),
           status: isUpdated,
         },
-      }
+      },
     }
   }
   case RATE_UPDATED:
     if (action.rankNo) {
+      const { rankNo } = action
       const rankStore = rankSelector(window.getStore()).rank
-      if (!rankStore.activeRank[action.rankNo].active) {
+      if (!rankStore.activeRank[rankNo] || !rankStore.activeRank[rankNo].active) {
         return state
       }
       const updatedList = state.updatedList
-      updatedList[idx] = true
+      updatedList[rankNo] = true
 
-      let { refreshed, accounted } = state.counter
+      const { counter } = state
+      const { refreshed, accounted } = counter
       refreshed.status = checkIsUpdated(rankStore.activeRank, updatedList)
 
       if (refreshed.status) {
@@ -443,13 +444,13 @@ function timerReducer(state = initialState.timer, action) {
         ...state,
         updatedList,
         counter: {
-          ...state.counter,
+          ...counter,
           refreshed: {
-            ...state.counter.refreshed,
+            ...counter.refreshed,
             refreshed,
           },
           accounted: {
-            ...state.counter.accounted,
+            ...counter.accounted,
             accounted,
           },
         },

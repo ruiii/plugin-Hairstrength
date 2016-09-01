@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
+import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox, Alert } from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
 import { expSelector, customSelector, updatedRateSelector, customShowSelector, eoRateSelector } from '../redux/selectors'
 import { __, estimateSenka, getStatusStyle } from './utils'

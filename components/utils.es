@@ -156,19 +156,22 @@ export function accountTimeout(timerState) {
   }
 
   return {
-    accounted: {
-      ...accounted,
-      status,
-      str,
-      nextTime,
-    }
+    counter: {
+      ...counter,
+      accounted: {
+        ...counter.accounted,
+        status,
+        str,
+        nextTime,
+      },
+    },
   }
 }
 
 export function refreshTimeout(timerState) {
-  const { updatedList, counter } = timerState
+  const { updatedList, counter, isTimeUp } = timerState
   let { finalTimes } = timerState
-  let { isTimeUp, accounted, refreshed } = counter
+  const { accounted, refreshed } = counter
 
   if (!isTimeUp) {
     reduce(updatedList, (newList, value, key) => {
@@ -195,8 +198,9 @@ export function refreshTimeout(timerState) {
   return {
     updatedList,
     finalTimes,
+    isTimeUp: !isTimeUp,
     counter: {
-      isTimeUp: !isTimeUp,
+      ...counter,
       accounted,
       refreshed,
     },

@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { __, isLastDay, timeToString } from './utils'
-import { timerCounterSelector } from '../redux/selectors'
+import { timerSelector } from '../redux/selectors'
 import { rateAccounted, rateTimeUp } from '../redux/actions'
 
 import { CountdownTimer } from 'views/components/main/parts/countdown-timer'
 
 export default connect(
-  timerCounterSelector,
+  timerSelector,
   { rateAccounted, rateTimeUp }
 )(class TimerPanel extends Component {
   constructor(props) {
@@ -17,14 +17,14 @@ export default connect(
     }
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.counter.nextTime != this.props.counter.nextTime) {
+    if (nextProps.timer.counter.accounted.nextTime != this.props.timer.counter.accounted.nextTime) {
       this.setState({
         isLastDay: isLastDay(),
       })
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.counter != this.props.counter
+    return nextProps.timer != this.props.coutimernter
   }
   accountTick = (timeRemaining) => {
     if (timeRemaining === 0) {
@@ -43,7 +43,8 @@ export default connect(
     }
   }
   render() {
-    const { isTimeUp, accounted, refreshed } = this.props.counter
+    const { isTimeUp, counter } = this.props.timer
+    const { accounted, refreshed } = counter
     return (
       <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
