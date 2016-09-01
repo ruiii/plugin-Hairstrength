@@ -56,20 +56,19 @@ export function getFilePath(filename = false) {
          : userPath
 }
 
-export function getFinalTime(type) {
+export function getFinalTime(type, nextMonth) {
+  const offset = nextMonth ? 2 : 1
   const finalDate = new Date()
   finalDate.setUTCHours(finalDate.getUTCHours() + 9)    // mapping Tokyo(00:00) to UTC(00:00)
   finalDate.setUTCDate(1)                               // in case next month's day less than this month
-  finalDate.setUTCMonth(finalDate.getUTCMonth() + 1)
+  finalDate.setUTCMonth(finalDate.getUTCMonth() + offset)
   finalDate.setUTCDate(0)
 
   switch (type) {
-  case 'eo':
-    finalDate.setUTCHours(15)
-    break
-  case 'exp':
+  case 'pm':
     finalDate.setUTCHours(13)
     break
+  case 'am':
   default:
     finalDate.setUTCHours(6)
   }
@@ -131,85 +130,75 @@ export function dateToString(time) {
   return `${date.getMonth() + 1}-${date.getDate()}`
 }
 
-export function checkIsUpdated(updatedDetail, updatedList) {
-  return !reduce(updatedDetail, function(sum, data, key) {
+export function checkIsUpdated(activeRank, updatedList) {
+  return !reduce(activeRank, function(sum, data, key) {
     if (data.active && !updatedList[key]) sum++
     return sum
   }, 0)
 }
 
 export function accountTimeout(timerState) {
-  let { finalTimes, nextAccountTime } = timerState
-  let { accounted, expAccounted, eoAccounted } = timerState
-  let { accountString } = timerState
+  const { counter, finalTimes } = timerState
+  let { status, str, nextTime } = counter.accounted
 
   const now = Date.now()
   // some logic to determine account Stage
-  if (now >= finalTimes.eo) {
-    eoAccounted = true
-    accounted = true
-  } else if (now >= finalTimes.exp) {
-    expAccounted = true
-    accountString = __('EO map final time')
-    nextAccountTime = finalTimes.eo
-  } else if (now >= finalTimes.refresh) {
-    accountString = __('Normal map final time')
-    nextAccountTime = finalTimes.exp
-  } else if (now >= nextAccountTime) {
-    accounted = true
+  if (now >= finalTimes.pm) {
+    status = true
+  } else if (now >= finalTimes.am) {
+    str = __('Normal map final time')
+    nextTime = finalTimes.pm
+  } else if (now >= nextTime) {
+    status = true
   } else {
-    accountString = __('Account time')
-    accounted = false
+    str = __('Account time')
+    status = false
   }
 
   return {
-    nextAccountTime,
-    accounted,
-    expAccounted,
-    eoAccounted,
-    accountString,
+    accounted: {
+      ...accounted,
+      status,
+      str,
+      nextTime,
+    }
   }
 }
 
 export function refreshTimeout(timerState) {
-  let { isTimeUp, isUpdated, updatedList } = timerState
-  let { accounted, expAccounted, eoAccounted } = timerState
-  let { accountString } = timerState
-  let { nextRefreshTime, finalTimes, nextAccountTime } = timerState
+  const { updatedList, counter } = timerState
+  let { finalTimes } = timerState
+  let { isTimeUp, accounted, refreshed } = counter
 
   if (!isTimeUp) {
-    updatedList = [false, false, false, false, false]
-    isUpdated = false
+    reduce(updatedList, (newList, value, key) => {
+      newList[key] = false
+      return newList
+    }, {})
+    refreshed.status = false
   } else {
-    nextRefreshTime = getRefreshTime('next')
-    nextAccountTime = getRefreshTime('account')
-    accounted = false
-    accountString = __('Account time')
-    if (eoAccounted) {
+    refreshed.nextTime = getRefreshTime('next')
+    accounted.nextTime = getRefreshTime('account')
+    accounted.status = false
+    accounted.str = __('Account time')
+    if (Date.now() >= finalTimes.pm) {
       finalTimes = {
-        refresh: getFinalTime(),
-        exp: getFinalTime('exp'),
-        eo: getFinalTime('eo'),
+        am: getFinalTime('am', true),
+        pm: getFinalTime('pm', true),
       }
-      expAccounted = false
-      eoAccounted = false
-    }
-    if (Date.now() >= finalTimes.refresh) {
-      accountString = __('Normal map final time')
-      nextAccountTime = finalTimes.exp
+    } else if (Date.now() >= finalTimes.am) {
+      accounted.str = __('Normal map final time')
+      accounted.nextTime = finalTimes.pm
     }
   }
 
   return {
-    isUpdated,
     updatedList,
-    accounted,
-    expAccounted,
-    eoAccounted,
-    nextAccountTime,
-    nextRefreshTime,
     finalTimes,
-    accountString,
-    isTimeUp: !isTimeUp,
+    counter: {
+      isTimeUp: !isTimeUp,
+      accounted,
+      refreshed,
+    },
   }
 }

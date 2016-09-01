@@ -9,10 +9,10 @@ export const RATE_UPDATED = '@@RATE_UPDATED'
 export const RATE_ACCOUNTED = '@@RATE_ACCOUNTED'
 export const RATE_CUSTOM_CHANGE = '@@RATE_CUSTOM_CHANGE'
 
-export function activeRankChange(updatedDetail) {
+export function activeRankChange(activeRank) {
   return {
     type: ACTIVE_RANK_UPDATE,
-    updatedDetail,
+    activeRank,
   }
 }
 

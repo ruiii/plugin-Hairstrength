@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { __, isLastDay, timeToString } from './utils'
-import { timerSelector } from '../redux/selectors'
+import { timerCounterSelector } from '../redux/selectors'
 import { rateAccounted, rateTimeUp } from '../redux/actions'
 
 import { CountdownTimer } from 'views/components/main/parts/countdown-timer'
 
 export default connect(
-  timerSelector,
+  timerCounterSelector,
   { rateAccounted, rateTimeUp }
 )(class TimerPanel extends Component {
   constructor(props) {
@@ -17,14 +17,14 @@ export default connect(
     }
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timer.nextAccountTime != this.props.timer.nextAccountTime) {
+    if (nextProps.counter.nextTime != this.props.counter.nextTime) {
       this.setState({
         isLastDay: isLastDay(),
       })
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.timer != this.props.timer
+    return nextProps.counter != this.props.counter
   }
   accountTick = (timeRemaining) => {
     if (timeRemaining === 0) {
@@ -43,19 +43,11 @@ export default connect(
     }
   }
   render() {
-    const {
-      accounted,
-      accountString,
-      nextAccountTime,
-      refreshString,
-      nextRefreshTime,
-      isTimeUp,
-      isUpdated,
-    } = this.props.timer
+    const { isTimeUp, accounted, refreshed } = this.props.counter
     return (
       <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
         {
-          accounted
+          accounted.status
           ? (
             <div className="timer-container">
               <span>{__('Accounted')}</span>
@@ -64,13 +56,13 @@ export default connect(
           : (
             <div className="timer-container">
               <div className="timer-part">
-                <span>{accountString}</span>
-                <span>{timeToString(nextAccountTime)}</span>
+                <span>{accounted.str}</span>
+                <span>{timeToString(accounted.nextTime)}</span>
               </div>
               <div className="timer-part">
                 <span>{__('Before account')}</span>
                 <CountdownTimer countdownId="sanka-account"
-                                completeTime={nextAccountTime}
+                                completeTime={accounted.nextTime}
                                 tickCallback={this.accountTick} />
               </div>
             </div>
@@ -78,17 +70,17 @@ export default connect(
         }
         <div className="timer-container">
           <div className="timer-part">
-            <span>{refreshString}</span>
-            <span>{timeToString(nextRefreshTime)}</span>
+            <span>{refreshed.str}</span>
+            <span>{timeToString(refreshed.nextTime)}</span>
           </div>
           {
-            (isTimeUp && !isUpdated)
+            (isTimeUp && !refreshed.status)
             ? ''
             :(
               <div className="timer-part">
                 <span>{__('Before refresh')}</span>
                 <CountdownTimer countdownId="sanka-refresh"
-                                completeTime={nextRefreshTime}
+                                completeTime={refreshed.nextTime}
                                 tickCallback={this.refreshTick} />
               </div>
             )

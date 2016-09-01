@@ -80,16 +80,21 @@ export const timerSelector = createSelector(
   state => ({ timer: state.timer })
 )
 
-export const rankDetailSelector = createSelector(
+export const timerCounterSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
-  state => ({ rankDetail: this.state.rank.activeRank })
+  state => ({ counter: state.timer.counter })
+)
+
+export const activeRankSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => ({ activeRank: this.state.rank.activeRank })
 )
 
 export const updateTimerDetailSelector = createSelector(
   extensionSelectorFactory(REDUCER_EXTENSION_KEY),
   state => {
-    const { updatedList, isUpdated } = state.timer
-    return { updatedList, isUpdated }
+    const { updatedList, counter } = state.timer
+    return { updatedList, isUpdated: counter.refreshed.status }
   }
 )
 
