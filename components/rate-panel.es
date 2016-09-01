@@ -138,13 +138,8 @@ export default connect(
   render() {
     const { exp, custom, customShow, eoRate } = this.props
     const { baseExp, baseRate, enable } = custom
-<<<<<<< ef9419782ddf32a87fd586611a6df6d51767ba11
     const { _customExp, _customRate, _enable, _auto, btnDisable } = this.state
-    const rate = estimateSenka(exp, baseExp)
-=======
-    const { _customExp, _customRate, _enable, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp) + eoRate.new
->>>>>>> Add eoRate & accountTimeout & refreshTimeout
 
     return (
       <div className="rate-panel">
