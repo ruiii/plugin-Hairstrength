@@ -96,11 +96,6 @@ const initialState = {
       "store": 0,
       "new": 0,
     },
-    "finalTimes": {
-      refresh: 0,
-      exp: 0,
-      eo: 0,
-    },
     "updatedTime": 0,
   },
   "history": {
