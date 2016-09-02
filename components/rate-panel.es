@@ -203,8 +203,8 @@ export default connect(
               <div className="rate-container">
                 <span className="rate-part">{__('Rate')}</span>
                 <div className="rate-part">
-                  <span> {baseRate} -> {enable ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
-                  { enable ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
+                  <span> {baseRate} -> {(_enable || _auto) ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
+                  { (_enable || _auto) ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
                 </div>
               </div>
             </div>
