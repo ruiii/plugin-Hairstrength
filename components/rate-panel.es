@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox, Alert } from 'react-bootstrap'
+import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
 import { expSelector, customSelector, updatedRateSelector, customShowSelector, eoRateSelector } from '../redux/selectors'
 import { __, estimateSenka, getStatusStyle } from './utils'
@@ -176,13 +176,11 @@ export default connect(
           </div>
           <Checkbox onChange={this.onEnableAuto}
                     checked={_auto}>
-            {__('auto set')}
+            {__('Auto-set the base value')}
           </Checkbox>
-          <Alert bsStyle="danger"
-                 className={_auto ? 'show' : 'hidden'}>
-            we will automatically set your ranking rate and current exp as the base rate & exp,
-            but the ranking rate may not relate to your current exp.
-          </Alert>
+          <p className={_auto ? 'show' : 'hidden'} style={{color: 'red', fontSize: 12}}>
+            {__('Auto-set tips')}
+          </p>
           <div className="rate-btns">
             <Button onClick={this.onCustomChange}
                     disabled={btnDisable}>{ __('OK') }</Button>

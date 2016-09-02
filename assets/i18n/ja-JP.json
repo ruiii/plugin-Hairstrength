@@ -15,5 +15,6 @@
   "Increment": "増分",
   "It will save when all rates is updated": "すべでのランキングを更新した後にセーブされます",
   "Presumed rate": "推定戦果",
-  "Presumed experience": "推定経験値"
+  "Presumed experience": "推定経験値",
+  "Auto-set tips": "We will automatically set your ranking rate and current exp as the base rate & exp, but the ranking rate may not relate to your current exp."
 }

@@ -30,7 +30,7 @@ export const reactClass = class SenkaCalc extends Component {
       </div>
     )
   }
-})
+}
 
 export { reducer }
 

@@ -19,5 +19,7 @@
   "Accounted": "已結算",
   "EO map final time": "EO海圖戰果結算時間",
   "Normal map final time": "普通海圖戰果結算時間",
-  "Click to show your rates this month": "點選檢視本月戰績"
+  "Click to show your rates this month": "點選檢視本月戰績",
+  "Auto-set the base value": "自动将榜上的战果值和读榜时的经验值设定为计算的基础战果值和经验值。",
+  "Auto-set tips": "由于 API 的原因，目前无法获取战果结算时的提督经验值(无法获取到榜单上的战果值对应的经验值)。只能根据读榜时的经验值进行计算，得出的战果值总值与实际战果总值可能存在误差。"
 }
