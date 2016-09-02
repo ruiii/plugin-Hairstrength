@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { isEmpty } from 'lodash'
 import { join } from 'path-extra'
 import { observer, observe } from 'redux-observers'
 
 import { store } from 'views/createStore'
 import { reducer } from './redux'
-import { initStatusSelector, baseDetailSelector, historyDataSelector, rankSelector } from './redux/selectors'
+import { baseDetailSelector, historyDataSelector, rankSelector } from './redux/selectors'
 import { storeHistoryData } from './redux/actions'
 import { saveHistoryData, storePath, getMemberId } from './components/utils'
 import SettingPanel from './components/setting-panel'

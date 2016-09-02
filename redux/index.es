@@ -252,7 +252,8 @@ function rankReducer(state = initialState.rank, action) {
     const nickname = getUserNickname()
     const { timer } = timerSelector(window.getStore())
     let { updatedDetail, updatedTime, activeRank } = state
-    const { rate, rank, exp } = updatedDetail
+    const { rate, rank } = updatedDetail
+    let { exp } = updatedDetail
     let updated = false
 
     forEach(body.api_list, (data) => {
@@ -267,7 +268,7 @@ function rankReducer(state = initialState.rank, action) {
         rank.value = api_no
         rate.delta = rate.value - state.updatedDetail.rate.value
         rank.delta = rank.value - state.updatedDetail.rank.value
-        exp = expSelector(_store).exp
+        exp = expSelector(window.getStore()).exp
         updatedTime = getRefreshTime()
         updated = true
       }
