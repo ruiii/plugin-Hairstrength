@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { forEach, isEmpty, includes } from 'lodash'
+import { forEach, isEmpty, includes, pick } from 'lodash'
 import {
   timerSelector,
   rankSelector,
@@ -90,6 +90,7 @@ const initialState = {
       },
     },
     "updatedDetail": {
+      "exp": 0,
       "rate": {
         "value": 0,
         "delta": 0,
@@ -186,7 +187,7 @@ function customReducer(state = initialState.custom, action) {
     } else {
       return {
         ...state,
-        ...storeData,
+        ...pick(storeData, Object.keys(state)),
       }
     }
   }
@@ -201,11 +202,11 @@ function customReducer(state = initialState.custom, action) {
     let exp = 0
     let rate = 0
     if (auto) {
-      exp = expSelector(_store).exp
-      if (exp === state.baseExp) {
+      const { updatedDetail } = userDetailInitSelector(_store)
+      if (updatedDetail.exp === state.baseExp) {
         return state
       }
-      const { updatedDetail } = userDetailInitSelector(_store)
+      exp = updatedDetail.exp
       rate = updatedDetail.rate.value
     }
     return {
@@ -238,7 +239,7 @@ function rankReducer(state = initialState.rank, action) {
       }
       return {
         ...state,
-        ...storeData,
+        ...pick(storeData, Object.keys(state)),
       }
     }
   } else if (type.includes(apiMap.api)) {
@@ -251,7 +252,7 @@ function rankReducer(state = initialState.rank, action) {
     const nickname = getUserNickname()
     const { timer } = timerSelector(window.getStore())
     let { updatedDetail, updatedTime, activeRank } = state
-    const { rate, rank } = updatedDetail
+    const { rate, rank, exp } = updatedDetail
     let updated = false
 
     forEach(body.api_list, (data) => {
@@ -266,6 +267,7 @@ function rankReducer(state = initialState.rank, action) {
         rank.value = api_no
         rate.delta = rate.value - state.updatedDetail.rate.value
         rank.delta = rank.value - state.updatedDetail.rank.value
+        exp = expSelector(_store).exp
         updatedTime = getRefreshTime()
         updated = true
       }
@@ -289,6 +291,7 @@ function rankReducer(state = initialState.rank, action) {
       activeRank,
       updatedDetail: {
         ...updatedDetail,
+        exp,
         rate,
         rank,
       },
@@ -372,7 +375,7 @@ function timerReducer(state = initialState.timer, action) {
         }
       }
     }
-    const storeTimer = storeData.timer
+    const storeTimer = pick(storeData.timer, Object.keys(state))
 
     let newState = {
       ...state,
