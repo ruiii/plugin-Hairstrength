@@ -1,6 +1,12 @@
 import { combineReducers } from 'redux'
-import { forEach, isEmpty, includes, reduce } from 'lodash'
-import { timerSelector, rankSelector } from './selectors'
+import { forEach, isEmpty, includes } from 'lodash'
+import {
+  timerSelector,
+  rankSelector,
+  customSelector,
+  expSelector,
+  userDetailInitSelector,
+} from './selectors'
 import {
   getRate,
   getMemberId,
@@ -13,6 +19,7 @@ import {
   storePath,
   accountTimeout,
   refreshTimeout,
+  isNewMonth,
 } from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
@@ -108,7 +115,7 @@ const initialState = {
     ],
   },
   "timer": {
-    "isTimeUp": true,
+    "isTimeUp": false,
     "updateTime": 0,
     "updatedList": {
       "1": true,
@@ -118,7 +125,6 @@ const initialState = {
       "500": true,
     },
     "counter": {
-      "isTimeUp": false,
       "accounted": {
         "status": false,
         "str": "",
@@ -189,12 +195,25 @@ function customReducer(state = initialState.custom, action) {
       ...state,
       ...action.custom,
     }
-  case '@@RATE_RESET_RATE':
+  case '@@RATE_RESET_RATE': {
+    const _store = window.getStore()
+    const { auto } = customSelector(_store).custom
+    let exp = 0
+    let rate = 0
+    if (auto) {
+      exp = expSelector(_store).exp
+      if (exp === state.baseExp) {
+        return state
+      }
+      const { updatedDetail } = userDetailInitSelector(_store)
+      rate = updatedDetail.rate.value
+    }
     return {
       ...state,
-      baseExp: 0,
-      baseRate: 0,
+      baseExp: exp,
+      baseRate: rate,
     }
+  }
   }
   return state
 }
@@ -206,6 +225,17 @@ function rankReducer(state = initialState.rank, action) {
     if (!storeData || isEmpty(storeData)) {
       return state
     } else {
+      const { updatedTime, activeRank } = storeData
+      if (updatedTime && isNewMonth(updatedTime)) {
+        forEach(activeRank, (data, i) => {
+          data.rate = 0
+          data.delta = 0
+        })
+        return {
+          ...state,
+          activeRank,
+        }
+      }
       return {
         ...state,
         ...storeData,
@@ -219,7 +249,7 @@ function rankReducer(state = initialState.rank, action) {
 
     const memberId = getMemberId()
     const nickname = getUserNickname()
-    const timer = timerSelector(window.getStore()).timer
+    const { timer } = timerSelector(window.getStore())
     let { updatedDetail, updatedTime, activeRank } = state
     const { rate, rank } = updatedDetail
     let updated = false
@@ -231,7 +261,7 @@ function rankReducer(state = initialState.rank, action) {
       const api_rate = data[apiMap.api_rate]
       const newRate = getRate(api_no, api_rate, memberId)
 
-      if (api_nickname === nickname && timer.counter.isTimeUp && updatedTime !== getRefreshTime()) {
+      if (api_nickname === nickname && (timer.isTimeUp || rate.value === 0) && updatedTime !== getRefreshTime()) {
         rate.value = newRate
         rank.value = api_no
         rate.delta = rate.value - state.updatedDetail.rate.value
@@ -267,7 +297,7 @@ function rankReducer(state = initialState.rank, action) {
   } else if (type === ACTIVE_RANK_UPDATE) {
     return {
       ...state,
-      updatedDetail: action.updatedDetail,
+      activeRank: action.activeRank,
     }
   } else if (type === '@@RATE_STORE_EORATE') {
     const { eoRate } = state
@@ -356,40 +386,43 @@ function timerReducer(state = initialState.timer, action) {
       newState.counter.accounted.status = true
     }
 
-    let { counter, updatedList, isTimeUp } = newState
+    const { counter } = newState
 
     // refresh timer
     counter.refreshed.str = __("Refresh time")
     counter.refreshed.nextTime = getRefreshTime()
     // if not refreshed, mark as timeup
-    if (!storeData.rank
-        || (storeTimer.updateTime && storeTimer.updateTime !== counter.refreshed.nextTime)) {
-      reduce(updatedList, (newList, value, key) => {
-        newList[key] = false
-        return newList
-      }, {})
+
+    if (!storeData.rank.updatedTime || (storeTimer.updateTime !== counter.refreshed.nextTime)) {
+      newState = {
+        ...newState,
+        ...refreshTimeout(newState),
+      }
     } else {
-      isTimeUp = false
       counter.refreshed.nextTime = getRefreshTime('next')
       forEach(storeData.rank.activeRank, (data, i) => {
         if (data.rate === 0) {
-          updatedList[i] = false
+          newState.updatedList[i] = false
         }
       })
     }
-    counter.refreshed.status = checkIsUpdated(storeData.rank.activeRank, updatedList)
+    counter.refreshed.status = checkIsUpdated(storeData.rank.activeRank, newState.updatedList)
     return {
       ...newState,
       counter,
-      updatedList,
-      isTimeUp,
     }
   }
-  case RATE_TIME_UP:
+  case RATE_TIME_UP: {
+    const isTimeUp = true
+
     return {
       ...state,
-      ...refreshTimeout(state),
+      ...refreshTimeout({
+        ...state,
+        isTimeUp,
+      }),
     }
+  }
   case ACTIVE_RANK_UPDATE: {
     const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
     const { counter } = state
@@ -447,11 +480,11 @@ function timerReducer(state = initialState.timer, action) {
           ...counter,
           refreshed: {
             ...counter.refreshed,
-            refreshed,
+            ...refreshed,
           },
           accounted: {
             ...counter.accounted,
-            accounted,
+            ...accounted,
           },
         },
       }

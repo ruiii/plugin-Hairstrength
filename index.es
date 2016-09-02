@@ -51,15 +51,15 @@ export function pluginDidLoad() {
       if (isEmpty(current.custom)) {
         return
       }
-      if (previous.timer.accounted !== current.timer.accounted
-          && current.timer.accounted
+      if (previous.rank.updatedDetail !== current.rank.updatedDetail) {
+        return dispatch({ type: '@@RATE_RESET_RATE'})
+      }
+      if (previous.timer.counter.accounted.status !== current.timer.counter.accounted.status
+          && current.timer.counter.accounted.status
           && current.rank.eoRate.new !== 0) {
         return dispatch({ type: '@@RATE_STORE_EORATE'})
       }
-      if (previous.rank.updatedRate
-          && previous.rank.updatedRate !== current.rank.updatedRate) {
-        return dispatch({ type: '@@RATE_RESET_RATE'})
-      }
+
       const id = getMemberId()
       const data = JSON.parse(localStorage.getItem(storePath) || '{}')
       data[id] = current

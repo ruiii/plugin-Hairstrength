@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { join } from 'path-extra'
 import CSON from 'cson'
-import { reduce, uniqBy } from 'lodash'
+import { reduce, uniqBy, forEach } from 'lodash'
 import FileWriter from 'views/utils/fileWriter'
 
 const { APPDATA_PATH, i18n } = window
@@ -89,6 +89,15 @@ export function isLastDay() {
   return today.getUTCMonth() !== tomorrow.getUTCMonth()
 }
 
+export function isNewMonth(time) {
+  const updatedDay = new Date(time)
+  const today = new Date()
+  today.setUTCHours(today.getUTCHours() + 9)
+  updatedDay.setUTCHours(updatedDay.getUTCHours() + 9)
+
+  return today.getUTCMonth() !== updatedDay.getUTCMonth()
+}
+
 export function getRefreshTime(type) {
   const date = new Date()
   const hour = date.getUTCHours()
@@ -174,11 +183,9 @@ export function refreshTimeout(timerState) {
   const { accounted, refreshed } = counter
 
   if (!isTimeUp) {
-    reduce(updatedList, (newList, value, key) => {
-      newList[key] = false
-      return newList
-    }, {})
-    refreshed.status = false
+    forEach(updatedList, (value, key) => {
+      updatedList[key] = false
+    })
   } else {
     refreshed.nextTime = getRefreshTime('next')
     accounted.nextTime = getRefreshTime('account')
