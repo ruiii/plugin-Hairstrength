@@ -137,7 +137,7 @@ export default connect(
   }
   render() {
     const { exp, custom, customShow, eoRate } = this.props
-    const { baseExp, baseRate, enable } = custom
+    const { baseExp, baseRate, enable, auto } = custom
     const { _customExp, _customRate, _enable, _auto, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp) + eoRate.new
 
@@ -203,8 +203,8 @@ export default connect(
               <div className="rate-container">
                 <span className="rate-part">{__('Rate')}</span>
                 <div className="rate-part">
-                  <span> {baseRate} -> {(_enable || _auto) ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
-                  { (_enable || _auto) ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
+                  <span> {baseRate} -> {(enable || auto) ?  (rate + baseRate).toFixed(1) : rate.toFixed(1)} </span>
+                  { (enable || auto) ? <span>( ↑ {rate.toFixed(1)} )</span> : '' }
                 </div>
               </div>
             </div>
