@@ -16,27 +16,19 @@ import RatePanel from './components/rate-panel'
 import RankPanel from './components/rank-panel'
 import HistoryPanel from './components/history-panel'
 
-export const reactClass = connect(
-  initStatusSelector
-)(class SenkaCalc extends Component {
+export const reactClass = class SenkaCalc extends Component {
   render() {
-    if (this.props.init) {
-      return (
-        <div id="Senka Calc" className="Senka Calc">
-          <link rel='stylesheet' href={join(__dirname , 'assets', 'senka-calc.css')} />
-          <SettingPanel />
-          <DetailPanel />
-          <TimerPanel />
-          <RatePanel />
-          <RankPanel />
-          <HistoryPanel />
-        </div>
-      )
-    } else {
-      return (
-        <h6>请登录</h6>
-      )
-    }
+    return (
+      <div id="Senka Calc" className="Senka Calc">
+        <link rel='stylesheet' href={join(__dirname , 'assets', 'senka-calc.css')} />
+        <SettingPanel />
+        <DetailPanel />
+        <TimerPanel />
+        <RatePanel />
+        <RankPanel />
+        <HistoryPanel />
+      </div>
+    )
   }
 })
 
