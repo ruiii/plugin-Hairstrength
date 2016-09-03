@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { join } from 'path-extra'
 import CSON from 'cson'
-import { reduce, uniqBy, forEach } from 'lodash'
+import { reduce, uniqBy, forEach, pick, omit } from 'lodash'
 import FileWriter from 'views/utils/fileWriter'
 
 const { APPDATA_PATH, i18n } = window
@@ -28,6 +28,19 @@ export function loadHistoryData() {
     historyData = []
   }
   return historyData
+}
+
+export function pickStoreData(storeData, initialData) {
+  const pickedData = {
+    ...pick(storeData, Object.keys(initialData)),
+    ...omit(initialData, Object.keys(storeData)),
+  }
+  forEach(pickedData, (value, key) => {
+    if (Object.prototype.toString.call(value) !== Object.prototype.toString.call(initialData[key])) {
+      pickedData[key] = initialData[key]
+    }
+  })
+  return pickedData
 }
 
 export function estimateSenka(exp, baseExp) {

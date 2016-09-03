@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { forEach, isEmpty, includes, pick } from 'lodash'
+import { forEach, isEmpty, includes } from 'lodash'
 import {
   timerSelector,
   rankSelector,
@@ -20,6 +20,7 @@ import {
   accountTimeout,
   refreshTimeout,
   isNewMonth,
+  pickStoreData,
 } from '../components/utils'
 import {
   ACTIVE_RANK_UPDATE,
@@ -185,10 +186,7 @@ function customReducer(state = initialState.custom, action) {
     if (!storeData || isEmpty(storeData)) {
       return state
     } else {
-      return {
-        ...state,
-        ...pick(storeData, Object.keys(state)),
-      }
+      return pickStoreData(storeData, state)
     }
   }
   case RATE_CUSTOM_CHANGE:
@@ -237,10 +235,7 @@ function rankReducer(state = initialState.rank, action) {
           activeRank,
         }
       }
-      return {
-        ...state,
-        ...pick(storeData, Object.keys(state)),
-      }
+      return pickStoreData(storeData, state)
     }
   } else if (type.includes(apiMap.api)) {
 
@@ -376,7 +371,7 @@ function timerReducer(state = initialState.timer, action) {
         }
       }
     }
-    const storeTimer = pick(storeData.timer, Object.keys(state))
+    const storeTimer = pickStoreData(storeData.timer, state)
 
     let newState = {
       ...state,
