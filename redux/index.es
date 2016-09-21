@@ -413,13 +413,11 @@ function timerReducer(state = initialState.timer, action) {
   }
   case RATE_TIME_UP: {
     const isTimeUp = true
-
+    const newState = refreshTimeout({ ...state, isTimeUp })
+    newState.counter.refreshed.status = false
     return {
       ...state,
-      ...refreshTimeout({
-        ...state,
-        isTimeUp,
-      }),
+      ...newState,
     }
   }
   case ACTIVE_RANK_UPDATE: {

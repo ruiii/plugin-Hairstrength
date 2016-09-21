@@ -152,6 +152,7 @@ export function dateToString(time) {
   return `${date.getMonth() + 1}-${date.getDate()}`
 }
 
+// return true if all true
 export function checkIsUpdated(activeRank, updatedList) {
   return !reduce(activeRank, function(sum, data, key) {
     if (data.active && !updatedList[key]) sum++
