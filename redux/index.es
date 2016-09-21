@@ -381,18 +381,18 @@ function timerReducer(state = initialState.timer, action) {
       ...newState,
       ...accountTimeout(state),
     }
-    if (Date.now() >= storeTimer.updateTime + 11 * 3600 * 1000) {
-      newState.counter.accounted.status = true
-    }
 
     const { counter } = newState
 
     // refresh timer
     counter.refreshed.str = __("Refresh time")
-    counter.refreshed.nextTime = getRefreshTime()
-    // if not refreshed, mark as timeup
+    const _lastRefreshTime = getRefreshTime()
 
-    if (!storeData.rank.updatedTime || (storeTimer.updateTime !== counter.refreshed.nextTime)) {
+    if (!storeData.rank.updatedTime || (storeTimer.updateTime !== _lastRefreshTime)) {
+      if (storeTimer.updateTime !== _lastRefreshTime) {
+        newState.isTimeUp = false
+        counter.refreshed.nextTime = _lastRefreshTime
+      }
       newState = {
         ...newState,
         ...refreshTimeout(newState),

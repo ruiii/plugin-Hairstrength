@@ -160,7 +160,7 @@ export function checkIsUpdated(activeRank, updatedList) {
 }
 
 export function accountTimeout(timerState) {
-  const { counter, finalTimes } = timerState
+  const { counter, updateTime, finalTimes } = timerState
   let { status, str, nextTime } = counter.accounted
 
   const now = Date.now()
@@ -170,7 +170,7 @@ export function accountTimeout(timerState) {
   } else if (now >= finalTimes.am) {
     str = __('Normal map final time')
     nextTime = finalTimes.pm
-  } else if (now >= nextTime) {
+  } else if (now >= updateTime + 11 * 3600 * 1000) {
     status = true
   } else {
     str = __('Account time')
