@@ -8,11 +8,11 @@ Senka calculator for [poi](https://github.com/poooi/poi)
 
 [中文说明](/README.zh-CN.md)
 
-## Screenshot
-
-![Screenshot](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/Hairstrength.en.png)
-
 ## Usage
+
+[Usage](https://github.com/ruiii/plugin-Hairstrength/issues/31)
+
+## Installation
 
 ### From POI Plugins Center
 
@@ -22,11 +22,13 @@ Senka calculator for [poi](https://github.com/poooi/poi)
 2. Got **Senka Calc**:
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-2.en.png)
 
+3. Click the download button.
+
 ### Manual Installation ( for test only )
 
 Download & Extract to following directory:
 
-* Windows: `%APP_DATA%\poi\plugins\node_modules\`
+* Windows: `%AppData%\poi\plugins\node_modules\`
 
 * macOS (Mac OS X): `~/Library/Application\ Support/poi/plugins/node_modules/`
 

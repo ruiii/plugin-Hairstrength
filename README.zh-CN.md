@@ -8,11 +8,11 @@
 
 [English version](/README.md)
 
-## 屏幕截图
-
-![屏幕截图](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/Hairstrength.zh-CN.png)
-
 ## 使用方法
+
+[使用方法](https://github.com/ruiii/plugin-Hairstrength/issues/31)
+
+## 安装方法
 
 ### poi 的插件中心
 
@@ -22,11 +22,13 @@
 2. 找到 **我变强了**：
 ![](https://github.com/ruiii/poi-wiki-plugins-image/blob/master/from-poi-plugins-center-2.zh-CN.png)
 
+3. 点击下载按钮
+
 ### 手动安装（用于测试最新功能）
 
 下载并解压到对应的目录：
 
-* Windows: `%APP_DATA%\poi\plugins\node_modules\`
+* Windows: `%AppData%\poi\plugins\node_modules\`
 
 * macOS (Mac OS X): `~/Library/Application\ Support/poi/plugins/node_modules/`
 
