@@ -42,7 +42,7 @@ export function pluginDidLoad() {
       if (isEmpty(current.custom)) {
         return
       }
-      if (previous.rank.updatedDetail !== current.rank.updatedDetail) {
+      if (previous.rank.updatedTime && previous.rank.updatedTime !== current.rank.updatedTime) {
         return dispatch({ type: '@@RATE_RESET_RATE'})
       }
       if (previous.timer.counter.accounted.status !== current.timer.counter.accounted.status
