@@ -1,6 +1,6 @@
 {
   "name": "poi-plugin-senka-calc",
-  "version": "4.1.5",
+  "version": "4.1.6",
   "description": "senka calculator for poi",
   "main": "index.js",
   "dependencies": {
