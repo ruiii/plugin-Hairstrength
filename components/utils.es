@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import { join } from 'path-extra'
 import CSON from 'cson'
 import { reduce, uniqBy, forEach, pick, omit } from 'lodash'
-import FileWriter from 'views/utils/fileWriter'
+import FileWriter from 'views/utils/file-writer'
 
 const { APPDATA_PATH, i18n } = window
 export const storePath = 'plugin-senka'
