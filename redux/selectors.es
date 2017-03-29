@@ -101,3 +101,8 @@ export const baseDetailSelector = createSelector(
     timer: state.timer,
   })
 )
+
+export const magicNumsSelector = createSelector(
+  extensionSelectorFactory(REDUCER_EXTENSION_KEY),
+  state => state.custom.MAGIC_NUMS
+)

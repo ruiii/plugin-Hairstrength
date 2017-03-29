@@ -1,3 +1,4 @@
+import Promise from 'bluebird'
 import fs from 'fs-extra'
 import { join } from 'path-extra'
 import CSON from 'cson'
@@ -47,9 +48,29 @@ export function estimateSenka(exp, baseExp) {
   return (exp - baseExp) / 1428 - 0.0499
 }
 
-export function getRate(rankNo, obfsRate, memberId) {
-  const MAGIC_R_NUMS = [ 8931, 1201, 1156, 5061, 4569, 4732, 3779, 4568, 5695, 4619, 4912, 5669, 6586 ]
-  const MAGIC_L_NUMS = [ 63, 30, 70, 83, 95, 52, 45, 88, 92, 83 ]
+export const requestAsyncMagicNums = async () => {
+  const requestAsync = Promise.promisify(
+    Promise.promisifyAll(require('request')),
+    { multiArgs: true }
+  )
+  let response
+  let body
+  try {
+    [response, body] = await requestAsync('https://rui.ai/poi/data/tutu.json', {
+      method: 'GET',
+      json: true,
+    })
+  } catch (e) {
+    error(e.stack)
+    console.warn('Check update error.')
+  }
+  localStorage.setItem(`${storePath}.MAGIC_NUMS`, JSON.stringify(body))
+  return body
+}
+
+export function getRate(rankNo, obfsRate, memberId, MAGIC_NUMS) {
+  const [ MAGIC_R_NUMS, MAGIC_L_NUMS ] = MAGIC_NUMS
+
   const rate = obfsRate / MAGIC_R_NUMS[rankNo % 13] / MAGIC_L_NUMS[memberId % 10] - 73 - 18
   return rate > 0 ? rate : 0
 }

@@ -6,6 +6,7 @@ import {
   customSelector,
   expSelector,
   userDetailInitSelector,
+  magicNumsSelector,
 } from './selectors'
 import {
   getRate,
@@ -32,7 +33,9 @@ import {
   RATE_UPDATED,
   RATE_ACCOUNTED,
   RATE_CUSTOM_CHANGE,
+  RATE_UPDATED_MAGIC_NUMS,
   rateUpdated,
+  updateMagicNums,
 } from './actions'
 
 /*
@@ -183,12 +186,18 @@ function customReducer(state = initialState.custom, action) {
   case '@@Response/kcsapi/api_get_member/require_info':
   case '@@poi-plugin-senka-calc@init': {
     const storeData = getLocalStorage().custom
+    setImmediate(() => window.dispatch(updateMagicNums()))
     if (!storeData || isEmpty(storeData)) {
       return state
     } else {
       return pickStoreData(storeData, state)
     }
   }
+  case RATE_UPDATED_MAGIC_NUMS:
+    return {
+      ...state,
+      MAGIC_NUMS: action.MAGIC_NUMS,
+    }
   case RATE_CUSTOM_CHANGE:
     return {
       ...state,
@@ -256,7 +265,7 @@ function rankReducer(state = initialState.rank, action) {
       const api_nickname = data[apiMap.api_nickname]
       const api_no = data[apiMap.api_no]
       const api_rate = data[apiMap.api_rate]
-      const newRate = getRate(api_no, api_rate, memberId)
+      const newRate = getRate(api_no, api_rate, memberId, magicNumsSelector(window.getStore()))
 
       if (api_nickname === nickname && (timer.isTimeUp || rate.value === 0) && updatedTime !== getRefreshTime()) {
         rate.value = newRate

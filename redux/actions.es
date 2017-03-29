@@ -1,3 +1,4 @@
+import { storePath, requestAsyncMagicNums } from '../components/utils'
 
 export const ACTIVE_RANK_UPDATE = '@@ACTIVE_RANK_UPDATE'
 export const RATE_HISTORY_SHOW = '@@RATE_HISTORY_SHOW'
@@ -8,6 +9,7 @@ export const RATE_TIME_UP = '@@RATE_TIME_UP'
 export const RATE_UPDATED = '@@RATE_UPDATED'
 export const RATE_ACCOUNTED = '@@RATE_ACCOUNTED'
 export const RATE_CUSTOM_CHANGE = '@@RATE_CUSTOM_CHANGE'
+export const RATE_UPDATED_MAGIC_NUMS = '@@RATE_UPDATED_MAGIC_NUMS'
 
 export function activeRankChange(activeRank) {
   return {
@@ -63,5 +65,22 @@ export function customChange(custom) {
 export function storeHistoryData() {
   return {
     type: RATE_HISTORY_UPDATE,
+  }
+}
+
+export function updateMagicNums() {
+  const MAGIC_NUMS = JSON.parse(
+    localStorage.getItem(`${storePath}.MAGIC_NUMS`) || '[]'
+  )
+  if (MAGIC_NUMS.length) {
+    return {
+      type: RATE_UPDATED_MAGIC_NUMS,
+      MAGIC_NUMS,
+    }
+  } else {
+    return {
+      type: RATE_UPDATED_MAGIC_NUMS,
+      MAGIC_NUMS: requestAsyncMagicNums(),
+    }
   }
 }
