@@ -62,100 +62,104 @@ const apiMap = {
 }
 
 const initialState = {
-  "initStatus": {
-    "init": false,
+  initStatus: {
+    init: false,
   },
-  "rank": {
-    "activeRank": {
-      "1": {
+  rank: {
+    activeRank: {
+      '1': {
         active: true,
         rate: 0,
         delta: 0,
       },
-      "5": {
+      '5': {
         active: true,
         rate: 0,
         delta: 0,
       },
-      "20": {
+      '20': {
         active: true,
         rate: 0,
         delta: 0,
       },
-      "100": {
+      '100': {
         active: true,
         rate: 0,
         delta: 0,
       },
-      "500": {
+      '500': {
         active: true,
         rate: 0,
         delta: 0,
       },
     },
-    "updatedDetail": {
-      "exp": 0,
-      "rate": {
-        "value": 0,
-        "delta": 0,
+    updatedDetail: {
+      exp: 0,
+      rate: {
+        value: 0,
+        delta: 0,
       },
-      "rank": {
-        "value": 0,
-        "delta": 0,
+      rank: {
+        value: 0,
+        delta: 0,
       },
     },
-    "eoRate": {
-      "store": 0,
-      "new": 0,
+    eoRate: {
+      store: 0,
+      new: 0,
     },
-    "updatedTime": 0,
+    updatedTime: 0,
   },
-  "history": {
-    "historyData": [
+  history: {
+    historyData: [
       {
-        "rate": 0,
-        "rank": 0,
-        "time": 0,
+        rate: 0,
+        rank: 0,
+        time: 0,
       },
     ],
   },
-  "timer": {
-    "isTimeUp": false,
-    "updateTime": 0,
-    "updatedList": {
-      "1": true,
-      "5": true,
-      "20": true,
-      "100": true,
-      "500": true,
+  timer: {
+    isTimeUp: false,
+    updateTime: 0,
+    updatedList: {
+      '1': true,
+      '5': true,
+      '20': true,
+      '100': true,
+      '500': true,
     },
-    "counter": {
-      "accounted": {
-        "status": false,
-        "str": "",
-        "nextTime": 0,
+    counter: {
+      accounted: {
+        status: false,
+        str: '',
+        nextTime: 0,
       },
-      "refreshed": {
-        "status": false,
-        "str": "",
-        "nextTime": 0,
+      refreshed: {
+        status: false,
+        str: '',
+        nextTime: 0,
       },
     },
-    "finalTimes": {
+    finalTimes: {
       am: getFinalTime('am'),
       pm: getFinalTime('pm'),
     },
   },
-  "custom": {
-    "baseExp": 0,
-    "baseRate": 0,
-    "enable": false,
-    "auto": false,
+  custom: {
+    baseExp: 0,
+    baseRate: 0,
+    enable: false,
+    auto: false,
+    MAGIC_NUMS: [
+      new Array(13).fill(0),
+      new Array(10).fill(0),
+    ],
   },
-  "setting": {
-    "historyShow": false,
-    "customShow": false,
-    "filterShow": false,
+  setting: {
+    historyShow: false,
+    customShow: false,
+    filterShow: false,
   },
 }
 const emptyStoreData = {
@@ -186,7 +190,9 @@ function customReducer(state = initialState.custom, action) {
   case '@@Response/kcsapi/api_get_member/require_info':
   case '@@poi-plugin-senka-calc@init': {
     const storeData = getLocalStorage().custom
-    setImmediate(() => window.dispatch(updateMagicNums()))
+    if (action.type === '@@poi-plugin-senka-calc@init') {
+      setImmediate(() => window.dispatch(updateMagicNums()))
+    }
     if (!storeData || isEmpty(storeData)) {
       return state
     } else {

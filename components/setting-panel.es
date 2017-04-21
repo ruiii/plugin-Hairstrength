@@ -31,7 +31,7 @@ export default connect(
             { __('Custom calc') }
           </MenuItem>
           <MenuItem onSelect={this.onShowFilter} eventKey="2">
-            { __('Rank list') }
+            { __('Setting') }
           </MenuItem>
           <MenuItem onSelect={this.onShowHistory} eventKey="3">
             { __('History') }
