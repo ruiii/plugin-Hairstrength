@@ -29,7 +29,7 @@
 #Senka\ Calc .timer-panel {
   display: flex;
   justify-content: space-around;
-  margin: 15px; }
+  margin: 15px 0; }
   #Senka\ Calc .timer-panel .timer-container {
     display: flex;
     flex-direction: column;
@@ -131,5 +131,79 @@
       display: block;
       width: 80%;
       margin: 10px auto; }
+#Senka\ Calc .rank-block {
+  width: 180px;
+  padding: 0 10px;
+  width: 50%; }
+  #Senka\ Calc .rank-block .panel {
+    position: absolute;
+    width: 100%;
+    top: 52px; }
+    #Senka\ Calc .rank-block .panel .panel-body {
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline; }
+  #Senka\ Calc .rank-block .table {
+    width: 180px;
+    height: 200px; }
+    #Senka\ Calc .rank-block .table th p {
+      margin: 0; }
+    #Senka\ Calc .rank-block .table th:nth-child(1) .checkbox {
+      margin: 0; }
+#Senka\ Calc .rate-block {
+  width: 50%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  font-size: 17px; }
+  #Senka\ Calc .rate-block .rate-calc {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    transition-delay: .7s;
+    transition: .3s; }
+    #Senka\ Calc .rate-block .rate-calc.on-custom {
+      margin-top: 40px; }
+    #Senka\ Calc .rate-block .rate-calc .rate-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      margin: 10px auto; }
+      #Senka\ Calc .rate-block .rate-calc .rate-container .rate-part {
+        display: flex;
+        flex-direction: column; }
+        #Senka\ Calc .rate-block .rate-calc .rate-container .rate-part:nth-child(odd) {
+          text-align: center; }
+        #Senka\ Calc .rate-block .rate-calc .rate-container .rate-part:nth-child(even) {
+          font-size: 14px; }
+    #Senka\ Calc .rate-block .rate-calc span {
+      margin: 3px auto; }
+  #Senka\ Calc .rate-block .panel {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: 10; }
+    #Senka\ Calc .rate-block .panel .form-group {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end; }
+      #Senka\ Calc .rate-block .panel .form-group label {
+        font-size: 16px; }
+      #Senka\ Calc .rate-block .panel .form-group input {
+        width: 100px;
+        display: inline-block;
+        margin-left: 15px;
+        font-size: 14px; }
+    #Senka\ Calc .rate-block .panel .checkbox {
+      font-size: 15px; }
+    #Senka\ Calc .rate-block .panel .rate-btns {
+      display: flex;
+      justify-content: space-around; }
+      #Senka\ Calc .rate-block .panel .rate-btns > button:last-child, #Senka\ Calc .rate-block .panel .rate-btns > button:nth-last-child(2) {
+        width: 40%;
+        display: block;
+        margin: 0 auto; }
 
 /*# sourceMappingURL=senka-calc.css.map */

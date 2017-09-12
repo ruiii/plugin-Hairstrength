@@ -55,6 +55,7 @@ export default connect(
         </span>
       )
     })
+    console.log(activeRank);
 
     return (
       <div className="rank-panel">

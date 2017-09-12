@@ -46,16 +46,13 @@ export default connect(
     const { isTimeUp, counter } = this.props.timer
     const { accounted, refreshed } = counter
     return (
-      <div className="timer-panel" style={this.state.isLastDay ? { color: 'red' } : { color: 'inherit' }}>
+      <div className="timer-panel" style={{ color: this.state.isLastDay ? 'red' : 'inherit' }}>
         {
           accounted.status
-          ? (
-            <div className="timer-container">
+          ? <div className="timer-container">
               <span>{__('Accounted')}</span>
             </div>
-          )
-          : (
-            <div className="timer-container">
+          : <div className="timer-container">
               <div className="timer-part">
                 <span>{accounted.str}</span>
                 <span>{timeToString(accounted.nextTime)}</span>
@@ -67,7 +64,6 @@ export default connect(
                                 tickCallback={this.accountTick} />
               </div>
             </div>
-          )
         }
         <div className="timer-container">
           <div className="timer-part">
@@ -75,16 +71,14 @@ export default connect(
             <span>{timeToString(refreshed.nextTime)}</span>
           </div>
           {
-            (isTimeUp && !refreshed.status)
-            ? ''
-            :(
-              <div className="timer-part">
-                <span>{__('Before refresh')}</span>
-                <CountdownTimer countdownId="sanka-refresh"
-                                completeTime={refreshed.nextTime}
-                                tickCallback={this.refreshTick} />
-              </div>
-            )
+            Boolean(isTimeUp && !refreshed.status)
+            &&
+            <div className="timer-part">
+              <span>{__('Before refresh')}</span>
+              <CountdownTimer countdownId="sanka-refresh"
+                              completeTime={refreshed.nextTime}
+                              tickCallback={this.refreshTick} />
+            </div>
           }
         </div>
       </div>

@@ -38,7 +38,7 @@
   .timer-panel {
     display: flex;
     justify-content: space-around;
-    margin: 15px;
+    margin: 15px 0;
     .timer-container {
       display: flex;
       flex-direction: column;
@@ -169,6 +169,104 @@
         display: block;
         width: 80%;
         margin: 10px auto;
+      }
+    }
+  }
+  .rank-block {
+    width: 180px;
+    padding: 0 10px;
+    width: 50%;
+    .panel {
+      position: absolute;
+      width: 100%;
+      top: 52px;
+      .panel-body {
+        display: flex;
+        justify-content: space-around;
+        align-items: baseline;
+      }
+    }
+    .table {
+      width: 180px;
+      height: 200px;
+      th {
+        p {
+          margin: 0;
+        }
+        &:nth-child(1) {
+          .checkbox {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+  .rate-block {
+    width: 50%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 17px;
+    .rate-calc {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      transition-delay: .7s;
+      transition: .3s;
+      .rate-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        margin: 10px auto;
+        .rate-part {
+          display: flex;
+          flex-direction: column;
+          &:nth-child(odd) {
+            text-align: center;
+          }
+          &:nth-child(even) {
+            font-size: 14px;
+          }
+        }
+      }
+      span {
+        margin: 3px auto;
+      }
+    }
+    .panel {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      .form-group {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        label {
+          font-size: 16px;
+        }
+        input {
+          width: 100px;
+          display: inline-block;
+          margin-left: 15px;
+          font-size: 14px;
+        }
+      }
+      .checkbox {
+        font-size: 15px;
+      }
+      .rate-btns {
+        display: flex;
+        justify-content: space-around;
+        & > button {
+         &:last-child, &:nth-last-child(2) {
+           width: 40%;
+           display: block;
+           margin: 0 auto;
+         }
+       }
       }
     }
   }
