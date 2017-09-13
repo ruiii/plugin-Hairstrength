@@ -5,12 +5,10 @@ import { Button, Checkbox, Panel, Table } from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
 import { forEach, includes } from 'lodash'
 import { __, getStatusStyle } from './utils'
-import { activeRankChange } from '../redux/actions'
 import {
   activeRankSelector,
   updateTimerDetailSelector,
   userDetailInitSelector,
-  userInitInfoSelector,
 } from '../redux/selectors'
 
 export default connect(
@@ -18,30 +16,22 @@ export default connect(
     activeRankSelector,
     updateTimerDetailSelector,
     userDetailInitSelector,
-    userInitInfoSelector,
-  ], ({ activeRank }, timerDetail, { updatedDetail }, { api_nickname }) =>
-    ({ activeRank, timerDetail, updatedDetail, api_nickname })),
-  { activeRankChange }
+  ], ({ activeRank }, timerDetail, { updatedDetail }) =>
+    ({ activeRank, timerDetail, updatedDetail })),
 )(class RankBlock extends Component {
   constructor(props) {
     super(props)
   }
-  onClickCheckbox = (index) => {
-    const activeRank = this.props.activeRank
-    activeRank[index].active = !activeRank[index].active
-    this.props.activeRankChange(activeRank)
-  }
   render() {
-    const { activeRank, timerDetail, updatedDetail, api_nickname } = this.props
-    const { updatedList, isUpdated } = timerDetail
+    const { activeRank, timerDetail, updatedDetail } = this.props
+    const { updatedList } = timerDetail
     const { rank, rate } = updatedDetail
 
     return (
       <div className="rank-block">
-        <Table responsive>
+        <Table bordered responsive>
           <thead>
             <tr>
-              <th>#</th>
               <th>{ __('Ranking') }</th>
               <th>{ __('Rate') }</th>
             </tr>
@@ -50,10 +40,6 @@ export default connect(
             {
               Object.keys(activeRank).map(rank =>
                 <tr key={rank} style={getStatusStyle(activeRank[rank].active)}>
-                  <th>
-                    <Checkbox onChange={this.onClickCheckbox.bind(this, rank)}
-                              checked={activeRank[rank].active} />
-                  </th>
                   <th>{ rank }</th>
                   <th style={getStatusStyle(updatedList[rank])}>
                     { `${activeRank[rank].rate} ( ↑${activeRank[rank].delta} )` }
@@ -62,7 +48,6 @@ export default connect(
               )
             }
             <tr>
-              <th>{ api_nickname }</th>
               <th>
                 <p>{ rank.value.toFixed(0) }</p>
                 <p>

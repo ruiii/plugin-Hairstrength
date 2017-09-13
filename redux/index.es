@@ -24,7 +24,7 @@ import {
   pickStoreData,
 } from '../components/utils'
 import {
-  ACTIVE_RANK_UPDATE,
+  // ACTIVE_RANK_UPDATE,
   RATE_HISTORY_SHOW,
   RATE_CUSTOM_SHOW,
   RATE_FILTER_SHOW,
@@ -308,11 +308,11 @@ function rankReducer(state = initialState.rank, action) {
       },
       updatedTime,
     }
-  } else if (type === ACTIVE_RANK_UPDATE) {
-    return {
-      ...state,
-      activeRank: action.activeRank,
-    }
+//  }  else if (type === ACTIVE_RANK_UPDATE) {
+    // return {
+    //   ...state,
+    //   activeRank: action.activeRank,
+    // }
   } else if (type === '@@RATE_STORE_EORATE') {
     const { eoRate } = state
     eoRate.store = eoRate.new
@@ -435,34 +435,34 @@ function timerReducer(state = initialState.timer, action) {
       ...newState,
     }
   }
-  case ACTIVE_RANK_UPDATE: {
-    const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
-    const { counter } = state
-    let { status, nextTime } = counter.accounted
-    if (isUpdated !== counter.refreshed.status) {
-      nextTime = getRefreshTime('account')
-      status = true
-      if (nextTime > Date.now()) {
-        status = false
-      }
-    }
-    return {
-      ...state,
-      counter: {
-        ...counter,
-        accounted: {
-          ...counter.accounted,
-          status,
-          nextTime,
-        },
-        refreshed:{
-          ...counter.refreshed,
-          nextTime: getRefreshTime('next'),
-          status: isUpdated,
-        },
-      },
-    }
-  }
+  // case ACTIVE_RANK_UPDATE: {
+  //   const isUpdated = checkIsUpdated(action.activeRank, state.updatedList)
+  //   const { counter } = state
+  //   let { status, nextTime } = counter.accounted
+  //   if (isUpdated !== counter.refreshed.status) {
+  //     nextTime = getRefreshTime('account')
+  //     status = true
+  //     if (nextTime > Date.now()) {
+  //       status = false
+  //     }
+  //   }
+  //   return {
+  //     ...state,
+  //     counter: {
+  //       ...counter,
+  //       accounted: {
+  //         ...counter.accounted,
+  //         status,
+  //         nextTime,
+  //       },
+  //       refreshed:{
+  //         ...counter.refreshed,
+  //         nextTime: getRefreshTime('next'),
+  //         status: isUpdated,
+  //       },
+  //     },
+  //   }
+  // }
   case RATE_UPDATED:
     if (action.rankNo) {
       const { rankNo } = action
@@ -475,15 +475,18 @@ function timerReducer(state = initialState.timer, action) {
 
       const { counter } = state
       const { refreshed, accounted } = counter
-      refreshed.status = checkIsUpdated(rankStore.activeRank, updatedList)
+      // refreshed.status = checkIsUpdated(rankStore.activeRank, updatedList)
 
-      if (refreshed.status) {
+      // if (refreshed.status) {
+      if (!refreshed.status) {
+        refreshed.status = true
         refreshed.nextTime = getRefreshTime('next')
         accounted.nextTime = getRefreshTime('account')
         if (accounted.nextTime > Date.now()) {
           accounted.status = false
         }
       }
+
 
       return {
         ...state,
