@@ -1,9 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox } from 'react-bootstrap'
+import { Button, FormGroup, FormControl, ControlLabel, Panel, Checkbox, Table } from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
-import { expSelector, customSelector, updatedRateSelector, customShowSelector, eoRateSelector } from '../redux/selectors'
+import {
+  expSelector,
+  customSelector,
+  updatedRateSelector,
+  customShowSelector,
+  eoRateSelector,
+  userDetailInitSelector,
+} from '../redux/selectors'
 import { __, estimateSenka, getStatusStyle } from './utils'
 import { customChange, showCustom } from '../redux/actions'
 
@@ -14,8 +21,9 @@ export default connect(
     updatedRateSelector,
     customShowSelector,
     eoRateSelector,
-  ], ({ exp }, { custom }, { updatedRate }, { customShow }, { eoRate }) =>
-    ({ exp, custom, updatedRate, customShow, eoRate })),
+    userDetailInitSelector,
+  ], ({ exp }, { custom }, { updatedRate }, { customShow }, { eoRate }, { updatedDetail }) =>
+    ({ exp, custom, updatedRate, customShow, eoRate, updatedDetail })),
   { customChange, showCustom }
 )(class RatePanel extends Component{
   constructor(props) {
@@ -136,16 +144,13 @@ export default connect(
     }
   }
   render() {
-    const { exp, custom, customShow, eoRate } = this.props
+    const { exp, custom, customShow, eoRate, updatedDetail } = this.props
     const { baseExp, baseRate, enable, auto } = custom
     const { _customExp, _customRate, _enable, _auto, btnDisable } = this.state
     const rate = estimateSenka(exp, baseExp) + eoRate.new
 
     return (
       <div className="rate-block">
-        <Button onClick={this.props.showCustom}>
-          <FontAwesome className="setting-icon" key={0} name='gear' />
-        </Button>
         <Panel collapsible expanded={customShow}>
           <div style={getStatusStyle(!_auto)}>
             <FormGroup>
@@ -192,6 +197,39 @@ export default connect(
             </Button>
           </div>
         </Panel>
+        <Table bordered responsive>
+          <thead>
+            <tr>
+              <th onClick={this.props.showCustom}>
+                <FontAwesome className="setting-icon" key={0} name='gear' />
+              </th>
+              <th>
+                <p></p>
+              </th>
+              <th>
+                <p></p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>{ __('Ranking') }</th>
+              <th>{ updatedDetail.rank.value.toFixed(0) }</th>
+              <th>
+                {
+                  updatedDetail.rank.delta > 0
+                  ? `↓${updatedDetail.rank.delta.toFixed(0)}`
+                  : `↑${Math.abs(updatedDetail.rank.delta).toFixed(0)}`
+                }
+              </th>
+            </tr>
+            <tr>
+              <th>{ __('Rate') }</th>
+              <th>{ updatedDetail.rate.value.toFixed(1) }</th>
+              <th>{ updatedDetail.rate.delta > 0 && `↑${updatedDetail.rate.delta.toFixed(1)}` }</th>
+            </tr>
+          </tbody>
+        </Table>
         {
           !isNaN(exp)
           ? (

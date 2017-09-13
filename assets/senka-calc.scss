@@ -49,7 +49,6 @@
       .timer-part {
         margin: 3px 0;
         width: 100%;
-        text-align: center;
         span {
           margin-left: 10px;
         }
@@ -206,7 +205,6 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    font-size: 17px;
     .rate-calc {
       width: 100%;
       display: flex;
@@ -214,6 +212,7 @@
       align-items: baseline;
       transition-delay: .7s;
       transition: .3s;
+      font-size: 17px;
       .rate-container {
         display: flex;
         flex-direction: column;
